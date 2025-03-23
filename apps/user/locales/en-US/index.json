@@ -5,6 +5,7 @@
   "Month": "Month",
   "NoLimit": "No Limit",
   "Year": "Year",
+  "discount": "Discount",
   "global_map_description": "Explore seamless global connectivity. Choose network services that suit your needs and stay connected anytime, anywhere.",
   "global_map_itle": "Global Connection, Easy and Worry-free",
   "locations": "Locations",
@@ -14,6 +15,7 @@
   "started": "Get Started",
   "subscribe": "Subscribe",
   "tos": "Terms of Service",
+  "total": "Total",
   "users": "Users",
   "welcome": "Welcome to"
 }

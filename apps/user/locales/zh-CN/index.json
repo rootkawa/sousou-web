@@ -5,6 +5,7 @@
   "Month": "月",
   "NoLimit": "无限制",
   "Year": "年",
+  "discount": "折扣",
   "global_map_description": "探索无缝的全球连接。选择符合您需求的网络服务，随时随地保持连接。",
   "global_map_itle": "全球互联，轻松无忧",
   "locations": "地区",
@@ -14,6 +15,7 @@
   "started": "开始使用",
   "subscribe": "订阅",
   "tos": "服务协议",
+  "total": "总计",
   "users": "用户",
   "welcome": "欢迎来到"
 }
