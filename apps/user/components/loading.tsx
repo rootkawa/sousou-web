@@ -13,7 +13,16 @@ export default function Loading({ loading = true }: LoadingProps) {
     >
       <div className='flex min-h-screen items-center justify-center'>
         <div className='text-center'>
-          <div className='border-primary mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-t-2'></div>
+          <div className='relative mx-auto mb-4'>
+            <div className='border-primary h-24 w-24 animate-spin rounded-full border-b-2 border-t-2'></div>
+            <div className='absolute inset-0 flex items-center justify-center'>
+              <img
+                src='loading.gif'
+                alt='Loading'
+                className='h-16 w-16 rounded-full object-cover'
+              />
+            </div>
+          </div>
           <p className='text-muted-foreground text-lg'>Loading...</p>
         </div>
       </div>
