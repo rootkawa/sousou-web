@@ -3,13 +3,13 @@
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { SubscriptionCard } from './subscription-card';
+
 interface ProductShowcaseProps {
   subscriptionData: API.Subscribe[];
 }
 
 export function Content({ subscriptionData }: ProductShowcaseProps) {
   const t = useTranslations('index');
-
   return (
     <motion.section
       initial={{ opacity: 0 }}
@@ -33,26 +33,32 @@ export function Content({ subscriptionData }: ProductShowcaseProps) {
       >
         {t('product_showcase_description')}
       </motion.p>
-      <div className='mx-auto flex flex-wrap justify-center gap-8 overflow-x-auto overflow-y-hidden *:max-w-80 *:flex-auto'>
-        {subscriptionData?.map((item, index) => (
-          <motion.div
-            key={item.id}
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.5 }}
-            transition={{ duration: 0.5, delay: index * 0.1 }}
-            className='w-1/2 lg:w-1/4'
-          >
-            {item.discount?.map((discountTier, discountIndex) => (
-              <SubscriptionCard
-                key={`${discountTier.quantity}`}
-                item={item}
-                discountTier={discountTier}
-                t={t}
-              />
-            ))}
-          </motion.div>
-        ))}
+
+      <div className='mx-auto grid max-w-7xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
+        {subscriptionData?.flatMap((item, index) => {
+          const allOptions = [{ quantity: 1, discount: 100 }, ...(item.discount || [])];
+
+          return allOptions.map((discountTier, discountIndex) => {
+            const isPopular = discountTier.quantity === 6;
+
+            return (
+              <motion.div
+                key={`${item.id}-${discountTier.quantity}`}
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: (index + discountIndex) * 0.1 }}
+                className='w-full'
+              >
+                <SubscriptionCard
+                  item={item}
+                  discountTier={discountTier}
+                  t={t}
+                  isPopular={isPopular}
+                />
+              </motion.div>
+            );
+          });
+        }) || []}
       </div>
     </motion.section>
   );
