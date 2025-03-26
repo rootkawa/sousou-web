@@ -29,7 +29,7 @@ export function Content({ subscriptionData }: ProductShowcaseProps) {
         initial={{ opacity: 0, y: -20 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
-        className='text-muted-foreground mb-8 text-center text-lg'
+        className='text-muted-foreground mb-16 text-center text-lg'
       >
         {t('product_showcase_description')}
       </motion.p>
