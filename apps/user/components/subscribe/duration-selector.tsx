@@ -42,7 +42,6 @@ const DurationSelector: React.FC<DurationSelectorProps> = ({
   // 查找当前选中项的折扣信息
   const currentDiscount = discounts?.find((item) => item.quantity === quantity)?.discount;
   const discountPercentage = currentDiscount ? 100 - currentDiscount : 0;
-
   return (
     <>
       <div className='font-semibold'>{t('purchaseDuration')}</div>
@@ -51,7 +50,7 @@ const DurationSelector: React.FC<DurationSelectorProps> = ({
         onValueChange={handleChange}
         className='flex flex-wrap gap-3'
       >
-        {unitTime !== 'Minute' && <DurationOption value='1' label={`1 / ${t(unitTime)}`} />}
+        {/* {unitTime !== 'Minute' && <DurationOption value='1' label={`1 / ${t(unitTime)}`} />} */}
         {discounts?.map((item) => (
           <DurationOption
             key={item.quantity}

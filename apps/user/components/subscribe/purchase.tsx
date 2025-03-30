@@ -26,8 +26,27 @@ export default function Purchase({ subscribe, setSubscribe }: Readonly<PurchaseP
   const t = useTranslations('subscribe');
   const { getUserInfo } = useGlobalStore();
   const router = useRouter();
+
+  let parsedDescription;
+  try {
+    parsedDescription = JSON.parse(subscribe?.description || `{ description: '', features: {} }`);
+  } catch {
+    parsedDescription = { description: '', features: {} };
+  }
+
+  // Extract duration and saves from features
+  let subscriptionQuantity = 1; // Default to 1
+  const features = parsedDescription.features;
+  // Simple direct property access for the dictionary
+  if (features) {
+    // Get duration/quantity from features
+    if (features.duration) {
+      subscriptionQuantity = parseFloat(features.duration) || 1;
+    }
+  }
+
   const [params, setParams] = useState<Partial<API.PurchaseOrderRequest>>({
-    quantity: 1,
+    quantity: subscriptionQuantity,
     subscribe_id: 0,
     payment: -1,
     coupon: '',
@@ -48,9 +67,28 @@ export default function Purchase({ subscribe, setSubscribe }: Readonly<PurchaseP
 
   useEffect(() => {
     if (subscribe) {
+      let parsedDescription;
+      try {
+        parsedDescription = JSON.parse(
+          subscribe?.description || `{ description: '', features: {} }`,
+        );
+      } catch {
+        parsedDescription = { description: '', features: {} };
+      }
+
+      // Extract duration and saves from features
+      let subscriptionQuantity = 1; // Default to 1
+      const features = parsedDescription.features;
+      // Simple direct property access for the dictionary
+      if (features) {
+        // Get duration/quantity from features
+        if (features.duration) {
+          subscriptionQuantity = parseFloat(features.duration) || 1;
+        }
+      }
       setParams((prev) => ({
         ...prev,
-        quantity: 1,
+        quantity: subscriptionQuantity,
         subscribe_id: subscribe?.id,
       }));
     }
