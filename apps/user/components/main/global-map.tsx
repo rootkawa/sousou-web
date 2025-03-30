@@ -26,12 +26,12 @@ export function GlobalMap() {
         initial={{ opacity: 0, y: -20 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
-        className='text-muted-foreground mb-8 text-center text-lg'
+        className='text-muted-foreground mb-1 text-center text-lg'
       >
         {t('global_map_description')}
       </motion.p>
       <motion.div
-        className='aspect-video w-full overflow-hidden'
+        className='-mb-32 -mt-20 aspect-video w-full overflow-hidden'
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{

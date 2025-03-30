@@ -24,8 +24,6 @@ export default function Home() {
   return (
     <main className='container space-y-16'>
       <Hero />
-      <GlobalMap />
-      {/* <Stats /> */}
       {/* Product Showcase Section - Full Page */}
       <section id='products' className='flex h-screen items-center'>
         <div className='container mx-auto scale-110 px-4'>
@@ -33,6 +31,8 @@ export default function Home() {
           {/* a hack (server action) is used here to fetch the subscription data */}{' '}
         </div>
       </section>
+      <GlobalMap />
+      {/* <Stats /> */}
     </main>
   );
 }
