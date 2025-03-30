@@ -35,29 +35,40 @@ export function Content({ subscriptionData }: ProductShowcaseProps) {
       </motion.p>
 
       <div className='mx-auto grid max-w-7xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
-        {subscriptionData?.flatMap((item, index) => {
-          const allOptions = [{ quantity: 1, discount: 100 }, ...(item.discount || [])];
-
-          return allOptions.map((discountTier, discountIndex) => {
-            const isPopular = discountTier.quantity === 6;
-
-            return (
-              <motion.div
-                key={`${item.id}-${discountTier.quantity}`}
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: (index + discountIndex) * 0.1 }}
-                className='w-full'
-              >
-                <SubscriptionCard
-                  item={item}
-                  discountTier={discountTier}
-                  t={t}
-                  isPopular={isPopular}
-                />
-              </motion.div>
-            );
-          });
+        {subscriptionData?.map((item, index) => {
+          const isPopular = item.name.includes('超值');
+          // Extract discount from name if format is xxxx-xxxx-xxxx
+          let subscriptionName = '';
+          try {
+            subscriptionName = item.name?.split('-')[0] || '';
+          } catch {}
+          let subscriptionDiscount = 0;
+          try {
+            subscriptionDiscount = parseFloat(item.name?.split('-')[1] || '0');
+          } catch {}
+          let subscriptionQuantity = 0;
+          try {
+            subscriptionQuantity = parseFloat(item.name?.split('-')[2] || '0');
+          } catch {}
+          return (
+            <motion.div
+              key={`${item.id}-${item.name}`}
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              className='w-full'
+            >
+              <SubscriptionCard
+                item={item}
+                subscriptionName={subscriptionName}
+                subscriptionDiscount={subscriptionDiscount}
+                subscriptionQuantity={subscriptionQuantity}
+                t={t}
+                isPopular={isPopular}
+                fromDashboard={false}
+              />
+            </motion.div>
+          );
         }) || []}
       </div>
     </motion.section>

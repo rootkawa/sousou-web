@@ -22,9 +22,9 @@ export function SubscribeDetail({ subscribe }: Readonly<SubscribeDetailProps>) {
         {subscribe?.name && (
           <li className='flex items-center justify-between'>
             <span className='text-muted-foreground line-clamp-2 flex-1'>{subscribe?.name}</span>
-            <span>
+            {/* <span>
               x <span>{subscribe?.quantity || 1}</span>
-            </span>
+            </span> */}
           </li>
         )}
         <li>

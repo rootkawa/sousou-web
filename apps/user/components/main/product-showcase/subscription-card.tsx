@@ -12,12 +12,26 @@ import { Key, ReactNode } from 'react';
 
 interface SubscriptionCardProps {
   item: API.Subscribe;
-  discountTier: API.SubscribeDiscount; // Replace with proper type if available
+  subscriptionName: string;
+  subscriptionDiscount: number; // Replace with proper type if available
+  subscriptionQuantity: number; // Replace with proper type if available
   t: ReturnType<typeof useTranslations>;
   isPopular: boolean;
+  fromDashboard: boolean;
+  onSubscribe?: () => void;
 }
 
-export function SubscriptionCard({ item, discountTier, t, isPopular }: SubscriptionCardProps) {
+export function SubscriptionCard({
+  item,
+  subscriptionName,
+  subscriptionDiscount,
+  subscriptionQuantity,
+  t,
+  isPopular,
+  fromDashboard,
+  onSubscribe,
+}: SubscriptionCardProps) {
+  console.log(item.unit_price * subscriptionQuantity);
   return (
     <div className='relative flex flex-col'>
       {/* Popular badge positioned above the card */}
@@ -33,19 +47,17 @@ export function SubscriptionCard({ item, discountTier, t, isPopular }: Subscript
         )}
       >
         {/* Discount ribbon */}
-        {discountTier.discount < 100 && (
+        {subscriptionDiscount != 0 && (
           <div className='absolute right-0 top-0 z-10 overflow-hidden'>
             <div className='relative h-20 w-20'>
               <div className='absolute right-[-40px] top-[12px] w-[140px] rotate-45 bg-slate-600 py-1.5 text-center text-sm font-medium text-white shadow-sm'>
-                {100 - discountTier.discount}% {t('off')}
+                {t('saves')} {subscriptionDiscount}%
               </div>
             </div>
           </div>
         )}
 
-        <CardHeader className='bg-muted/50 p-4 text-xl font-medium'>
-          {discountTier.quantity} {t(item.unit_time)}
-        </CardHeader>
+        <CardHeader className='bg-muted/50 p-4 text-xl font-medium'>{subscriptionName}</CardHeader>
         <CardContent className='flex flex-grow flex-col gap-4 p-6 text-sm'>
           <ul className='flex flex-grow flex-col gap-3'>
             {(() => {
@@ -107,24 +119,43 @@ export function SubscriptionCard({ item, discountTier, t, isPopular }: Subscript
             transition={{ duration: 0.5, delay: 0.2 }}
             className='pb-4'
           >
-            <div className='text-2xl font-semibold sm:text-3xl'>
-              <Display type='currency' value={(item.unit_price * discountTier.discount) / 100} />
-              <span className='text-base font-medium'>/{t(item.unit_time)}</span>
-            </div>
-            <div className='text-muted-foreground text-sm'>
-              {t('total')}:{' '}
-              <Display
-                type='currency'
-                value={(item.unit_price * discountTier.discount * discountTier.quantity) / 100}
-              />
-            </div>
+            {item.unit_time == 'Month' && (
+              <div className='text-2xl font-semibold sm:text-3xl'>
+                <Display type='currency' value={item.unit_price} />
+                <span className='text-base font-medium'>/{t(item.unit_time)}</span>
+              </div>
+            )}
+            {item.unit_time == 'Day' && (
+              <div className='text-2xl font-semibold sm:text-3xl'>
+                <Display type='currency' value={item.unit_price * subscriptionQuantity} />
+              </div>
+            )}
+            {/* <div className='text-muted-foreground text-sm'>
+              <div>
+                {t('total')}:
+                <Display
+                  type='currency'
+                  value={(item.unit_price * discountTier.discount * discountTier.quantity) / 100}
+                />
+              </div>
+            </div> */}
           </motion.div>
           <motion.div>
-            <Button className='absolute bottom-0 left-0 w-full rounded-b-xl rounded-t-none' asChild>
-              <Link href={`/purchasing?id=${item.id}&quantity=${discountTier.quantity}`}>
-                {t('subscribe')}
-              </Link>
-            </Button>
+            {fromDashboard ? (
+              <Button
+                className='absolute bottom-0 left-0 w-full rounded-b-xl rounded-t-none'
+                onClick={onSubscribe}
+              >
+                {t('buy')}
+              </Button>
+            ) : (
+              <Button
+                className='absolute bottom-0 left-0 w-full rounded-b-xl rounded-t-none'
+                asChild
+              >
+                <Link href={`/purchasing?id=${item.id}`}>{t('subscribe')}</Link>
+              </Button>
+            )}
           </motion.div>
         </CardFooter>
       </Card>

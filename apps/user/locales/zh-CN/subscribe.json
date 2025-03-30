@@ -38,6 +38,7 @@
     "stripe_alipay": "Stripe(支付宝)",
     "stripe_wechat_pay": "Stripe(微信)"
   },
+  "most_popular": "最受欢迎",
   "paymentMethod": "支付方式",
   "productDescription": "商品描述",
   "products": "商品",
@@ -52,6 +53,7 @@
   "resetTraffic": "重置流量",
   "resetTrafficDescription": "将流量重置为零，并开始新的计费周期",
   "resetTrafficTitle": "重置流量",
+  "saves": "立省",
   "unsubscribe": {
     "cancel": "取消",
     "confirm": "确认",
