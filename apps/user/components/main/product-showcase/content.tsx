@@ -37,19 +37,30 @@ export function Content({ subscriptionData }: ProductShowcaseProps) {
       <div className='mx-auto grid max-w-7xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
         {subscriptionData?.map((item, index) => {
           const isPopular = item.name.includes('超值');
-          // Extract discount from name if format is xxxx-xxxx-xxxx
-          let subscriptionName = '';
+
+          let parsedDescription;
           try {
-            subscriptionName = item.name?.split('-')[0] || '';
-          } catch {}
-          let subscriptionDiscount = 0;
-          try {
-            subscriptionDiscount = parseFloat(item.name?.split('-')[1] || '0');
-          } catch {}
-          let subscriptionQuantity = 0;
-          try {
-            subscriptionQuantity = parseFloat(item.name?.split('-')[2] || '0');
-          } catch {}
+            parsedDescription = JSON.parse(item.description);
+          } catch {
+            parsedDescription = { description: '', features: {} };
+          }
+
+          // Extract duration and saves from features
+          let subscriptionQuantity = 1; // Default to 1
+          let subscriptionDiscount = 0; // Default to 0
+          const features = parsedDescription.features;
+          // Simple direct property access for the dictionary
+          if (features) {
+            // Get duration/quantity from features
+            if (features.duration) {
+              subscriptionQuantity = parseFloat(features.duration) || 1;
+            }
+
+            // Get saves/discount from features
+            if (features.saves) {
+              subscriptionDiscount = parseFloat(features.saves) || 0;
+            }
+          }
           return (
             <motion.div
               key={`${item.id}-${item.name}`}
@@ -60,7 +71,6 @@ export function Content({ subscriptionData }: ProductShowcaseProps) {
             >
               <SubscriptionCard
                 item={item}
-                subscriptionName={subscriptionName}
                 subscriptionDiscount={subscriptionDiscount}
                 subscriptionQuantity={subscriptionQuantity}
                 t={t}

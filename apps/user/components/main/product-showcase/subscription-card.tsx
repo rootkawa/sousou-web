@@ -3,16 +3,13 @@ import { SubscribeDetail } from '@/components/subscribe/detail';
 import { Button } from '@workspace/ui/components/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@workspace/ui/components/card';
 import { Separator } from '@workspace/ui/components/separator';
-import { Icon } from '@workspace/ui/custom-components/icon';
 import { cn } from '@workspace/ui/lib/utils';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
-import { Key, ReactNode } from 'react';
 
 interface SubscriptionCardProps {
   item: API.Subscribe;
-  subscriptionName: string;
   subscriptionDiscount: number; // Replace with proper type if available
   subscriptionQuantity: number; // Replace with proper type if available
   t: ReturnType<typeof useTranslations>;
@@ -23,7 +20,6 @@ interface SubscriptionCardProps {
 
 export function SubscriptionCard({
   item,
-  subscriptionName,
   subscriptionDiscount,
   subscriptionQuantity,
   t,
@@ -31,7 +27,6 @@ export function SubscriptionCard({
   fromDashboard,
   onSubscribe,
 }: SubscriptionCardProps) {
-  console.log(item.unit_price * subscriptionQuantity);
   return (
     <div className='relative flex flex-col'>
       {/* Popular badge positioned above the card */}
@@ -57,53 +52,8 @@ export function SubscriptionCard({
           </div>
         )}
 
-        <CardHeader className='bg-muted/50 p-4 text-xl font-medium'>{subscriptionName}</CardHeader>
+        <CardHeader className='bg-muted/50 p-4 text-xl font-medium'>{item.name}</CardHeader>
         <CardContent className='flex flex-grow flex-col gap-4 p-6 text-sm'>
-          <ul className='flex flex-grow flex-col gap-3'>
-            {(() => {
-              let parsedDescription;
-              try {
-                parsedDescription = JSON.parse(item.description);
-              } catch {
-                parsedDescription = { description: '', features: [] };
-              }
-
-              const { description, features } = parsedDescription;
-              return (
-                <>
-                  {description && <li className='text-muted-foreground'>{description}</li>}
-                  {features.map(
-                    (
-                      feature: {
-                        type: string;
-                        icon: string;
-                        label: ReactNode;
-                      },
-                      index: Key,
-                    ) => (
-                      <li
-                        className={cn('flex items-center gap-2', {
-                          'text-muted-foreground line-through': feature.type === 'destructive',
-                        })}
-                        key={index}
-                      >
-                        {feature.icon && (
-                          <Icon
-                            icon={feature.icon}
-                            className={cn('text-primary size-5', {
-                              'text-green-500': feature.type === 'success',
-                              'text-destructive': feature.type === 'destructive',
-                            })}
-                          />
-                        )}
-                        {feature.label}
-                      </li>
-                    ),
-                  )}
-                </>
-              );
-            })()}
-          </ul>
           <SubscribeDetail
             subscribe={{
               ...item,
