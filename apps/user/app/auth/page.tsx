@@ -31,17 +31,21 @@ export default function Page() {
     },
   ].filter((method) => method.enabled);
 
+  const Logo = (
+    <Link href='/' className='flex items-center gap-2 text-lg font-bold'>
+      {site.site_logo && (
+        <Image src={site.site_logo} width={112} height={112} alt='logo' unoptimized />
+      )}
+      <span className=''>{site.site_name}</span>
+    </Link>
+  );
+
   return (
     <main className='bg-muted/50 flex h-full min-h-screen items-center'>
       <div className='flex size-full flex-auto flex-col lg:flex-row'>
         <div className='flex bg-cover bg-center lg:w-1/2 lg:flex-auto'>
           <div className='lg:py-15 md:px-15 flex w-full flex-col items-center justify-center px-5 py-7'>
-            <Link className='mb-0 flex flex-col items-center lg:mb-12' href='/'>
-              {site.site_logo && (
-                <Image src={site.site_logo} height={48} width={48} alt='logo' unoptimized />
-              )}
-              <span className='text-2xl font-semibold'>{site.site_name}</span>
-            </Link>
+            {Logo}
             <DotLottieReact
               data={LoginLottie}
               autoplay

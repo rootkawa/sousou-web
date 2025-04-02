@@ -17,7 +17,7 @@ export default function Header() {
   const Logo = (
     <Link href='/' className='flex items-center gap-2 text-lg font-bold'>
       {site.site_logo && (
-        <Image src={site.site_logo} width={48} height={48} alt='logo' unoptimized />
+        <Image src={site.site_logo} width={112} height={112} alt='logo' unoptimized />
       )}
       <span className=''>{site.site_name}</span>
     </Link>
