@@ -6,7 +6,7 @@ import { Input } from '@workspace/ui/components/input';
 import { Icon } from '@workspace/ui/custom-components/icon';
 import { Markdown } from '@workspace/ui/custom-components/markdown';
 import { useTranslations } from 'next-intl';
-import { Dispatch, SetStateAction, useRef } from 'react';
+import { Dispatch, SetStateAction, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import SendCode from '../send-code';
@@ -71,10 +71,24 @@ export default function RegisterForm({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      ...initialValues,
+      email: initialValues?.email || '',
+      password: initialValues?.password || '',
+      repeat_password: '',
+      code: '',
       invite: localStorage.getItem('invite') || '',
+      cf_token: '',
     },
   });
+
+  useEffect(() => {
+    if (initialValues) {
+      form.reset({
+        ...form.getValues(),
+        email: initialValues.email || '',
+        password: initialValues.password || '',
+      });
+    }
+  }, [initialValues, form]);
 
   const turnstile = useRef<TurnstileRef>(null);
   const handleSubmit = form.handleSubmit((data) => {
@@ -206,7 +220,7 @@ export default function RegisterForm({
           variant='link'
           className='p-0'
           onClick={() => {
-            setInitialValues(undefined);
+            setInitialValues({ email: '', password: '' });
             onSwitchForm('login');
           }}
         >

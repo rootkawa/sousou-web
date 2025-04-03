@@ -80,7 +80,7 @@ export default function ResetForm({
                       placeholder='Enter code...'
                       type='text'
                       {...field}
-                      value={field.value as string}
+                      value={field.value ?? ''}
                     />
                     <SendCode
                       type='email'

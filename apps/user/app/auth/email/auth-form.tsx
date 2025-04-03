@@ -6,9 +6,11 @@ import { useRouter } from 'next/navigation';
 import { ReactNode, useState, useTransition } from 'react';
 import { toast } from 'sonner';
 
+import { SurveyRedirectDialog } from '@/components/survey';
 import {
   NEXT_PUBLIC_DEFAULT_USER_EMAIL,
   NEXT_PUBLIC_DEFAULT_USER_PASSWORD,
+  NEXT_PUBLIC_SURVEY_URL,
 } from '@/config/constants';
 import { getRedirectUrl, setAuthorization } from '@/utils/common';
 import LoginForm from './login-form';
@@ -24,9 +26,10 @@ export default function EmailAuthForm() {
     email?: string;
     password?: string;
   }>({
-    email: NEXT_PUBLIC_DEFAULT_USER_EMAIL,
-    password: NEXT_PUBLIC_DEFAULT_USER_PASSWORD,
+    email: NEXT_PUBLIC_DEFAULT_USER_EMAIL || '',
+    password: NEXT_PUBLIC_DEFAULT_USER_PASSWORD || '',
   });
+  const [showRedirectAlert, setShowRedirectAlert] = useState(false);
 
   const handleFormSubmit = async (params: any) => {
     const onLogin = async (token?: string) => {
@@ -47,7 +50,21 @@ export default function EmailAuthForm() {
           case 'register': {
             const create = await userRegister(params);
             toast.success(t('register.success'));
-            onLogin(create.data.data?.token);
+
+            // Get token from response
+            const token = create.data.data?.token;
+
+            // Only proceed if we have a valid token (registration succeeded)
+            if (!token) {
+              toast.error(t('register.tokenError') || 'Registration failed, please try again');
+              break;
+            }
+
+            // Store token for authentication
+            setAuthorization(token);
+
+            // Show the survey dialog
+            setShowRedirectAlert(true);
             break;
           }
           case 'reset':
@@ -99,5 +116,15 @@ export default function EmailAuthForm() {
       break;
   }
 
-  return UserForm;
+  return (
+    <>
+      {UserForm}
+      <SurveyRedirectDialog
+        open={showRedirectAlert}
+        onOpenChange={setShowRedirectAlert}
+        redirectUrl={NEXT_PUBLIC_SURVEY_URL || '/dashboard'}
+        t={t}
+      />
+    </>
+  );
 }
