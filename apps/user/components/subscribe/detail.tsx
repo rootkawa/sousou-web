@@ -19,14 +19,14 @@ export function SubscribeDetail({ subscribe }: Readonly<SubscribeDetailProps>) {
     <>
       <div className='font-semibold'>{t('productDetail')}</div>
       <ul className='grid grid-cols-1 gap-3 *:flex *:items-center *:justify-between lg:grid-cols-1'>
-        {subscribe?.name && (
+        {/* {subscribe?.name && (
           <li className='flex items-center justify-between'>
             <span className='text-muted-foreground line-clamp-2 flex-1'>{subscribe?.name}</span>
             <span>
               x <span>{subscribe?.quantity || 1}</span>
             </span>
           </li>
-        )}
+        )} */}
         <li>
           <span className='text-muted-foreground'>{t('availableTraffic')}</span>
           <span>

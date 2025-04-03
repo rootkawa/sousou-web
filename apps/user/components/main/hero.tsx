@@ -38,7 +38,7 @@ export function Hero() {
             className='*:text-muted-foreground mb-8 max-w-xl'
           />
         )}
-        <Link href={user ? '/dashboard' : '/auth'}>
+        <Link href='#products'>
           <HoverBorderGradient
             containerClassName='rounded-full'
             as='button'

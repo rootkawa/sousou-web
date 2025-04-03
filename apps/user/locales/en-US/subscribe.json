@@ -38,6 +38,7 @@
     "stripe_alipay": "Stripe (Alipay)",
     "stripe_wechat_pay": "Stripe (WeChat)"
   },
+  "most_popular": "Most Popular",
   "paymentMethod": "Payment Method",
   "productDescription": "Product Description",
   "products": "Products",
@@ -52,6 +53,7 @@
   "resetTraffic": "Reset Traffic",
   "resetTrafficDescription": "Reset traffic to zero, and start a new billing cycle",
   "resetTrafficTitle": "Reset Traffic",
+  "saves": "Save",
   "unsubscribe": {
     "cancel": "Cancel",
     "confirm": "Confirm",

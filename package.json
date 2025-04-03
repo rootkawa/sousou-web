@@ -22,7 +22,7 @@
     "lint": "turbo lint",
     "locale": "turbo locale && bun prettier",
     "openapi": "turbo openapi && bun prettier",
-    "prepare": "./scripts/prepare.sh",
+    "prepare": "husky",
     "prettier": "prettier --write \"**/*.{ts,tsx,js,jsx,cjs,mjs,md,json}\"",
     "release": "semantic-release",
     "update:deps": "./scripts/update-deps.sh",

@@ -47,33 +47,12 @@
     "typescript": "^5.7.3"
   },
   "i18n": {
-    "entry": "./locales/en-US",
-    "entryLocale": "en-US",
+    "entry": "./locales/zh-CN",
+    "entryLocale": "zh-CN",
     "output": "./locales",
     "outputLocales": [
-      "cs-CZ",
-      "de-DE",
       "en-US",
-      "es-ES",
-      "es-MX",
-      "fa-IR",
-      "fi-FI",
-      "fr-FR",
-      "hi-IN",
-      "hu-HU",
-      "ja-JP",
-      "ko-KR",
-      "no-NO",
-      "pl-PL",
-      "pt-BR",
-      "ro-RO",
-      "ru-RU",
-      "th-TH",
-      "tr-TR",
-      "uk-UA",
-      "vi-VN",
-      "zh-CN",
-      "zh-HK"
+      "zh-CN"
     ],
     "modelName": "gpt-4o-mini",
     "experimental": {

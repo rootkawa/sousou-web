@@ -1,17 +1,8 @@
 'use client';
 
-import { Display } from '@/components/display';
-import { SubscribeDetail } from '@/components/subscribe/detail';
-import useGlobalStore from '@/config/use-global';
-import { Button } from '@workspace/ui/components/button';
-import { Card, CardContent, CardFooter, CardHeader } from '@workspace/ui/components/card';
-import { Separator } from '@workspace/ui/components/separator';
-import { Icon } from '@workspace/ui/custom-components/icon';
-import { cn } from '@workspace/ui/lib/utils';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
-import Link from 'next/link';
-import { Key, ReactNode } from 'react';
+import { SubscriptionCard } from './subscription-card';
 
 interface ProductShowcaseProps {
   subscriptionData: API.Subscribe[];
@@ -19,9 +10,6 @@ interface ProductShowcaseProps {
 
 export function Content({ subscriptionData }: ProductShowcaseProps) {
   const t = useTranslations('index');
-
-  const { user } = useGlobalStore();
-
   return (
     <motion.section
       initial={{ opacity: 0 }}
@@ -41,101 +29,57 @@ export function Content({ subscriptionData }: ProductShowcaseProps) {
         initial={{ opacity: 0, y: -20 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
-        className='text-muted-foreground mb-8 text-center text-lg'
+        className='text-muted-foreground mb-16 text-center text-lg'
       >
         {t('product_showcase_description')}
       </motion.p>
-      <div className='mx-auto flex flex-wrap justify-center gap-8 overflow-x-auto overflow-y-hidden *:max-w-80 *:flex-auto'>
-        {subscriptionData?.map((item, index) => (
-          <motion.div
-            key={item.id}
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.5 }}
-            transition={{ duration: 0.5, delay: index * 0.1 }}
-            className='w-1/2 lg:w-1/4'
-          >
-            <Card className='flex flex-col overflow-hidden rounded-lg shadow-lg transition-shadow duration-300 hover:shadow-2xl'>
-              <CardHeader className='bg-muted/50 p-4 text-xl font-medium'>{item.name}</CardHeader>
-              <CardContent className='flex flex-grow flex-col gap-4 p-6 text-sm'>
-                <ul className='flex flex-grow flex-col gap-3'>
-                  {(() => {
-                    let parsedDescription;
-                    try {
-                      parsedDescription = JSON.parse(item.description);
-                    } catch {
-                      parsedDescription = { description: '', features: [] };
-                    }
 
-                    const { description, features } = parsedDescription;
-                    return (
-                      <>
-                        {description && <li className='text-muted-foreground'>{description}</li>}
-                        {features?.map(
-                          (
-                            feature: {
-                              type: string;
-                              icon: string;
-                              label: ReactNode;
-                            },
-                            index: Key,
-                          ) => (
-                            <li
-                              className={cn('flex items-center gap-2', {
-                                'text-muted-foreground line-through':
-                                  feature.type === 'destructive',
-                              })}
-                              key={index}
-                            >
-                              {feature.icon && (
-                                <Icon
-                                  icon={feature.icon}
-                                  className={cn('text-primary size-5', {
-                                    'text-green-500': feature.type === 'success',
-                                    'text-destructive': feature.type === 'destructive',
-                                  })}
-                                />
-                              )}
-                              {feature.label}
-                            </li>
-                          ),
-                        )}
-                      </>
-                    );
-                  })()}
-                </ul>
-                <SubscribeDetail
-                  subscribe={{
-                    ...item,
-                    name: undefined,
-                  }}
-                />
-              </CardContent>
-              <Separator />
-              <CardFooter className='relative flex flex-col gap-4 p-4'>
-                <motion.h2
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.5, delay: 0.2 }}
-                  className='pb-4 text-2xl font-semibold sm:text-3xl'
-                >
-                  <Display type='currency' value={item.unit_price} />
-                  <span className='text-base font-medium'>/{t(item.unit_time)}</span>
-                </motion.h2>
-                <motion.div>
-                  <Button
-                    className='absolute bottom-0 left-0 w-full rounded-b-xl rounded-t-none'
-                    asChild
-                  >
-                    <Link href={user ? '/subscribe' : `/purchasing?id=${item.id}`}>
-                      {t('subscribe')}
-                    </Link>
-                  </Button>
-                </motion.div>
-              </CardFooter>
-            </Card>
-          </motion.div>
-        ))}
+      <div className='mx-auto grid max-w-7xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
+        {subscriptionData?.map((item, index) => {
+          const isPopular = item.name.includes('超值');
+
+          let parsedDescription;
+          try {
+            parsedDescription = JSON.parse(item.description);
+          } catch {
+            parsedDescription = { description: '', features: {} };
+          }
+
+          // Extract duration and saves from features
+          let subscriptionQuantity = 1; // Default to 1
+          let subscriptionDiscount = 0; // Default to 0
+          const features = parsedDescription.features;
+          // Simple direct property access for the dictionary
+          if (features) {
+            // Get duration/quantity from features
+            if (features.duration) {
+              subscriptionQuantity = parseFloat(features.duration) || 1;
+            }
+
+            // Get saves/discount from features
+            if (features.saves) {
+              subscriptionDiscount = parseFloat(features.saves) || 0;
+            }
+          }
+          return (
+            <motion.div
+              key={`${item.id}-${item.name}`}
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              className='w-full'
+            >
+              <SubscriptionCard
+                item={item}
+                subscriptionDiscount={subscriptionDiscount}
+                subscriptionQuantity={subscriptionQuantity}
+                t={t}
+                isPopular={isPopular}
+                fromDashboard={false}
+              />
+            </motion.div>
+          );
+        }) || []}
       </div>
     </motion.section>
   );
