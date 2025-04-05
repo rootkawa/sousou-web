@@ -12,6 +12,7 @@
   "dependencies": {
     "@stripe/react-stripe-js": "^3.4.0",
     "@stripe/stripe-js": "^6.0.0",
+    "@tabler/icons-react": "^3.31.0",
     "@tanstack/react-query": "^5.63.0",
     "@tanstack/react-query-next-experimental": "^5.63.0",
     "@workspace/ui": "workspace:*",

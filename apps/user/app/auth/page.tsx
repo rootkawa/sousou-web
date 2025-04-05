@@ -1,12 +1,11 @@
 'use client';
 
+import { AuthCarousel } from '@/components/auth/auth-carousel';
 import { OAuthMethods } from '@/components/auth/oauth-methods';
 import LanguageSwitch from '@/components/language-switch';
 import ThemeSwitch from '@/components/theme-switch';
 import useGlobalStore from '@/config/use-global';
-import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@workspace/ui/components/tabs';
-import LoginLottie from '@workspace/ui/lotties/login.json';
 import { useTranslations } from 'next-intl';
 import Image from 'next/legacy/image';
 import Link from 'next/link';
@@ -32,29 +31,34 @@ export default function Page() {
   ].filter((method) => method.enabled);
 
   const Logo = (
-    <Link href='/' className='flex items-center gap-2 text-lg font-bold'>
-      {site.site_logo && (
-        <Image src={site.site_logo} width={112} height={112} alt='logo' unoptimized />
-      )}
-      <span className=''>{site.site_name}</span>
-    </Link>
+    <div className='flex flex-col'>
+      <Link href='/' className='flex items-center gap-2'>
+        {site.site_logo && (
+          <div className='relative h-16 w-32 overflow-hidden'>
+            <Image
+              src={site.site_logo}
+              layout='fill'
+              alt='logo'
+              unoptimized
+              className='scale-150 object-contain'
+            />
+          </div>
+        )}
+        <span className='text-2xl font-bold'>{site.site_name}</span>
+      </Link>
+      <span className='text-muted-foreground mt-1 text-sm'>{site.site_desc}</span>
+    </div>
   );
 
   return (
     <main className='bg-muted/50 flex h-full min-h-screen items-center'>
       <div className='flex size-full flex-auto flex-col lg:flex-row'>
         <div className='flex bg-cover bg-center lg:w-1/2 lg:flex-auto'>
-          <div className='lg:py-15 md:px-15 flex w-full flex-col items-center justify-center px-5 py-7'>
+          <div className='lg:py-15 flex w-full flex-col items-center justify-center px-5 py-7 md:px-10'>
             {Logo}
-            <DotLottieReact
-              data={LoginLottie}
-              autoplay
-              loop
-              className='mx-auto hidden w-[275px] lg:block xl:w-[500px]'
-            />
-            <p className='hidden w-[275px] text-center md:w-1/2 lg:block xl:w-[500px]'>
-              {site.site_desc}
-            </p>
+            <div className='mt-6 flex w-full justify-center'>
+              <AuthCarousel t={t} />
+            </div>
           </div>
         </div>
         <div className='flex flex-initial justify-center p-12 lg:flex-auto lg:justify-end'>
