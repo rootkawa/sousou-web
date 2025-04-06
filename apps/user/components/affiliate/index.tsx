@@ -1,25 +1,16 @@
 'use client';
 
-import { Display } from '@/components/display';
 import { Empty } from '@/components/empty';
 import { ProList } from '@/components/pro-list';
 import useGlobalStore from '@/config/use-global';
 import { queryUserAffiliate, queryUserAffiliateList } from '@/services/user/user';
 import { useQuery } from '@tanstack/react-query';
-import { Button } from '@workspace/ui/components/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@workspace/ui/components/card';
-import { formatDate, isBrowser } from '@workspace/ui/utils';
-import { Copy } from 'lucide-react';
+import { Card, CardContent } from '@workspace/ui/components/card';
+import { formatDate } from '@workspace/ui/utils';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { toast } from 'sonner';
+import { CommissionCard } from './commission-card';
+import { ReferralCodeCard } from './referral-code-card';
 
 export default function Affiliate() {
   const t = useTranslations('affiliate');
@@ -35,49 +26,13 @@ export default function Affiliate() {
 
   return (
     <div className='flex flex-col gap-4'>
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('totalCommission')}</CardTitle>
-          <CardDescription>{t('commissionInfo')}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className='flex items-baseline gap-2'>
-            <span className='text-3xl font-bold'>
-              <Display type='currency' value={data?.total_commission} />
-            </span>
-            <span className='text-muted-foreground text-sm'>
-              ({t('commissionRate')}: {common?.invite?.referral_percentage}%)
-            </span>
-          </div>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader className='flex flex-row items-center justify-between space-y-0'>
-          <CardTitle className='text-lg font-medium'>{t('inviteCode')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className='flex items-center justify-between'>
-            <code className='bg-muted rounded px-2 py-1 text-2xl font-bold'>
-              {user?.refer_code}
-            </code>
-            {isBrowser() && (
-              <CopyToClipboard
-                text={`${location?.origin}/auth?invite=${user?.refer_code}`}
-                onCopy={(text, result) => {
-                  if (result) {
-                    toast.success(t('copySuccess'));
-                  }
-                }}
-              >
-                <Button variant='secondary' size='sm' className='gap-2'>
-                  <Copy className='h-4 w-4' />
-                  {t('copyInviteLink')}
-                </Button>
-              </CopyToClipboard>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      <CommissionCard totalCommission={data?.total_commission} />
+
+      <ReferralCodeCard
+        referCode={user?.refer_code}
+        referralPercentage={common?.invite?.referral_percentage}
+      />
+
       <ProList<API.UserAffiliate, Record<string, unknown>>
         request={async (pagination, filter) => {
           const response = await queryUserAffiliateList({ ...pagination, ...filter });

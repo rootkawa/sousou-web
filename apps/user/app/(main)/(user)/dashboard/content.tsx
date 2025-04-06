@@ -1,5 +1,6 @@
 'use client';
 
+import { ReferralCodeCard } from '@/components/affiliate/referral-code-card';
 import { Display } from '@/components/display';
 import Renewal from '@/components/subscribe/renewal';
 import ResetTraffic from '@/components/subscribe/reset-traffic';
@@ -53,7 +54,7 @@ const platforms: (keyof API.ApplicationPlatform)[] = [
 
 export default function Content() {
   const t = useTranslations('dashboard');
-  const { getUserSubscribe, getAppSubLink } = useGlobalStore();
+  const { getUserSubscribe, getAppSubLink, user, common } = useGlobalStore();
 
   const [protocol, setProtocol] = useState('');
 
@@ -90,6 +91,12 @@ export default function Content() {
 
   return (
     <>
+      {user?.refer_code && (
+        <ReferralCodeCard
+          referCode={user?.refer_code}
+          referralPercentage={common?.invite?.referral_percentage}
+        />
+      )}
       {userSubscribe.length ? (
         <>
           <div className='flex items-center justify-between'>
