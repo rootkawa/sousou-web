@@ -52,7 +52,6 @@
     "entryLocale": "zh-CN",
     "output": "./locales",
     "outputLocales": [
-      "en-US",
       "zh-CN"
     ],
     "modelName": "gpt-4o-mini",
