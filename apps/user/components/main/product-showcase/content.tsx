@@ -64,7 +64,6 @@ export function Content({ subscriptionData }: ProductShowcaseProps) {
                 subscriptionQuantity={subscriptionQuantity}
                 t={t}
                 isPopular={isPopular}
-                fromDashboard={false}
                 isSelected={index === selectedPlanIndex}
                 onSelect={() => handleSelectPlan(index)}
               />

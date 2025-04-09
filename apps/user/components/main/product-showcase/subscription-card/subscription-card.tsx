@@ -14,7 +14,6 @@ interface SubscriptionCardProps {
   subscriptionQuantity: number;
   t: ReturnType<typeof useTranslations>;
   isPopular: boolean;
-  fromDashboard: boolean;
   isSelected?: boolean;
   onSelect?: () => void;
 }
@@ -25,7 +24,6 @@ export function SubscriptionCard({
   subscriptionQuantity,
   t,
   isPopular,
-  fromDashboard,
   isSelected = false,
   onSelect,
 }: SubscriptionCardProps) {

@@ -45,6 +45,8 @@
   "productDescription": "商品描述",
   "products": "商品",
   "purchaseDuration": "购买时长",
+  "purchase_selected_plan": "立即购买所选订阅",
+
   "recharge": "充值",
   "rechargeAmount": "充值金额",
   "rechargeDescription": "一键充值，轻松处理",
@@ -56,6 +58,8 @@
   "resetTrafficDescription": "将流量重置为零，并开始新的计费周期",
   "resetTrafficTitle": "重置流量",
   "saves": "立省",
+  "select_plan": "选择此订阅",
+  "selected": "已选择",
   "unsubscribe": {
     "cancel": "取消",
     "confirm": "确认",

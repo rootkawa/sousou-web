@@ -4,12 +4,13 @@ import { querySubscribeGroupList, querySubscribeList } from '@/services/user/sub
 import { useQuery } from '@tanstack/react-query';
 import { Tabs, TabsList, TabsTrigger } from '@workspace/ui/components/tabs';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { Empty } from '@/components/empty';
 import { SubscriptionCard } from '@/components/main/product-showcase/subscription-card/subscription-card';
+import parseSubscriptionFeatures from '@/components/main/product-showcase/subscription-card/subscription-parser';
 import Purchase from '@/components/subscribe/purchase';
-import { motion } from 'framer-motion';
+import { HoverBorderGradient } from '@workspace/ui/components/hover-border-gradient';
 
 export default function Page() {
   const t = useTranslations('subscribe');
@@ -33,77 +34,85 @@ export default function Page() {
     },
   });
 
+  // Memoize filtered subscriptions
+  const filteredSubscriptions = useMemo(() => {
+    return data?.filter((item) => (group ? item.group_id === Number(group) : true)) || [];
+  }, [data, group]);
+
+  // Memoize the processed subscription data
+  const processedSubscriptions = useMemo(() => {
+    return filteredSubscriptions.map((item) => ({
+      ...item,
+      ...parseSubscriptionFeatures(item),
+    }));
+  }, [filteredSubscriptions]);
+
+  const [selectedPlanIndex, setSelectedPlanIndex] = useState<number>(0);
+
+  const handleSelectPlan = useCallback((index: number) => {
+    setSelectedPlanIndex(index);
+  }, []);
+
+  // Get the selected subscription based on selectedPlanIndex
+  const selectedSubscription = useMemo(() => {
+    return filteredSubscriptions[selectedPlanIndex];
+  }, [filteredSubscriptions, selectedPlanIndex]);
+
+  // Memoize the onClick handler
+  const handlePurchaseClick = useCallback(() => {
+    if (selectedSubscription) {
+      setSubscribe(selectedSubscription);
+    }
+  }, [selectedSubscription]);
+
   return (
     <>
       <Tabs value={group} onValueChange={setGroup} className='space-y-4'>
         {groups && groups.length > 0 && (
           <>
             <h1 className='text-muted-foreground w-full'>{t('category')}</h1>
-            <TabsList>
-              <TabsTrigger value=''>{t('all')}</TabsTrigger>
-              {groups.map((group) => (
-                <TabsTrigger key={group.id} value={String(group.id)}>
-                  {group.name}
-                </TabsTrigger>
-              ))}
-            </TabsList>
+            <div className='flex items-center justify-between'>
+              <TabsList>
+                <TabsTrigger value=''>{t('all')}</TabsTrigger>
+                {groups.map((group) => (
+                  <TabsTrigger key={group.id} value={String(group.id)}>
+                    {group.name}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+
+              {/* Checkout button moved to top-right position */}
+              <HoverBorderGradient
+                containerClassName='rounded-full'
+                as='button'
+                className='m-0.5 flex items-center space-x-2 text-white'
+                onClick={handlePurchaseClick}
+              >
+                {t('purchase_selected_plan')}
+              </HoverBorderGradient>
+            </div>
             <h2 className='text-muted-foreground w-full'>{t('products')}</h2>
           </>
         )}
         <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3'>
-          {data
-            ?.filter((item) => (group ? item.group_id === Number(group) : true))
-            ?.map((item, index) => {
-              const isPopular = item.name.includes('超值');
-              let parsedDescription;
-              try {
-                parsedDescription = JSON.parse(item.description);
-              } catch {
-                parsedDescription = { description: '', features: {} };
-              }
-
-              // Extract duration and saves from features
-              let subscriptionQuantity = 1; // Default to 1
-              let subscriptionDiscount = 0; // Default to 0
-              const features = parsedDescription.features;
-              // Simple direct property access for the dictionary
-              if (features) {
-                // Get duration/quantity from features
-                if (features.duration) {
-                  subscriptionQuantity = parseFloat(features.duration) || 1;
-                }
-
-                // Get saves/discount from features
-                if (features.saves) {
-                  subscriptionDiscount = parseFloat(features.saves) || 0;
-                }
-              }
-              return (
-                <motion.div
-                  key={`${item.id}-${item.name}`}
-                  initial={{ opacity: 0, y: 50 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className='w-full'
-                >
-                  <SubscriptionCard
-                    item={item}
-                    subscriptionDiscount={subscriptionDiscount}
-                    subscriptionQuantity={subscriptionQuantity}
-                    t={t}
-                    isPopular={isPopular}
-                    fromDashboard={true}
-                    onSubscribe={() => {
-                      setSubscribe(item);
-                    }}
-                  />
-                </motion.div>
-              );
-            })}
+          {processedSubscriptions.map((processed, index) => (
+            <SubscriptionCard
+              key={`${processed.id}-${processed.name}`}
+              item={processed}
+              subscriptionDiscount={processed.subscriptionDiscount}
+              subscriptionQuantity={processed.subscriptionQuantity}
+              t={t}
+              isPopular={processed.isPopular}
+              isSelected={index === selectedPlanIndex}
+              onSelect={() => handleSelectPlan(index)}
+            />
+          ))}
         </div>
         {data?.length === 0 && <Empty />}
       </Tabs>
-      <Purchase subscribe={subscribe} setSubscribe={setSubscribe} />
+
+      {/* Only render Purchase component when subscribe is defined */}
+      {subscribe && <Purchase subscribe={subscribe} setSubscribe={setSubscribe} />}
     </>
   );
 }

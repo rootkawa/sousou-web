@@ -1,6 +1,6 @@
 'use client';
 
-import CouponInput from '@/components/subscribe/coupon-input';
+import parseSubscriptionFeatures from '@/components/main/product-showcase/subscription-card/subscription-parser';
 import DurationSelector from '@/components/subscribe/duration-selector';
 import PaymentMethods from '@/components/subscribe/payment-methods';
 import useGlobalStore from '@/config/use-global';
@@ -13,12 +13,13 @@ import { Separator } from '@workspace/ui/components/separator';
 import { LoaderCircle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useState, useTransition } from 'react';
+import { useCallback, useState, useTransition } from 'react';
 import { SubscribeBilling } from './billing';
+import CouponInput from './coupon-input';
 import { SubscribeDetail } from './detail';
 
 interface PurchaseProps {
-  subscribe?: API.Subscribe;
+  subscribe: API.Subscribe;
   setSubscribe: (subscribe?: API.Subscribe) => void;
 }
 
@@ -27,72 +28,26 @@ export default function Purchase({ subscribe, setSubscribe }: Readonly<PurchaseP
   const { getUserInfo } = useGlobalStore();
   const router = useRouter();
 
-  let parsedDescription;
-  try {
-    parsedDescription = JSON.parse(subscribe?.description || `{ description: '', features: {} }`);
-  } catch {
-    parsedDescription = { description: '', features: {} };
-  }
-
-  // Extract duration and saves from features
-  let subscriptionQuantity = 1; // Default to 1
-  const features = parsedDescription.features;
-  // Simple direct property access for the dictionary
-  if (features) {
-    // Get duration/quantity from features
-    if (features.duration) {
-      subscriptionQuantity = parseFloat(features.duration) || 1;
-    }
-  }
-
+  const { subscriptionQuantity } = parseSubscriptionFeatures(subscribe);
   const [params, setParams] = useState<Partial<API.PurchaseOrderRequest>>({
     quantity: subscriptionQuantity,
-    subscribe_id: 0,
+    subscribe_id: subscribe.id,
     payment: -1,
     coupon: '',
   });
   const [loading, startTransition] = useTransition();
 
   const { data: order } = useQuery({
-    enabled: !!subscribe?.id,
+    enabled: true,
     queryKey: ['preCreateOrder', params],
     queryFn: async () => {
       const { data } = await preCreateOrder({
         ...params,
-        subscribe_id: subscribe?.id as number,
+        subscribe_id: subscribe.id as number,
       } as API.PurchaseOrderRequest);
       return data.data;
     },
   });
-
-  useEffect(() => {
-    if (subscribe) {
-      let parsedDescription;
-      try {
-        parsedDescription = JSON.parse(
-          subscribe?.description || `{ description: '', features: {} }`,
-        );
-      } catch {
-        parsedDescription = { description: '', features: {} };
-      }
-
-      // Extract duration and saves from features
-      let subscriptionQuantity = 1; // Default to 1
-      const features = parsedDescription.features;
-      // Simple direct property access for the dictionary
-      if (features) {
-        // Get duration/quantity from features
-        if (features.duration) {
-          subscriptionQuantity = parseFloat(features.duration) || 1;
-        }
-      }
-      setParams((prev) => ({
-        ...prev,
-        quantity: subscriptionQuantity,
-        subscribe_id: subscribe?.id,
-      }));
-    }
-  }, [subscribe]);
 
   const handleChange = useCallback((field: keyof typeof params, value: string | number) => {
     setParams((prev) => ({
@@ -150,8 +105,8 @@ export default function Purchase({ subscribe, setSubscribe }: Readonly<PurchaseP
             <div className='mb-6 grid gap-3'>
               <DurationSelector
                 quantity={params.quantity!}
-                unitTime={subscribe?.unit_time}
-                discounts={subscribe?.discount}
+                unitTime={subscribe.unit_time}
+                discounts={subscribe.discount}
                 onChange={(value) => {
                   handleChange('quantity', value);
                 }}

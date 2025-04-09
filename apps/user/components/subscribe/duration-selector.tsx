@@ -1,6 +1,5 @@
 'use client';
 
-import { Badge } from '@workspace/ui/components/badge';
 import { Label } from '@workspace/ui/components/label';
 import { RadioGroup, RadioGroupItem } from '@workspace/ui/components/radio-group';
 import { useTranslations } from 'next-intl';
@@ -40,8 +39,8 @@ const DurationSelector: React.FC<DurationSelectorProps> = ({
   );
 
   // 查找当前选中项的折扣信息
-  const currentDiscount = discounts?.find((item) => item.quantity === quantity)?.discount;
-  const discountPercentage = currentDiscount ? 100 - currentDiscount : 0;
+  // const currentDiscount = discounts?.find((item) => item.quantity === quantity)?.discount;
+  // const discountPercentage = currentDiscount ? 100 - currentDiscount : 0;
   return (
     <>
       <div className='font-semibold'>{t('purchaseDuration')}</div>
@@ -59,7 +58,7 @@ const DurationSelector: React.FC<DurationSelectorProps> = ({
           />
         ))}
       </RadioGroup>
-      <div className='flex items-center justify-between'>
+      {/* <div className='flex items-center justify-between'>
         <span className='text-muted-foreground text-sm'>{t('discountInfo')}:</span>
         {discountPercentage > 0 ? (
           <Badge variant='destructive' className='h-6 text-sm'>
@@ -68,7 +67,7 @@ const DurationSelector: React.FC<DurationSelectorProps> = ({
         ) : (
           <span className='text-muted-foreground h-6 text-sm'>--</span>
         )}
-      </div>
+      </div> */}
     </>
   );
 };
