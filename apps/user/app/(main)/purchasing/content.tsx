@@ -23,6 +23,10 @@ export default function Content({ subscription }: { subscription?: API.Subscribe
   const { common } = useGlobalStore();
   const router = useRouter();
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   let parsedDescription;
   try {
     parsedDescription = JSON.parse(

@@ -4,6 +4,7 @@
   "Minute": "分",
   "Month": "月",
   "NoLimit": "无限制",
+  "Second": "秒",
   "Year": "年",
   "all": "全部",
   "balanceRecharge": "余额充值",
@@ -31,6 +32,7 @@
   "discountInfo": "折扣信息",
   "enterAmount": "输入充值金额",
   "enterCoupon": "输入优惠券代码",
+  "limited_time_offer": "限时特惠",
   "methods": {
     "alipay_f2f": "支付宝(面对面)",
     "balance": "余额",

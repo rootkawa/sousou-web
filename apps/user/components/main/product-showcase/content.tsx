@@ -1,38 +1,33 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { HoverBorderGradient } from '@workspace/ui/components/hover-border-gradient';
 import { useTranslations } from 'next-intl';
-import { SubscriptionCard } from './subscription-card';
+import Link from 'next/link';
+import { memo, useState } from 'react';
+import { SubscriptionCard } from './subscription-card/subscription-card';
 
 interface ProductShowcaseProps {
   subscriptionData: API.Subscribe[];
 }
 
+const MemoizedSubscriptionCard = memo(SubscriptionCard);
+
 export function Content({ subscriptionData }: ProductShowcaseProps) {
   const t = useTranslations('index');
+
+  // Default to the first plan
+  const [selectedPlanIndex, setSelectedPlanIndex] = useState(0);
+
+  const handleSelectPlan = (index: number) => {
+    setSelectedPlanIndex(index);
+  };
+
   return (
-    <motion.section
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5 }}
-    >
-      <motion.h2
-        initial={{ opacity: 0, y: -20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className='mb-2 text-center text-3xl font-bold'
-      >
-        {t('product_showcase_title')}
-      </motion.h2>
-      <motion.p
-        initial={{ opacity: 0, y: -20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.1 }}
-        className='text-muted-foreground mb-16 text-center text-lg'
-      >
+    <div className='flex flex-col items-center'>
+      <h2 className='mb-2 text-center text-3xl font-bold'>{t('product_showcase_title')}</h2>
+      <p className='text-muted-foreground mb-16 text-center text-lg'>
         {t('product_showcase_description')}
-      </motion.p>
+      </p>
 
       <div className='mx-auto grid max-w-7xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
         {subscriptionData?.map((item, index) => {
@@ -62,25 +57,36 @@ export function Content({ subscriptionData }: ProductShowcaseProps) {
             }
           }
           return (
-            <motion.div
-              key={`${item.id}-${item.name}`}
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className='w-full'
-            >
-              <SubscriptionCard
+            <div key={`${item.id}-${item.name}`} className='w-full'>
+              <MemoizedSubscriptionCard
                 item={item}
                 subscriptionDiscount={subscriptionDiscount}
                 subscriptionQuantity={subscriptionQuantity}
                 t={t}
                 isPopular={isPopular}
                 fromDashboard={false}
+                isSelected={index === selectedPlanIndex}
+                onSelect={() => handleSelectPlan(index)}
               />
-            </motion.div>
+            </div>
           );
         }) || []}
       </div>
-    </motion.section>
+
+      {/* Common subscription button for the selected plan */}
+      {subscriptionData && subscriptionData.length > 0 && selectedPlanIndex >= 0 && (
+        <div className='mt-12 flex w-full max-w-md items-center justify-center'>
+          <Link href={`/purchasing?id=${subscriptionData[selectedPlanIndex]?.id}`}>
+            <HoverBorderGradient
+              containerClassName='rounded-full'
+              as='button'
+              className='m-0.5 flex items-center space-x-2 text-white'
+            >
+              {t('purchase_selected_plan')}
+            </HoverBorderGradient>
+          </Link>
+        </div>
+      )}
+    </div>
   );
 }

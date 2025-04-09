@@ -7,7 +7,7 @@ import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
 import { Empty } from '@/components/empty';
-import { SubscriptionCard } from '@/components/main/product-showcase/subscription-card';
+import { SubscriptionCard } from '@/components/main/product-showcase/subscription-card/subscription-card';
 import Purchase from '@/components/subscribe/purchase';
 import { motion } from 'framer-motion';
 

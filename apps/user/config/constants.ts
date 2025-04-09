@@ -7,6 +7,11 @@ export const defaultLocale = packageJSON.i18n.entry;
 export const NEXT_PUBLIC_DEFAULT_LANGUAGE =
   env('NEXT_PUBLIC_DEFAULT_LANGUAGE') ?? process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE ?? defaultLocale;
 
+export const NEXT_PUBLIC_LIMITED_OFFER_END_DATE =
+  env('NEXT_PUBLIC_LIMITED_OFFER_END_DATE') ??
+  process.env.NEXT_PUBLIC_LIMITED_OFFER_END_DATE ??
+  '20000000';
+
 export const NEXT_PUBLIC_SITE_URL = env('NEXT_PUBLIC_SITE_URL') ?? process.env.NEXT_PUBLIC_SITE_URL;
 export const NEXT_PUBLIC_API_URL = env('NEXT_PUBLIC_API_URL') ?? process.env.NEXT_PUBLIC_API_URL;
 export const NEXT_PUBLIC_SURVEY_URL =
