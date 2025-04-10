@@ -23,8 +23,7 @@ export function AuthCarousel({ t }: AuthCarouselProps) {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const isMountedRef = useRef(true);
 
-  // Fix 2: Better interval control with mounted check
-  const resetAutoScrollInterval = () => {
+  const resetAutoScrollInterval = useCallback(() => {
     if (!isMountedRef.current) return;
 
     if (intervalRef.current) {
@@ -43,7 +42,7 @@ export function AuthCarousel({ t }: AuthCarouselProps) {
 
       if (api) api.scrollNext();
     }, 4000);
-  };
+  }, [api]);
 
   // 1. FIRST: Initialize mounted flag
   useEffect(() => {
@@ -76,7 +75,7 @@ export function AuthCarousel({ t }: AuthCarouselProps) {
     return () => {
       api.off('select', onSelect);
     };
-  }, [api]);
+  }, [api, resetAutoScrollInterval]);
 
   // 3. THIRD: Interval management
   useEffect(() => {
@@ -90,7 +89,7 @@ export function AuthCarousel({ t }: AuthCarouselProps) {
         intervalRef.current = null;
       }
     };
-  }, [api]);
+  }, [api, resetAutoScrollInterval]);
 
   // Memoize the animation components
   const renderDiscountAnimation = useCallback(

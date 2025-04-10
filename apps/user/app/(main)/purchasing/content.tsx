@@ -24,32 +24,8 @@ export default function Content({ subscription }: { subscription?: API.Subscribe
   const { common } = useGlobalStore();
   const router = useRouter();
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
-  let parsedDescription;
-  try {
-    parsedDescription = JSON.parse(
-      subscription?.description || `{ description: '', features: {} }`,
-    );
-  } catch {
-    parsedDescription = { description: '', features: {} };
-  }
-
-  // Extract duration and saves from features
-  let subscriptionQuantity = 1; // Default to 1
-  const features = parsedDescription.features;
-  // Simple direct property access for the dictionary
-  if (features) {
-    // Get duration/quantity from features
-    if (features.duration) {
-      subscriptionQuantity = parseFloat(features.duration) || 1;
-    }
-  }
-
   const [params, setParams] = useState<API.PortalPurchaseRequest>({
-    quantity: subscriptionQuantity, // Use extracted quantity instead of hardcoded 1
+    quantity: 1,
     subscribe_id: 0,
     payment: -1,
     coupon: '',
@@ -116,11 +92,7 @@ export default function Content({ subscription }: { subscription?: API.Subscribe
         console.log(error);
       }
     });
-  }, [params, router, subscription?.id]);
-
-  if (!subscription) {
-    return <div className='p-6 text-center'>{t('subscriptionNotFound')}</div>;
-  }
+  }, [params, router]);
 
   return (
     <div className='mx-auto mt-8 flex max-w-4xl flex-col gap-8 md:grid md:grid-cols-2 md:flex-row'>
@@ -197,7 +169,7 @@ export default function Content({ subscription }: { subscription?: API.Subscribe
         </Card>
         <Card>
           <CardContent className='grid gap-3 p-6 text-sm'>
-            <h2 className='text-xl font-semibold'>{subscription.name}</h2>
+            <h2 className='text-xl font-semibold'>{subscription?.name}</h2>
             {/* <p className='text-muted-foreground'>{subscription.description}</p> */}
             <SubscribeDetail
               subscribe={{

@@ -27,7 +27,7 @@ export default function Certification({ platform, children }: CertificationProps
       .catch((error) => {
         router.replace('/auth');
       });
-  }, [pathname]);
+  }, [pathname, router, platform]);
 
   return children;
 }

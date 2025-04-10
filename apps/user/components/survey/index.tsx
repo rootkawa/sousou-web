@@ -8,6 +8,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@workspace/ui/components/alert-dialog';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
 interface SurveyRedirectDialogProps {
@@ -25,6 +27,7 @@ export function SurveyRedirectDialog({
 }: SurveyRedirectDialogProps) {
   const [redirectCountdown, setRedirectCountdown] = useState(15);
   const countdownTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const router = useRouter();
 
   // Effect for countdown and automatic redirect
   useEffect(() => {
@@ -36,7 +39,7 @@ export function SurveyRedirectDialog({
       }, 1000);
     } else {
       // Time's up, redirect
-      window.location.href = redirectUrl || '/dashboard';
+      router.push(redirectUrl || '/dashboard');
     }
 
     return () => {
@@ -44,11 +47,11 @@ export function SurveyRedirectDialog({
         clearTimeout(countdownTimerRef.current);
       }
     };
-  }, [open, redirectCountdown, redirectUrl]);
+  }, [open, redirectCountdown, redirectUrl, router]);
 
   // Handle manual redirect
   const handleManualRedirect = () => {
-    window.location.href = redirectUrl || '/dashboard';
+    router.push(redirectUrl || '/dashboard');
   };
 
   // Reset countdown when dialog is opened
@@ -73,10 +76,13 @@ export function SurveyRedirectDialog({
           </p>
 
           <div className='mx-auto my-6 flex justify-center'>
-            <img
-              src='survey.gif'
-              alt='Survey animation'
-              className='h-36 w-auto rounded-lg object-cover shadow-md transition-all duration-300 hover:scale-105'
+            <Image
+              src='/survey.gif'
+              unoptimized={true}
+              alt='Survey'
+              width={200} // Set appropriate width
+              height={200} // Set appropriate height
+              className='...'
             />
           </div>
 

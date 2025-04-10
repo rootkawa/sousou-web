@@ -1,3 +1,5 @@
+import Image from 'next/image';
+
 interface LoadingProps {
   loading?: boolean;
 }
@@ -16,10 +18,13 @@ export default function Loading({ loading = true }: LoadingProps) {
           <div className='relative mx-auto mb-4'>
             <div className='border-primary h-24 w-24 animate-spin rounded-full border-b-2 border-t-2'></div>
             <div className='absolute inset-0 flex items-center justify-center'>
-              <img
-                src='loading.gif'
+              <Image
+                unoptimized={true}
+                src='/loading.gif'
                 alt='Loading'
-                className='h-16 w-16 rounded-full object-cover'
+                width={40}
+                height={40}
+                className='h-10 w-10'
               />
             </div>
           </div>
