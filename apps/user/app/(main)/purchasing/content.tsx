@@ -1,5 +1,6 @@
 'use client';
 
+import parseSubscriptionFeatures from '@/components/main/product-showcase/subscription-card/subscription-parser';
 import { SubscribeBilling } from '@/components/subscribe/billing';
 import CouponInput from '@/components/subscribe/coupon-input';
 import { SubscribeDetail } from '@/components/subscribe/detail';
@@ -76,30 +77,15 @@ export default function Content({ subscription }: { subscription?: API.Subscribe
 
   useEffect(() => {
     if (subscription) {
-      let parsedDescription;
-      try {
-        parsedDescription = JSON.parse(
-          subscription?.description || `{ description: '', features: {} }`,
-        );
-      } catch {
-        parsedDescription = { description: '', features: {} };
-      }
-
-      // Extract duration and saves from features
-      let subscriptionQuantity = 1; // Default to 1
-      const features = parsedDescription.features;
-      // Simple direct property access for the dictionary
-      if (features) {
-        // Get duration/quantity from features
-        if (features.duration) {
-          subscriptionQuantity = parseFloat(features.duration) || 1;
-        }
-      }
+      const processedSubscription = {
+        ...subscription,
+        ...parseSubscriptionFeatures(subscription),
+      };
 
       setParams((prev) => ({
         ...prev,
-        quantity: subscriptionQuantity, // Use extracted quantity instead of hardcoded 1
-        subscribe_id: subscription?.id,
+        quantity: processedSubscription.subscriptionQuantity, // Use extracted quantity instead of hardcoded 1
+        subscribe_id: processedSubscription.id,
       }));
     }
   }, [subscription]);
@@ -135,12 +121,6 @@ export default function Content({ subscription }: { subscription?: API.Subscribe
   if (!subscription) {
     return <div className='p-6 text-center'>{t('subscriptionNotFound')}</div>;
   }
-
-  let extractedSubscriptionName = '';
-  try {
-    extractedSubscriptionName = subscription?.name?.split('-')[0] || '';
-  } catch {}
-  console.log(extractedSubscriptionName);
 
   return (
     <div className='mx-auto mt-8 flex max-w-4xl flex-col gap-8 md:grid md:grid-cols-2 md:flex-row'>

@@ -4,7 +4,7 @@ import { querySubscribeGroupList, querySubscribeList } from '@/services/user/sub
 import { useQuery } from '@tanstack/react-query';
 import { Tabs, TabsList, TabsTrigger } from '@workspace/ui/components/tabs';
 import { useTranslations } from 'next-intl';
-import { useCallback, useMemo, useState } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 
 import { Empty } from '@/components/empty';
 import { SubscriptionCard } from '@/components/main/product-showcase/subscription-card/subscription-card';
@@ -12,10 +12,13 @@ import parseSubscriptionFeatures from '@/components/main/product-showcase/subscr
 import Purchase from '@/components/subscribe/purchase';
 import { HoverBorderGradient } from '@workspace/ui/components/hover-border-gradient';
 
-export default function Page() {
-  const t = useTranslations('subscribe');
-  const [subscribe, setSubscribe] = useState<API.Subscribe>();
+// Memoize the SubscriptionCard component to prevent unnecessary re-renders
+const MemoizedSubscriptionCard = memo(SubscriptionCard);
 
+export default function SubscribePage() {
+  const t = useTranslations('subscribe');
+
+  const [subscribe, setSubscribe] = useState<API.Subscribe>();
   const [group, setGroup] = useState<string>('');
 
   const { data: groups } = useQuery({
@@ -96,7 +99,7 @@ export default function Page() {
         )}
         <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3'>
           {processedSubscriptions.map((processed, index) => (
-            <SubscriptionCard
+            <MemoizedSubscriptionCard
               key={`${processed.id}-${processed.name}`}
               item={processed}
               subscriptionDiscount={processed.subscriptionDiscount}

@@ -3,8 +3,9 @@
 import { HoverBorderGradient } from '@workspace/ui/components/hover-border-gradient';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
-import { memo, useState } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import { SubscriptionCard } from './subscription-card/subscription-card';
+import parseSubscriptionFeatures from './subscription-card/subscription-parser';
 
 interface ProductShowcaseProps {
   subscriptionData: API.Subscribe[];
@@ -18,9 +19,16 @@ export function Content({ subscriptionData }: ProductShowcaseProps) {
   // Default to the first plan
   const [selectedPlanIndex, setSelectedPlanIndex] = useState(0);
 
-  const handleSelectPlan = (index: number) => {
+  const handleSelectPlan = useCallback((index: number) => {
     setSelectedPlanIndex(index);
-  };
+  }, []);
+
+  const processedSubscriptionData = useMemo(() => {
+    return subscriptionData.map((item) => ({
+      ...item,
+      ...parseSubscriptionFeatures(item),
+    }));
+  }, [subscriptionData]);
 
   return (
     <div className='flex flex-col items-center'>
@@ -30,40 +38,15 @@ export function Content({ subscriptionData }: ProductShowcaseProps) {
       </p>
 
       <div className='mx-auto grid max-w-7xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
-        {subscriptionData?.map((item, index) => {
-          const isPopular = item.name.includes('超值');
-
-          let parsedDescription;
-          try {
-            parsedDescription = JSON.parse(item.description);
-          } catch {
-            parsedDescription = { description: '', features: {} };
-          }
-
-          // Extract duration and saves from features
-          let subscriptionQuantity = 1; // Default to 1
-          let subscriptionDiscount = 0; // Default to 0
-          const features = parsedDescription.features;
-          // Simple direct property access for the dictionary
-          if (features) {
-            // Get duration/quantity from features
-            if (features.duration) {
-              subscriptionQuantity = parseFloat(features.duration) || 1;
-            }
-
-            // Get saves/discount from features
-            if (features.saves) {
-              subscriptionDiscount = parseFloat(features.saves) || 0;
-            }
-          }
+        {processedSubscriptionData?.map((item, index) => {
           return (
             <div key={`${item.id}-${item.name}`} className='w-full'>
               <MemoizedSubscriptionCard
                 item={item}
-                subscriptionDiscount={subscriptionDiscount}
-                subscriptionQuantity={subscriptionQuantity}
+                subscriptionDiscount={item.subscriptionDiscount}
+                subscriptionQuantity={item.subscriptionQuantity}
                 t={t}
-                isPopular={isPopular}
+                isPopular={item.isPopular}
                 isSelected={index === selectedPlanIndex}
                 onSelect={() => handleSelectPlan(index)}
               />
