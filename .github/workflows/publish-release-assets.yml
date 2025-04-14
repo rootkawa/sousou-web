@@ -1,10 +1,9 @@
 name: Publish Release Assets
 
 on:
-  # Only manual triggers
   workflow_dispatch:
-  # release:
-  #   types: [published]
+  release:
+    types: [published]
 
 permissions:
   contents: write
@@ -48,44 +47,3 @@ jobs:
             out/sousou-admin-web.tar.gz
             out/sousou-user-web.tar.gz
           token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Install jq
-        run: sudo apt-get install -y jq
-
-      - name: Extract version from package.json
-        id: version
-        run: echo "SOUSOU_VERSION=$(jq -r '.version' package.json)" >> $GITHUB_ENV
-
-      - name: Build and push Docker image for sousou-admin-web
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: ./docker/sousou-admin-web/Dockerfile
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: |
-            ${{ secrets.DOCKER_USERNAME }}/sousou-admin-web:latest
-            ${{ secrets.DOCKER_USERNAME }}/sousou-admin-web:${{ env.SOUSOU_VERSION }}
-
-      - name: Build and push Docker image for sousou-user-web
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: ./docker/sousou-user-web/Dockerfile
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: |
-            ${{ secrets.DOCKER_USERNAME }}/sousou-user-web:latest
-            ${{ secrets.DOCKER_USERNAME }}/sousou-user-web:${{ env.SOUSOU_VERSION }}
