@@ -4,7 +4,7 @@ on:
   # Only manual triggers
   workflow_dispatch:
   # push: # Uncomment to enable automatic releases
-  #   branches: [sousou-feat] # Changed from main to sousou-feat
+  #   branches: [sousou] # Changed from main to sousou-feat
 
 permissions:
   contents: write

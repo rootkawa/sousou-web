@@ -1,7 +1,7 @@
 const { createConfig } = require('semantic-release-config-gitmoji/lib/createConfig');
 
 const config = createConfig({
-  branches: ['sousou-feat'],
+  branches: ['sousou'],
   tagFormat: 'v${version}',
   changelogTitle: `<a name="readme-top"></a>
 # Changelog`,
@@ -68,5 +68,8 @@ const config = createConfig({
     { release: false, subject: '*skip release*' },
   ],
 });
+
+// Force branches to only include 'sousou-feat' (overwriting any defaults)
+config.branches = ['sousou'];
 
 module.exports = config;
