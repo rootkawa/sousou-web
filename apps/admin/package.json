@@ -1,5 +1,5 @@
 {
-  "name": "ppanel-admin-web",
+  "name": "sousou-admin-web",
   "private": true,
   "scripts": {
     "build": "next build",

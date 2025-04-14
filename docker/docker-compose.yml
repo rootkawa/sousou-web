@@ -1,21 +1,21 @@
 services:
   admin-web:
-    container_name: ppanel-admin-web
+    container_name: sousou-admin-web
     build:
       context: ../
-      dockerfile: ./docker/ppanel-admin-web/Dockerfile
+      dockerfile: ./docker/sousou-admin-web/Dockerfile
     environment:
-      NEXT_PUBLIC_API_URL: 'https://api.ppanel.dev'
+      NEXT_PUBLIC_API_URL: 'https://api.sousou.dev'
     restart: always
     ports:
       - 3001:3000
   user-web:
-    container_name: ppanel-user-web
+    container_name: sousou-user-web
     build:
       context: ../
-      dockerfile: ./docker/ppanel-user-web/Dockerfile
+      dockerfile: ./docker/sousou-user-web/Dockerfile
     environment:
-      NEXT_PUBLIC_API_URL: 'https://api.ppanel.dev'
+      NEXT_PUBLIC_API_URL: 'https://api.sousou.dev'
     restart: always
     ports:
       - 3002:3000

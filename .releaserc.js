@@ -69,14 +69,4 @@ const config = createConfig({
   ],
 });
 
-if (
-  !config.plugins.some(
-    (plugin) =>
-      (Array.isArray(plugin) && plugin[0] === '@semantic-release/github') ||
-      plugin === '@semantic-release/github',
-  )
-) {
-  config.plugins.push('@semantic-release/github');
-}
-
 module.exports = config;
