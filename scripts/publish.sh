@@ -9,8 +9,8 @@ mkdir -p $OUT_DIR
 
 # Declare an array of projects to build
 PROJECTS=(
-  "ppanel-admin-web:apps/admin:3001"
-  "ppanel-user-web:apps/user:3002"
+  "sousou-admin-web:apps/admin:3001"
+  "sousou-user-web:apps/user:3002"
 )
 
 # Step 1: Install dependencies

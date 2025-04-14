@@ -1,6 +1,7 @@
 const { createConfig } = require('semantic-release-config-gitmoji/lib/createConfig');
 
 const config = createConfig({
+  branches: ['sousou-feat'],
   tagFormat: 'v${version}',
   changelogTitle: `<a name="readme-top"></a>
 # Changelog`,
@@ -67,5 +68,15 @@ const config = createConfig({
     { release: false, subject: '*skip release*' },
   ],
 });
+
+if (
+  !config.plugins.some(
+    (plugin) =>
+      (Array.isArray(plugin) && plugin[0] === '@semantic-release/github') ||
+      plugin === '@semantic-release/github',
+  )
+) {
+  config.plugins.push('@semantic-release/github');
+}
 
 module.exports = config;

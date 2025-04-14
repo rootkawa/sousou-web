@@ -1,8 +1,10 @@
 name: Build and Release
 
 on:
-  push:
-    branches: [main, next, beta]
+  # Only manual triggers
+  workflow_dispatch:
+  # push: # Uncomment to enable automatic releases
+  #   branches: [sousou-feat] # Changed from main to sousou-feat
 
 permissions:
   contents: write
@@ -39,4 +41,4 @@ jobs:
         id: release
         run: bun run release
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Changed from GH_TOKEN to GITHUB_TOKEN

@@ -1,8 +1,10 @@
 name: Publish Release Assets
 
 on:
-  release:
-    types: [published]
+  # Only manual triggers
+  workflow_dispatch:
+  # release:
+  #   types: [published]
 
 permissions:
   contents: write
@@ -43,8 +45,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            out/ppanel-admin-web.tar.gz
-            out/ppanel-user-web.tar.gz
+            out/sousou-admin-web.tar.gz
+            out/sousou-user-web.tar.gz
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up QEMU
@@ -64,26 +66,26 @@ jobs:
 
       - name: Extract version from package.json
         id: version
-        run: echo "PPANEL_VERSION=$(jq -r '.version' package.json)" >> $GITHUB_ENV
+        run: echo "SOUSOU_VERSION=$(jq -r '.version' package.json)" >> $GITHUB_ENV
 
-      - name: Build and push Docker image for ppanel-admin-web
+      - name: Build and push Docker image for sousou-admin-web
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./docker/ppanel-admin-web/Dockerfile
+          file: ./docker/sousou-admin-web/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
-            ${{ secrets.DOCKER_USERNAME }}/ppanel-admin-web:latest
-            ${{ secrets.DOCKER_USERNAME }}/ppanel-admin-web:${{ env.PPANEL_VERSION }}
+            ${{ secrets.DOCKER_USERNAME }}/sousou-admin-web:latest
+            ${{ secrets.DOCKER_USERNAME }}/sousou-admin-web:${{ env.SOUSOU_VERSION }}
 
-      - name: Build and push Docker image for ppanel-user-web
+      - name: Build and push Docker image for sousou-user-web
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./docker/ppanel-user-web/Dockerfile
+          file: ./docker/sousou-user-web/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
-            ${{ secrets.DOCKER_USERNAME }}/ppanel-user-web:latest
-            ${{ secrets.DOCKER_USERNAME }}/ppanel-user-web:${{ env.PPANEL_VERSION }}
+            ${{ secrets.DOCKER_USERNAME }}/sousou-user-web:latest
+            ${{ secrets.DOCKER_USERNAME }}/sousou-user-web:${{ env.SOUSOU_VERSION }}

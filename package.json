@@ -1,14 +1,14 @@
 {
-  "name": "ppanel-web",
-  "version": "1.0.0-beta.34",
+  "name": "sousou-web",
+  "version": "1.0.0",
   "private": true,
-  "homepage": "https://github.com/perfect-panel/ppanel-web",
+  "homepage": "https://github.com/Saxxon-Usagi/sousou-web",
   "bugs": {
-    "url": "https://github.com/perfect-panel/ppanel-web/issues/new"
+    "url": "https://github.com/Saxxon-Usagi/sousou-web/issues/new"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/perfect-panel/ppanel-web.git"
+    "url": "https://github.com/Saxxon-Usagi/sousou-web.git"
   },
   "license": "GUN",
   "workspaces": [
