@@ -1,8 +1,7 @@
 'use client';
 
-import { HoverBorderGradient } from '@workspace/ui/components/hover-border-gradient';
 import { useTranslations } from 'next-intl';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { memo, useCallback, useMemo, useState } from 'react';
 import { SubscriptionCard } from './subscription-card/subscription-card';
 import parseSubscriptionFeatures from './subscription-card/subscription-parser';
@@ -15,6 +14,7 @@ const MemoizedSubscriptionCard = memo(SubscriptionCard);
 
 export function Content({ subscriptionData }: ProductShowcaseProps) {
   const t = useTranslations('index');
+  const router = useRouter();
 
   // Default to the first plan
   const [selectedPlanIndex, setSelectedPlanIndex] = useState(0);
@@ -22,6 +22,13 @@ export function Content({ subscriptionData }: ProductShowcaseProps) {
   const handleSelectPlan = useCallback((index: number) => {
     setSelectedPlanIndex(index);
   }, []);
+
+  const handlePurchase = useCallback(
+    (item: API.Subscribe) => {
+      router.push(`/purchasing?id=${item.id}`);
+    },
+    [router],
+  );
 
   const processedSubscriptionData = useMemo(() => {
     return subscriptionData.map((item) => ({
@@ -49,13 +56,14 @@ export function Content({ subscriptionData }: ProductShowcaseProps) {
                 isPopular={item.isPopular}
                 isSelected={index === selectedPlanIndex}
                 onSelect={() => handleSelectPlan(index)}
+                onPurchase={() => handlePurchase(item)}
               />
             </div>
           );
         }) || []}
       </div>
 
-      {/* Common subscription button for the selected plan */}
+      {/* Common subscription button for the selected plan
       {subscriptionData && subscriptionData.length > 0 && selectedPlanIndex >= 0 && (
         <div className='mt-12 flex w-full max-w-md items-center justify-center'>
           <Link href={`/purchasing?id=${subscriptionData[selectedPlanIndex]?.id}`}>
@@ -68,7 +76,7 @@ export function Content({ subscriptionData }: ProductShowcaseProps) {
             </HoverBorderGradient>
           </Link>
         </div>
-      )}
+      )} */}
     </div>
   );
 }

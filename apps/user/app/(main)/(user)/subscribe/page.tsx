@@ -10,7 +10,6 @@ import { Empty } from '@/components/empty';
 import { SubscriptionCard } from '@/components/main/product-showcase/subscription-card/subscription-card';
 import parseSubscriptionFeatures from '@/components/main/product-showcase/subscription-card/subscription-parser';
 import Purchase from '@/components/subscribe/purchase';
-import { HoverBorderGradient } from '@workspace/ui/components/hover-border-gradient';
 
 // Memoize the SubscriptionCard component to prevent unnecessary re-renders
 const MemoizedSubscriptionCard = memo(SubscriptionCard);
@@ -68,12 +67,10 @@ export default function SubscribePage() {
     return filteredSubscriptions[selectedPlanIndex];
   }, [filteredSubscriptions, selectedPlanIndex]);
 
-  // Memoize the onClick handler
-  const handlePurchaseClick = useCallback(() => {
-    if (selectedSubscription) {
-      setSubscribe(selectedSubscription);
-    }
-  }, [selectedSubscription]);
+  // Handle purchase for a specific subscription
+  const handlePurchase = useCallback((subscription: API.Subscribe) => {
+    setSubscribe(subscription);
+  }, []);
 
   return (
     <>
@@ -91,16 +88,6 @@ export default function SubscribePage() {
                     </TabsTrigger>
                   ))}
                 </TabsList>
-
-                {/* Checkout button */}
-                <HoverBorderGradient
-                  containerClassName='rounded-full'
-                  as='button'
-                  className='m-0.5 flex items-center space-x-2 text-white'
-                  onClick={handlePurchaseClick}
-                >
-                  {t('purchase_selected_plan')}
-                </HoverBorderGradient>
               </div>
               <h2 className='text-muted-foreground w-full'>{t('products')}</h2>
             </>
@@ -116,6 +103,7 @@ export default function SubscribePage() {
                 isPopular={processed.isPopular}
                 isSelected={index === selectedPlanIndex}
                 onSelect={() => handleSelectPlan(index)}
+                onPurchase={() => handlePurchase(processed)}
               />
             ))}
           </div>
@@ -125,16 +113,6 @@ export default function SubscribePage() {
         <div className='space-y-4'>
           <div className='flex items-center justify-between'>
             <h2 className='text-muted-foreground'>{t('products')}</h2>
-
-            {/* Purchase button */}
-            <HoverBorderGradient
-              containerClassName='rounded-full'
-              as='button'
-              className='m-0.5 flex items-center space-x-2 text-white'
-              onClick={handlePurchaseClick}
-            >
-              {t('purchase_selected_plan')}
-            </HoverBorderGradient>
           </div>
 
           <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3'>
@@ -148,6 +126,7 @@ export default function SubscribePage() {
                 isPopular={processed.isPopular}
                 isSelected={index === selectedPlanIndex}
                 onSelect={() => handleSelectPlan(index)}
+                onPurchase={() => handlePurchase(processed)}
               />
             ))}
           </div>

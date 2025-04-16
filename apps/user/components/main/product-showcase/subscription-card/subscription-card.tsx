@@ -1,6 +1,7 @@
 import { Display } from '@/components/display';
 import { SubscribeDetail } from '@/components/subscribe/detail';
 import { Card, CardContent, CardFooter, CardHeader } from '@workspace/ui/components/card';
+import { HoverBorderGradient } from '@workspace/ui/components/hover-border-gradient';
 import { Separator } from '@workspace/ui/components/separator';
 import { cn } from '@workspace/ui/lib/utils';
 import { NEXT_PUBLIC_LIMITED_OFFER_END_DATE } from 'config/constants';
@@ -16,6 +17,7 @@ interface SubscriptionCardProps {
   isPopular: boolean;
   isSelected?: boolean;
   onSelect?: () => void;
+  onPurchase?: () => void;
 }
 
 export function SubscriptionCard({
@@ -26,6 +28,7 @@ export function SubscriptionCard({
   isPopular,
   isSelected = false,
   onSelect,
+  onPurchase,
 }: SubscriptionCardProps) {
   // Server-side expiration check
   const isOfferExpired = (() => {
@@ -161,20 +164,34 @@ export function SubscriptionCard({
             </motion.div>
 
             {/* Selection indicator */}
-            <div className='mt-2 flex w-full items-center justify-center'>
+            <div className='mt-2 flex w-full items-center justify-center space-x-3'>
               <div
                 className={cn(
-                  'flex h-6 w-6 items-center justify-center rounded-full border-2 transition-all',
+                  'flex h-7 w-7 items-center justify-center rounded-full border-2 transition-all',
                   isSelected
                     ? 'border-blue-500 bg-blue-500'
                     : 'border-gray-300 group-hover:border-blue-300',
                 )}
               >
-                {isSelected && <div className='h-3 w-3 rounded-full bg-white'></div>}
+                {isSelected && <div className='h-3.5 w-3.5 rounded-full bg-white'></div>}
               </div>
-              <span className='ml-2 text-sm font-medium'>
+              <span className='text-sm font-medium'>
                 {isSelected ? t('selected') : t('select_plan')}
               </span>
+              {/* Purchase button (only shown when selected and onPurchase is true) */}
+              {isSelected && onPurchase && (
+                <HoverBorderGradient
+                  containerClassName='rounded-full ml-2'
+                  as='button'
+                  className='m-0 flex h-8 items-center justify-center px-4 py-0 text-sm font-medium text-white'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onPurchase();
+                  }}
+                >
+                  {t('buyNow')}
+                </HoverBorderGradient>
+              )}
             </div>
           </CardFooter>
         </Card>

@@ -52,6 +52,10 @@ export default function Content({ subscription }: { subscription?: API.Subscribe
   });
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     if (subscription) {
       const processedSubscription = {
         ...subscription,
