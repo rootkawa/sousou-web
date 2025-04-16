@@ -282,17 +282,22 @@ export default function Content() {
                       </span>
                     </li>
                     <li>
+                      <span className='text-muted-foreground'>{t('speedLimit')}</span>
+                      <span className='text-2xl font-semibold'>
+                        <Display type='trafficSpeed' value={item.subscribe.speed_limit} unlimited />
+                      </span>
+                    </li>
+                    {/* <li>
                       <span className='text-muted-foreground'>{t('nextResetDays')}</span>
                       <span className='text-2xl font-semibold'>
                         {item.reset_time
                           ? differenceInDays(new Date(item.reset_time), new Date())
                           : t('noReset')}
                       </span>
-                    </li>
+                    </li> */}
                     <li>
                       <span className='text-muted-foreground'>{t('expirationDays')}</span>
                       <span className='text-2xl font-semibold'>
-                        {}
                         {item.expire_time
                           ? differenceInDays(new Date(item.expire_time), new Date()) || t('unknown')
                           : t('noLimit')}
