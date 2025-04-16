@@ -2,7 +2,7 @@
   "affiliate": "我的邀请",
   "announcement": "公告列表",
   "dashboard": "主页",
-  "document": "使用文档",
+  "document": "下载教程",
   "finance": "财务",
   "help": "帮助",
   "logout": "退出登录",
@@ -12,6 +12,6 @@
   "profile": "个人中心",
   "server": "服务",
   "subscribe": "购买订阅",
-  "ticket": "我的工单",
+  "ticket": "专属客服",
   "wallet": "财务中心"
 }

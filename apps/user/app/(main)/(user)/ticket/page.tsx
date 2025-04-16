@@ -1,6 +1,5 @@
 'use client';
 
-import { Empty } from '@/components/empty';
 import { ProList, ProListActions } from '@/components/pro-list';
 import {
   createUserTicket,
@@ -40,6 +39,7 @@ import { Label } from '@workspace/ui/components/label';
 import { ScrollArea } from '@workspace/ui/components/scroll-area';
 import { Textarea } from '@workspace/ui/components/textarea';
 import { ConfirmButton } from '@workspace/ui/custom-components/confirm-button';
+import { default as _Empty } from '@workspace/ui/custom-components/empty';
 import { Icon } from '@workspace/ui/custom-components/icon';
 import { cn } from '@workspace/ui/lib/utils';
 import { formatDate } from '@workspace/ui/utils';
@@ -224,7 +224,7 @@ export default function Page() {
             </Card>
           );
         }}
-        empty={<Empty />}
+        empty={<_Empty description={t('emptyDescription')} />}
       />
       <Drawer
         open={!!ticketId}

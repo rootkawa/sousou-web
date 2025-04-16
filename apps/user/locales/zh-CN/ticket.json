@@ -7,9 +7,10 @@
   "confirm": "确认",
   "confirmClose": "确认关闭工单吗？",
   "createSuccess": "创建成功",
-  "createTicket": "创建工单",
+  "createTicket": "在线问答",
   "createTicketDescription": "工单24小时内回复哦",
-  "description": "描述",
+  "description": "问题描述",
+  "emptyDescription": "点击右上角在线问答按钮，反馈您的任何问题，我们会有真人客服为您服务 😊",
   "inputPlaceholder": "输入您的消息",
   "reply": "回复",
   "status": {
@@ -21,6 +22,6 @@
   },
   "submit": "提交",
   "ticketList": "工单列表",
-  "title": "标题",
+  "title": "问题标题",
   "updatedAt": "更新时间"
 }
