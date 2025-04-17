@@ -44,9 +44,15 @@ export function ReferralCodeCard({ referCode, referralPercentage }: ReferralCode
     <Card className='overflow-hidden border-2 shadow-md transition-all duration-300 hover:shadow-lg'>
       <CardHeader className='bg-gradient-to-r from-blue-50 to-indigo-50 pb-4 dark:from-blue-950/40 dark:to-indigo-950/30'>
         <div className='flex items-center justify-between'>
-          <div className='flex items-center gap-2'>
-            <Gift className='h-5 w-5 text-indigo-500' />
-            <CardTitle className='text-lg font-semibold'>{t('inviteCode')}</CardTitle>
+          <div className='flex flex-col'>
+            <div className='flex items-center gap-2'>
+              <Gift className='h-5 w-5 text-indigo-500' />
+              <CardTitle className='text-lg font-semibold'>{t('inviteCode')}</CardTitle>
+            </div>
+            <p className='text-muted-foreground mt-1 text-sm'>
+              邀请好友注册并下单，您可以立即获得好友下单金额的{referralPercentage}
+              %返现，并用于购买我们的任意一项服务。
+            </p>
           </div>
 
           <div className='relative inline-flex items-center'>
