@@ -5,7 +5,7 @@ import { HoverBorderGradient } from '@workspace/ui/components/hover-border-gradi
 import { Separator } from '@workspace/ui/components/separator';
 import { cn } from '@workspace/ui/lib/utils';
 import { NEXT_PUBLIC_LIMITED_OFFER_END_DATE } from 'config/constants';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { LimitedTimeOffer } from './limited-time-offer';
 
@@ -48,39 +48,64 @@ export function SubscriptionCard({
   })();
 
   return (
-    <div
+    <motion.div
       className={cn('group relative flex cursor-pointer flex-col', isSelected && 'z-10')}
       onClick={onSelect}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      whileHover={{ scale: isSelected ? 1 : 1.02 }}
+      whileTap={{ scale: 0.98 }}
     >
       {/* Popular badge positioned above the card */}
-      {isPopular && (
-        <div className='bg-primary text-primary-foreground absolute left-0 right-0 top-[-36px] z-10 rounded-t-lg py-2 shadow-lg'>
-          <div
-            className={cn(
-              'flex items-center px-2',
-              isOfferExpired ? 'justify-center' : 'justify-between',
-            )}
+      <AnimatePresence>
+        {isPopular && (
+          <motion.div
+            className='bg-primary text-primary-foreground absolute left-0 right-0 top-[-36px] z-10 rounded-t-lg py-2 shadow-lg'
+            initial={{ opacity: 0, y: -10, height: 0 }}
+            animate={{ opacity: 1, y: 0, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3 }}
           >
-            {isOfferExpired ? (
-              <span className='text-m font-medium'>{t('most_popular')}</span>
-            ) : (
-              <span className='text-m font-medium'>{t('limited_time_offer')}</span>
-            )}
-            {!isOfferExpired && <LimitedTimeOffer t={t} />}
-          </div>
-        </div>
-      )}
-
-      <div
-        className={cn(
-          'relative overflow-hidden transition-all duration-300',
-          // Removed custom border radius styling from here
+            <div
+              className={cn(
+                'flex items-center px-2',
+                isOfferExpired ? 'justify-center' : 'justify-between',
+              )}
+            >
+              {isOfferExpired ? (
+                <motion.span
+                  className='text-m font-medium'
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  {t('most_popular')}
+                </motion.span>
+              ) : (
+                <motion.span
+                  className='text-m font-medium'
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  {t('limited_time_offer')}
+                </motion.span>
+              )}
+              {!isOfferExpired && <LimitedTimeOffer t={t} />}
+            </div>
+          </motion.div>
         )}
-        style={
-          {
-            // Remove the custom borderRadius style to prevent conflicts
-          }
-        }
+      </AnimatePresence>
+
+      <motion.div
+        className='relative overflow-hidden'
+        animate={{
+          boxShadow: isSelected
+            ? '0 5px 15px rgba(0, 0, 0, 0.07)'
+            : '0 2px 4px rgba(0, 0, 0, 0.03)',
+        }}
+        transition={{ duration: 0.5 }}
       >
         <Card
           className={cn(
@@ -92,7 +117,6 @@ export function SubscriptionCard({
           )}
           style={{
             borderRadius: isPopular ? '0 0 1rem 1rem' : '1rem',
-            // Ensure smooth border rendering
             boxSizing: 'border-box',
           }}
         >
@@ -126,23 +150,29 @@ export function SubscriptionCard({
             </div>
           )}
 
-          <CardHeader className='bg-muted/50 p-4 text-xl font-medium'>{item.name}</CardHeader>
+          <motion.div layout transition={{ type: 'spring', stiffness: 300, damping: 30 }}>
+            <CardHeader className='bg-muted/50 p-4 text-xl font-medium'>{item.name}</CardHeader>
+          </motion.div>
+
           <CardContent className='flex flex-grow flex-col gap-4 p-6 text-sm'>
-            <SubscribeDetail
-              subscribe={{
-                ...item,
-                name: undefined,
-              }}
-            />
-          </CardContent>
-          <Separator className='opacity-30' />
-          <CardFooter className='relative flex flex-col gap-4 p-4'>
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className='py-2'
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.4 }}
             >
+              <SubscribeDetail
+                subscribe={{
+                  ...item,
+                  name: undefined,
+                }}
+              />
+            </motion.div>
+          </CardContent>
+
+          <Separator className='opacity-30' />
+
+          <CardFooter className='relative flex flex-col gap-4 p-4'>
+            <div className='py-2'>
               {item.unit_time == 'Month' && (
                 <div className='text-2xl font-semibold sm:text-3xl'>
                   {isPopular && !isOfferExpired && subscriptionDiscount > 0 && (
@@ -161,9 +191,9 @@ export function SubscriptionCard({
                   <Display type='currency' value={item.unit_price * subscriptionQuantity} />
                 </div>
               )}
-            </motion.div>
+            </div>
 
-            {/* Selection indicator */}
+            {/* Selection indicator - removed motion animations */}
             <div className='mt-2 flex w-full items-center justify-center space-x-3'>
               <div
                 className={cn(
@@ -173,29 +203,33 @@ export function SubscriptionCard({
                     : 'border-gray-300 group-hover:border-blue-300',
                 )}
               >
-                {isSelected && <div className='h-3.5 w-3.5 rounded-full bg-white'></div>}
+                {isSelected && <div className='h-3.5 w-3.5 rounded-full bg-white' />}
               </div>
+
               <span className='text-sm font-medium'>
                 {isSelected ? t('selected') : t('select_plan')}
               </span>
+
               {/* Purchase button (only shown when selected and onPurchase is true) */}
               {isSelected && onPurchase && (
-                <HoverBorderGradient
-                  containerClassName='rounded-full ml-2'
-                  as='button'
-                  className='m-0 flex h-8 items-center justify-center px-4 py-0 text-sm font-medium text-white'
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onPurchase();
-                  }}
-                >
-                  {t('buyNow')}
-                </HoverBorderGradient>
+                <div className='ml-2'>
+                  <HoverBorderGradient
+                    containerClassName='rounded-full'
+                    as='button'
+                    className='m-0 flex h-8 items-center justify-center px-4 py-0 text-sm font-medium text-white'
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onPurchase();
+                    }}
+                  >
+                    {t('buyNow')}
+                  </HoverBorderGradient>
+                </div>
               )}
             </div>
           </CardFooter>
         </Card>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
