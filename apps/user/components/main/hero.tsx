@@ -38,15 +38,27 @@ export function Hero() {
             className='*:text-muted-foreground mb-8 max-w-xl'
           />
         )}
-        <Link href='#products'>
-          <HoverBorderGradient
-            containerClassName='rounded-full'
-            as='button'
-            className='m-0.5 flex items-center space-x-2 text-white'
-          >
-            {t('started')}
-          </HoverBorderGradient>
-        </Link>
+        {user ? (
+          <Link href='/dashboard'>
+            <HoverBorderGradient
+              containerClassName='rounded-full'
+              as='button'
+              className='m-0.5 flex items-center space-x-2 text-white'
+            >
+              {t('started')}
+            </HoverBorderGradient>
+          </Link>
+        ) : (
+          <Link href='#products'>
+            <HoverBorderGradient
+              containerClassName='rounded-full'
+              as='button'
+              className='m-0.5 flex items-center space-x-2 text-white'
+            >
+              {t('registerAndBuy')}
+            </HoverBorderGradient>
+          </Link>
+        )}
       </motion.div>
       <motion.div
         initial={{ opacity: 0, y: 50 }}
