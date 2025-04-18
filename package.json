@@ -63,5 +63,8 @@
   "packageManager": "bun@1.1.43",
   "engines": {
     "node": ">=20"
+  },
+  "dependencies": {
+    "react-fast-marquee": "^1.6.5"
   }
 }
