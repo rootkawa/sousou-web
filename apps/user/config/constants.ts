@@ -4,14 +4,31 @@ import packageJSON from '../package.json';
 export const locales = packageJSON.i18n.outputLocales;
 export const defaultLocale = packageJSON.i18n.entry;
 
+// language config
 export const NEXT_PUBLIC_DEFAULT_LANGUAGE =
   env('NEXT_PUBLIC_DEFAULT_LANGUAGE') ?? process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE ?? defaultLocale;
 
+// banner config
 export const NEXT_PUBLIC_LIMITED_OFFER_END_DATE =
   env('NEXT_PUBLIC_LIMITED_OFFER_END_DATE') ??
   process.env.NEXT_PUBLIC_LIMITED_OFFER_END_DATE ??
   '20000000';
 
+// promotion config
+export const NEXT_PUBLIC_PROMOTION_TITLE =
+  env('NEXT_PUBLIC_PROMOTION_TITLE') ?? process.env.NEXT_PUBLIC_PROMOTION_TITLE ?? '敬请期待';
+export const NEXT_PUBLIC_PROMOTION_DESCRIPTION =
+  env('NEXT_PUBLIC_PROMOTION_DESCRIPTION') ?? process.env.NEXT_PUBLIC_PROMOTION_DESCRIPTION ?? '';
+export const NEXT_PUBLIC_AFFILIATE_SHARE_TITLE =
+  env('NEXT_PUBLIC_AFFILIATE_SHARE_TITLE') ??
+  process.env.NEXT_PUBLIC_AFFILIATE_SHARE_TITLE ??
+  '敬请期待';
+export const NEXT_PUBLIC_AFFILIATE_SHARE_DESCRIPTION =
+  env('NEXT_PUBLIC_AFFILIATE_SHARE_DESCRIPTION') ??
+  process.env.NEXT_PUBLIC_AFFILIATE_SHARE_DESCRIPTION ??
+  '';
+
+// site config
 export const NEXT_PUBLIC_SITE_URL = env('NEXT_PUBLIC_SITE_URL') ?? process.env.NEXT_PUBLIC_SITE_URL;
 export const NEXT_PUBLIC_API_URL = env('NEXT_PUBLIC_API_URL') ?? process.env.NEXT_PUBLIC_API_URL;
 export const NEXT_PUBLIC_SURVEY_URL =
@@ -19,13 +36,14 @@ export const NEXT_PUBLIC_SURVEY_URL =
 export const NEXT_PUBLIC_CDN_URL =
   env('NEXT_PUBLIC_CDN_URL') || process.env.NEXT_PUBLIC_CDN_URL || 'https://fastly.jsdelivr.net';
 
+// config for default user
 export const NEXT_PUBLIC_DEFAULT_USER_EMAIL =
   env('NEXT_PUBLIC_DEFAULT_USER_EMAIL') ?? process.env.NEXT_PUBLIC_DEFAULT_USER_EMAIL;
 export const NEXT_PUBLIC_DEFAULT_USER_PASSWORD =
   env('NEXT_PUBLIC_DEFAULT_USER_PASSWORD') ?? process.env.NEXT_PUBLIC_DEFAULT_USER_PASSWORD;
 
+// config for social links
 export const NEXT_PUBLIC_EMAIL = env('NEXT_PUBLIC_EMAIL') ?? process.env.NEXT_PUBLIC_EMAIL;
-
 export const NEXT_PUBLIC_TELEGRAM_LINK =
   env('NEXT_PUBLIC_TELEGRAM_LINK') ?? process.env.NEXT_PUBLIC_TELEGRAM_LINK;
 export const NEXT_PUBLIC_DISCORD_LINK =

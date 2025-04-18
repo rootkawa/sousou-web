@@ -10,6 +10,12 @@ import {
 import { cn } from '@workspace/ui/lib/utils';
 import DiscountLottie from '@workspace/ui/lotties/discount.json';
 import GiftLottie from '@workspace/ui/lotties/gift.json';
+import {
+  NEXT_PUBLIC_AFFILIATE_SHARE_DESCRIPTION,
+  NEXT_PUBLIC_AFFILIATE_SHARE_TITLE,
+  NEXT_PUBLIC_PROMOTION_DESCRIPTION,
+  NEXT_PUBLIC_PROMOTION_TITLE,
+} from 'config/constants';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -131,7 +137,7 @@ export function AuthCarousel({ t }: AuthCarouselProps) {
           <CarouselItem className='h-full'>
             <div className='flex h-full flex-col items-center justify-center px-8 py-12'>
               <h2 className='mb-6 text-2xl font-bold text-slate-800 dark:text-white'>
-                {t('carousel.slide1.title')}
+                {NEXT_PUBLIC_PROMOTION_TITLE}
               </h2>
 
               <div className='mb-8 h-[200px] w-[200px]'>
@@ -139,7 +145,7 @@ export function AuthCarousel({ t }: AuthCarouselProps) {
               </div>
 
               <p className='max-w-md whitespace-pre-line text-center text-lg text-blue-600 dark:text-blue-300'>
-                {t('carousel.slide1.description')}
+                {NEXT_PUBLIC_PROMOTION_DESCRIPTION}
               </p>
             </div>
           </CarouselItem>
@@ -148,7 +154,7 @@ export function AuthCarousel({ t }: AuthCarouselProps) {
           <CarouselItem className='h-full'>
             <div className='flex h-full flex-col items-center justify-center px-8 py-12'>
               <h2 className='mb-6 text-2xl font-bold text-slate-800 dark:text-white'>
-                {t('carousel.slide2.title')}
+                {NEXT_PUBLIC_AFFILIATE_SHARE_TITLE}
               </h2>
 
               <div className='mb-8 h-[200px] w-[200px]'>
@@ -156,7 +162,7 @@ export function AuthCarousel({ t }: AuthCarouselProps) {
               </div>
 
               <p className='max-w-md whitespace-pre-line text-center text-lg text-blue-600 dark:text-blue-300'>
-                {t('carousel.slide2.description')}
+                {NEXT_PUBLIC_AFFILIATE_SHARE_DESCRIPTION}
               </p>
             </div>
           </CarouselItem>
