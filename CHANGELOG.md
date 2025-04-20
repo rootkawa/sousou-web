@@ -1,6 +1,27 @@
 <a name="readme-top"></a>
 # Changelog
 
+## [1.0.1](https://github.com/Saxxon-Usagi/sousou-web/compare/v1.0.0...v1.0.1) (2025-04-17)
+
+
+### ♻ Code Refactoring
+
+* **subscribe**: Refactor the subscribe page to make group filtering feature optional ([26c2174](https://github.com/Saxxon-Usagi/sousou-web/commit/26c2174))
+* **subscribe**: Refactor the subscription card to make it more user-friendly ([49f9eb7](https://github.com/Saxxon-Usagi/sousou-web/commit/49f9eb7))
+
+
+### 💄 Styles
+
+* **ui**: Modify icon/buttonname and description for ticket page ([8c2a43d](https://github.com/Saxxon-Usagi/sousou-web/commit/8c2a43d))
+* **ui**: Modify the slogan of referral code card ([56e0bb3](https://github.com/Saxxon-Usagi/sousou-web/commit/56e0bb3))
+* **ui**: Update icon logo for admin app ([310892e](https://github.com/Saxxon-Usagi/sousou-web/commit/310892e))
+* **ui**: Update subscription information to show speed limit instead of next reset time ([241ee80](https://github.com/Saxxon-Usagi/sousou-web/commit/241ee80))
+
+
+### 🔧 Continuous Integration
+
+* **github**: Refactor github workflows ([c3942a1](https://github.com/Saxxon-Usagi/sousou-web/commit/c3942a1))
+
 # 1.0.0 (2025-04-14)
 
 
