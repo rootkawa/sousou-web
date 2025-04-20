@@ -1,6 +1,21 @@
 <a name="readme-top"></a>
 # Changelog
 
+## [1.0.2](https://github.com/Saxxon-Usagi/sousou-web/compare/v1.0.1...v1.0.2) (2025-04-20)
+
+
+### ♻ Code Refactoring
+
+* **index**: Refactor the redirect logic of the index page ([a543602](https://github.com/Saxxon-Usagi/sousou-web/commit/a543602))
+
+
+### 💄 Styles
+
+* **auth**: Update promotion and affiliate share config to use next-runtime-env ([ed5e8bf](https://github.com/Saxxon-Usagi/sousou-web/commit/ed5e8bf))
+* **profile**: Disable UI for third-party account binding and notification settings changing ([c90dbc8](https://github.com/Saxxon-Usagi/sousou-web/commit/c90dbc8))
+* **ui**: Add animation to the subscription cards ([ecafb1e](https://github.com/Saxxon-Usagi/sousou-web/commit/ecafb1e))
+* **ui**: Add scrolling banner (marquee) to the index page ([9a99814](https://github.com/Saxxon-Usagi/sousou-web/commit/9a99814))
+
 ## [1.0.1](https://github.com/Saxxon-Usagi/sousou-web/compare/v1.0.0...v1.0.1) (2025-04-17)
 
 
