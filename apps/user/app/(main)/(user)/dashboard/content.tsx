@@ -174,6 +174,11 @@ export default function Content() {
             )}
           </div>
           {userSubscribe.map((item) => {
+            // if expire_time exists and expire_time is less than current time, set status to 3,
+            //  a patch for the backend bug
+            if (item.expire_time && item.status === 1 && new Date(item.expire_time) <= new Date()) {
+              item.status = 3;
+            }
             return (
               <Card
                 key={item.id}
@@ -299,7 +304,9 @@ export default function Content() {
                       <span className='text-muted-foreground'>{t('expirationDays')}</span>
                       <span className='text-2xl font-semibold'>
                         {item.expire_time
-                          ? differenceInDays(new Date(item.expire_time), new Date()) || t('unknown')
+                          ? new Date(item.expire_time) <= new Date()
+                            ? t('expired')
+                            : differenceInDays(new Date(item.expire_time), new Date())
                           : t('noLimit')}
                       </span>
                     </li>
