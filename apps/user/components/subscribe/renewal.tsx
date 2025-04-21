@@ -1,5 +1,6 @@
 'use client';
 
+import parseSubscriptionFeatures from '@/components/main/product-showcase/subscription-card/subscription-parser';
 import CouponInput from '@/components/subscribe/coupon-input';
 import DurationSelector from '@/components/subscribe/duration-selector';
 import PaymentMethods from '@/components/subscribe/payment-methods';
@@ -11,6 +12,7 @@ import { Card, CardContent } from '@workspace/ui/components/card';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -22,7 +24,6 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState, useTransition } from 'react';
 import { SubscribeBilling } from './billing';
 import { SubscribeDetail } from './detail';
-
 interface RenewalProps {
   id: number;
   subscribe: API.Subscribe;
@@ -39,6 +40,7 @@ export default function Renewal({ id, subscribe }: Readonly<RenewalProps>) {
     coupon: '',
     user_subscribe_id: id,
   });
+
   const [loading, startTransition] = useTransition();
 
   const { data: order } = useQuery({
@@ -63,6 +65,17 @@ export default function Renewal({ id, subscribe }: Readonly<RenewalProps>) {
       }));
     }
   }, [subscribe.id, id]);
+
+  useEffect(() => {
+    if (subscribe) {
+      const { subscriptionQuantity } = parseSubscriptionFeatures(subscribe);
+      subscribe.discount = [{ quantity: subscriptionQuantity, discount: 100 }];
+      setParams((prev) => ({
+        ...prev,
+        quantity: subscriptionQuantity, // Use extracted quantity instead of hardcoded 1
+      }));
+    }
+  }, [subscribe]);
 
   const handleChange = useCallback((field: keyof typeof params, value: string | number) => {
     setParams((prev) => ({
@@ -94,6 +107,7 @@ export default function Renewal({ id, subscribe }: Readonly<RenewalProps>) {
       <DialogContent className='flex h-full max-w-screen-lg flex-col overflow-hidden md:h-auto'>
         <DialogHeader>
           <DialogTitle>{t('renewSubscription')}</DialogTitle>
+          <DialogDescription></DialogDescription>
         </DialogHeader>
         <div className='grid w-full gap-3 lg:grid-cols-2'>
           <Card className='border-transparent shadow-none md:border-inherit md:shadow'>
