@@ -1,6 +1,20 @@
 <a name="readme-top"></a>
 # Changelog
 
+## [1.0.3](https://github.com/Saxxon-Usagi/sousou-web/compare/v1.0.2...v1.0.3) (2025-04-21)
+
+
+### 🐛 Bug Fixes
+
+* **renewal**: Fix the display and duration error when renewing a subscription ([f42184f](https://github.com/Saxxon-Usagi/sousou-web/commit/f42184f))
+* **rule-form**: Remove redundant rule set display ([ca39b92](https://github.com/Saxxon-Usagi/sousou-web/commit/ca39b92))
+* **rules**: Remove unused MATCH rule ([a9a16e0](https://github.com/Saxxon-Usagi/sousou-web/commit/a9a16e0))
+
+
+### 💄 Styles
+
+* **ui**: Implement a temporary patch for the backend bug when a subscription is expired ([8a8c035](https://github.com/Saxxon-Usagi/sousou-web/commit/8a8c035))
+
 ## [1.0.2](https://github.com/Saxxon-Usagi/sousou-web/compare/v1.0.1...v1.0.2) (2025-04-20)
 
 
