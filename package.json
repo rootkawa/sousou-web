@@ -47,6 +47,9 @@
     ]
   },
   "prettier": "@workspace/prettier-config",
+  "dependencies": {
+    "react-fast-marquee": "^1.6.5"
+  },
   "devDependencies": {
     "@umijs/openapi": "^1.13.0",
     "@workspace/commitlint-config": "workspace:*",
@@ -63,8 +66,5 @@
   "packageManager": "bun@1.1.43",
   "engines": {
     "node": ">=20"
-  },
-  "dependencies": {
-    "react-fast-marquee": "^1.6.5"
   }
 }
