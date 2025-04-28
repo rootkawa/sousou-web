@@ -118,17 +118,24 @@ export default function Content({ subscription }: { subscription?: API.Subscribe
                     ...prev,
                     identifier: email,
                   }));
+
+                  // Always start with a clean validation state
                   const reg = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                   if (!reg.test(email)) {
                     setIsEmailValid({
                       valid: false,
                       message: '请输入有效的邮箱地址',
                     });
-                  } else if (common.auth.email.enable_domain_suffix) {
+                    return; // Exit early if basic format is invalid
+                  }
+
+                  // Only check domain if email format is valid
+                  if (common.auth.email.enable_domain_suffix) {
                     const domain = email.split('@')[1];
                     const isValid = common.auth.email?.domain_suffix_list
                       .split('\n')
                       .includes(domain || '');
+
                     if (!isValid) {
                       setIsEmailValid({
                         valid: false,
@@ -136,12 +143,13 @@ export default function Content({ subscription }: { subscription?: API.Subscribe
                       });
                       return;
                     }
-                  } else {
-                    setIsEmailValid({
-                      valid: true,
-                      message: '',
-                    });
                   }
+
+                  // If we reach here, email is valid
+                  setIsEmailValid({
+                    valid: true,
+                    message: '',
+                  });
                 }}
                 required
               />

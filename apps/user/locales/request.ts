@@ -24,6 +24,7 @@ export default getRequestConfig(async () => {
     ticket: (await import(`./${locale}/ticket.json`)).default,
     document: (await import(`./${locale}/document.json`)).default,
     affiliate: (await import(`./${locale}/affiliate.json`)).default,
+    survey: (await import(`./${locale}/survey.json`)).default,
   };
 
   return {

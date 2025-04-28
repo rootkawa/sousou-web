@@ -5,6 +5,8 @@ import { Display } from '@/components/display';
 import Renewal from '@/components/subscribe/renewal';
 import ResetTraffic from '@/components/subscribe/reset-traffic';
 import Unsubscribe from '@/components/subscribe/unsubscribe';
+import { SurveyRedirectDialog } from '@/components/survey';
+import { NEXT_PUBLIC_SURVEY_URL } from '@/config/constants';
 import useGlobalStore from '@/config/use-global';
 import { getStat } from '@/services/common/common';
 import { queryApplicationConfig } from '@/services/user/subscribe';
@@ -38,8 +40,9 @@ import { differenceInDays, formatDate, isBrowser } from '@workspace/ui/utils';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { QRCodeCanvas } from 'qrcode.react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { toast } from 'sonner';
 import Subscribe from '../subscribe/page';
@@ -56,8 +59,23 @@ const platforms: (keyof API.ApplicationPlatform)[] = [
 export default function Content() {
   const t = useTranslations('dashboard');
   const { getUserSubscribe, getAppSubLink, user, common } = useGlobalStore();
-
+  const searchParams = useSearchParams();
   const [protocol, setProtocol] = useState('');
+  const [showSurveyDialog, setShowSurveyDialog] = useState(false);
+
+  // Check for surveyCompleted parameter and clear pending flag
+  useEffect(() => {
+    if (isBrowser() && searchParams.get('surveyCompleted') === 'true') {
+      window.localStorage.removeItem('surveyPending');
+    }
+  }, [searchParams]);
+
+  // Check for survey pending flag in localStorage
+  useEffect(() => {
+    if (isBrowser() && window.localStorage.getItem('surveyPending') === 'true') {
+      setShowSurveyDialog(true);
+    }
+  }, []);
 
   const {
     data: userSubscribe = [],
@@ -448,6 +466,11 @@ export default function Content() {
           <Subscribe />
         </>
       )}
+      <SurveyRedirectDialog
+        open={showSurveyDialog}
+        onOpenChange={setShowSurveyDialog}
+        redirectUrl={NEXT_PUBLIC_SURVEY_URL || '/dashboard'}
+      />
     </>
   );
 }

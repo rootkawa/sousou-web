@@ -19,7 +19,7 @@ import {
 } from '@workspace/ui/components/card';
 import { Separator } from '@workspace/ui/components/separator';
 import { Icon } from '@workspace/ui/custom-components/icon';
-import { formatDate } from '@workspace/ui/utils';
+import { formatDate, isBrowser } from '@workspace/ui/utils';
 import { useCountDown } from 'ahooks';
 import { addMinutes, format } from 'date-fns';
 import { useTranslations } from 'next-intl';
@@ -47,6 +47,13 @@ export default function Page() {
           setAuthorization(data?.data?.token);
           await new Promise((resolve) => setTimeout(resolve, 100));
           await getUserInfo();
+
+          // Check if payment was successful (status 2 or 5)
+          if ([2, 5].includes(data?.data?.status)) {
+            if (isBrowser()) {
+              window.localStorage.setItem('surveyPending', 'true');
+            }
+          }
         }
       }
       return data?.data;

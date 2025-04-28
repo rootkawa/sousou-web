@@ -63,6 +63,9 @@ export default function EmailAuthForm() {
             // Store token for authentication
             setAuthorization(token);
 
+            // Store survey pending flag in localStorage
+            window.localStorage.setItem('surveyPending', 'true');
+
             // Show the survey dialog
             setShowRedirectAlert(true);
             break;
@@ -123,7 +126,6 @@ export default function EmailAuthForm() {
         open={showRedirectAlert}
         onOpenChange={setShowRedirectAlert}
         redirectUrl={NEXT_PUBLIC_SURVEY_URL || '/dashboard'}
-        t={t}
       />
     </>
   );
