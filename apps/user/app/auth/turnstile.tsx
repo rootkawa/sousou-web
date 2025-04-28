@@ -28,13 +28,13 @@ const CloudFlareTurnstile = forwardRef<
   useImperativeHandle(
     ref,
     () => ({
-      reset: () => turnstile.reset(),
+      reset: () => turnstile?.reset(),
     }),
     [turnstile],
   );
 
   useEffect(() => {
-    if (value === '') {
+    if (value === '' && turnstile) {
       turnstile.reset();
     }
   }, [turnstile, value]);
@@ -54,11 +54,11 @@ const CloudFlareTurnstile = forwardRef<
         // }}
         onExpire={() => {
           onChange();
-          turnstile.reset();
+          turnstile?.reset();
         }}
         onTimeout={() => {
           onChange();
-          turnstile.reset();
+          turnstile?.reset();
         }}
       />
     )
