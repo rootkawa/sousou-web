@@ -57,7 +57,7 @@ export default function LoginForm({
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <Input placeholder='Enter your email...' type='email' {...field} />
+                  <Input placeholder='请输入您的邮箱...' type='email' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -69,7 +69,7 @@ export default function LoginForm({
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <Input placeholder='Enter your password...' type='password' {...field} />
+                  <Input placeholder='请输入您的密码...' type='password' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

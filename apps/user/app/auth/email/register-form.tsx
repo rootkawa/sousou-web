@@ -112,7 +112,7 @@ export default function RegisterForm({
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder='Enter your email...' type='email' {...field} />
+                    <Input placeholder='请输入您的邮箱...' type='email' {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -124,7 +124,7 @@ export default function RegisterForm({
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder='Enter your password...' type='password' {...field} />
+                    <Input placeholder='请输入您的密码...' type='password' {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -138,7 +138,7 @@ export default function RegisterForm({
                   <FormControl>
                     <Input
                       disabled={loading}
-                      placeholder='Enter password again...'
+                      placeholder='请再次输入密码...'
                       type='password'
                       {...field}
                     />
@@ -157,7 +157,7 @@ export default function RegisterForm({
                       <div className='flex items-center gap-2'>
                         <Input
                           disabled={loading}
-                          placeholder='Enter code...'
+                          placeholder='请输入验证码...'
                           type='text'
                           {...field}
                           value={field.value as string}

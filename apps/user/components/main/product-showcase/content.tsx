@@ -30,7 +30,8 @@ export function Content({ subscriptionData }: ProductShowcaseProps) {
       if (user) {
         router.push(`/subscribe?id=${item.id}`);
       } else {
-        router.push(`/purchasing?id=${item.id}`);
+        router.push(`/auth`);
+        // router.push(`/purchasing?id=${item.id}`);
       }
     },
     [router, user],
