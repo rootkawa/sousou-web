@@ -1,5 +1,6 @@
 'use client';
 
+import useGlobalStore from '@/config/use-global';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { memo, useCallback, useMemo, useState } from 'react';
@@ -15,6 +16,7 @@ const MemoizedSubscriptionCard = memo(SubscriptionCard);
 export function Content({ subscriptionData }: ProductShowcaseProps) {
   const t = useTranslations('index');
   const router = useRouter();
+  const { user } = useGlobalStore();
 
   // Default to the first plan
   const [selectedPlanIndex, setSelectedPlanIndex] = useState(0);
@@ -25,9 +27,13 @@ export function Content({ subscriptionData }: ProductShowcaseProps) {
 
   const handlePurchase = useCallback(
     (item: API.Subscribe) => {
-      router.push(`/purchasing?id=${item.id}`);
+      if (user) {
+        router.push(`/subscribe?id=${item.id}`);
+      } else {
+        router.push(`/purchasing?id=${item.id}`);
+      }
     },
-    [router],
+    [router, user],
   );
 
   const processedSubscriptionData = useMemo(() => {

@@ -4,7 +4,8 @@ import { querySubscribeGroupList, querySubscribeList } from '@/services/user/sub
 import { useQuery } from '@tanstack/react-query';
 import { Tabs, TabsList, TabsTrigger } from '@workspace/ui/components/tabs';
 import { useTranslations } from 'next-intl';
-import { memo, useCallback, useMemo, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { Empty } from '@/components/empty';
 import { SubscriptionCard } from '@/components/main/product-showcase/subscription-card/subscription-card';
@@ -19,6 +20,8 @@ const ENABLE_GROUP_FILTERING = false;
 
 export default function SubscribePage() {
   const t = useTranslations('subscribe');
+  const searchParams = useSearchParams();
+  const idParam = searchParams.get('id');
 
   const [subscribe, setSubscribe] = useState<API.Subscribe>();
   const [group, setGroup] = useState<string>('');
@@ -58,14 +61,20 @@ export default function SubscribePage() {
 
   const [selectedPlanIndex, setSelectedPlanIndex] = useState<number>(0);
 
+  // Handle initial selection based on URL param
+  useEffect(() => {
+    if (idParam && filteredSubscriptions?.length) {
+      const index = filteredSubscriptions.findIndex((item) => String(item.id) === idParam);
+      if (index !== -1) {
+        setSelectedPlanIndex(index);
+        setSubscribe(filteredSubscriptions[index]);
+      }
+    }
+  }, [idParam, filteredSubscriptions]);
+
   const handleSelectPlan = useCallback((index: number) => {
     setSelectedPlanIndex(index);
   }, []);
-
-  // Get the selected subscription based on selectedPlanIndex
-  const selectedSubscription = useMemo(() => {
-    return filteredSubscriptions[selectedPlanIndex];
-  }, [filteredSubscriptions, selectedPlanIndex]);
 
   // Handle purchase for a specific subscription
   const handlePurchase = useCallback((subscription: API.Subscribe) => {
