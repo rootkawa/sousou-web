@@ -1,6 +1,13 @@
 <a name="readme-top"></a>
 # Changelog
 
+# [1.1.0](https://github.com/Saxxon-Usagi/sousou-web/compare/v1.0.4...v1.1.0) (2025-04-28)
+
+
+### ✨ Features
+
+* **analytics**: Add Clarity and Vercel Analytics ([37bbcb2](https://github.com/Saxxon-Usagi/sousou-web/commit/37bbcb2))
+
 ## [1.0.4](https://github.com/Saxxon-Usagi/sousou-web/compare/v1.0.3...v1.0.4) (2025-04-28)
 
 
