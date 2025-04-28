@@ -13,7 +13,7 @@ import { Separator } from '@workspace/ui/components/separator';
 import { LoaderCircle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import { useCallback, useState, useTransition } from 'react';
+import { useCallback, useRef, useState, useTransition } from 'react';
 import { SubscribeBilling } from './billing';
 import CouponInput from './coupon-input';
 import { SubscribeDetail } from './detail';
@@ -36,8 +36,9 @@ export default function Purchase({ subscribe, setSubscribe }: Readonly<PurchaseP
     coupon: '',
   });
   const [loading, startTransition] = useTransition();
+  const defaultOrder = useRef<any>(null);
 
-  const { data: order } = useQuery({
+  const { data } = useQuery({
     enabled: true,
     queryKey: ['preCreateOrder', params],
     queryFn: async () => {
@@ -45,9 +46,13 @@ export default function Purchase({ subscribe, setSubscribe }: Readonly<PurchaseP
         ...params,
         subscribe_id: subscribe.id as number,
       } as API.PurchaseOrderRequest);
+      if (defaultOrder.current === null) {
+        defaultOrder.current = data.data;
+      }
       return data.data;
     },
   });
+  const order = data ?? defaultOrder.current;
 
   const handleChange = useCallback((field: keyof typeof params, value: string | number) => {
     setParams((prev) => ({
