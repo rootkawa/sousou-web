@@ -1,4 +1,26 @@
 <a name="readme-top"></a>
+# Changelog
+
+## [1.0.4](https://github.com/Saxxon-Usagi/sousou-web/compare/v1.0.3...v1.0.4) (2025-04-28)
+
+
+### 🎫 Chores
+
+* **release**: V1.0.0 [skip ci], closes [#9](https://github.com/Saxxon-Usagi/sousou-web/issues/9) [#9](https://github.com/Saxxon-Usagi/sousou-web/issues/9) ([87f4f6e](https://github.com/Saxxon-Usagi/sousou-web/commit/87f4f6e))
+
+
+### 🐛 Bug Fixes
+
+* **index**: Disable register + purchasing when not logged in due to backend bug ([0244a7f](https://github.com/Saxxon-Usagi/sousou-web/commit/0244a7f))
+* **index**: Fix index page payment display when user is logged in by redirecting to subscribe page with the selected subscription id ([4aad184](https://github.com/Saxxon-Usagi/sousou-web/commit/4aad184))
+* **index**: Update display bug when coupon code is entered ([818db63](https://github.com/Saxxon-Usagi/sousou-web/commit/818db63))
+* **logs**: Update log display to render key-value pairs and remove badge ([93ac40f](https://github.com/Saxxon-Usagi/sousou-web/commit/93ac40f))
+* **payment**: Refactor payment form placeholder and update localization files ([8fc6160](https://github.com/Saxxon-Usagi/sousou-web/commit/8fc6160))
+* **survey**: Fix survey state persistence through localStorage ([03c7d27](https://github.com/Saxxon-Usagi/sousou-web/commit/03c7d27))
+* **turnstile**: Fix turnstile error by adding null check ([e722cb0](https://github.com/Saxxon-Usagi/sousou-web/commit/e722cb0))
+* **wallet**: Remove balance as a payment method when recharging ([3df9fdb](https://github.com/Saxxon-Usagi/sousou-web/commit/3df9fdb))
+
+<a name="readme-top"></a>
 
 # Changelog
 
