@@ -35,6 +35,8 @@ export const NEXT_PUBLIC_SURVEY_URL =
   env('NEXT_PUBLIC_SURVEY_URL') ?? process.env.NEXT_PUBLIC_SURVEY_URL;
 export const NEXT_PUBLIC_CDN_URL =
   env('NEXT_PUBLIC_CDN_URL') || process.env.NEXT_PUBLIC_CDN_URL || 'https://fastly.jsdelivr.net';
+export const NEXT_PUBLIC_CLARITY_PROJECT_ID =
+  env('NEXT_PUBLIC_CLARITY_PROJECT_ID') ?? process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID ?? '';
 
 // config for default user
 export const NEXT_PUBLIC_DEFAULT_USER_EMAIL =

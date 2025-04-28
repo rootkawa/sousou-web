@@ -57,11 +57,13 @@
     "apps/user": {
       "name": "sousou-user-web",
       "dependencies": {
+        "@microsoft/clarity": "^1.0.0",
         "@stripe/react-stripe-js": "^3.4.0",
         "@stripe/stripe-js": "^6.0.0",
         "@tabler/icons-react": "^3.31.0",
         "@tanstack/react-query": "^5.63.0",
         "@tanstack/react-query-next-experimental": "^5.63.0",
+        "@vercel/analytics": "^1.5.0",
         "@workspace/ui": "workspace:*",
         "ahooks": "^3.8.4",
         "axios": "^1.7.9",
@@ -426,6 +428,8 @@
 
     "@lottiefiles/dotlottie-web": ["@lottiefiles/dotlottie-web@0.40.1", "", {}, "sha512-iNz1rr8zRTSJ0xCZEPeoCX6YnaNhBdkF7gJWhSa8bwB4NTrYZm0vAuC0jF/aLLhU7q9nf6ykxffrz0Sf4JPSPg=="],
 
+    "@microsoft/clarity": ["@microsoft/clarity@1.0.0", "", {}, "sha512-2QY6SmXnqRj6dWhNY8NYCN3e53j4zCFebH4wGnNhdGV1mqAsQwql2fT0w8TISxCvwwfVp8idsWLIdrRHOms1PQ=="],
+
     "@monaco-editor/loader": ["@monaco-editor/loader@1.5.0", "", { "dependencies": { "state-local": "^1.0.6" } }, "sha512-hKoGSM+7aAc7eRTRjpqAZucPmoNOC4UUbknb/VNoTkEIkCPhqV8LfbsgM1webRM7S/z21eHEx9Fkwx8Z/C/+Xw=="],
 
     "@monaco-editor/react": ["@monaco-editor/react@4.7.0", "", { "dependencies": { "@monaco-editor/loader": "^1.5.0" }, "peerDependencies": { "monaco-editor": ">= 0.25.0 < 1", "react": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0", "react-dom": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0" } }, "sha512-cyzXQCtO47ydzxpQtCGSQGOC8Gk3ZUeBXFAxD+CWXYFo5OqZyZUonFl0DwUlTyAfRHntBfw2p3w4s9R6oe1eCA=="],
@@ -755,6 +759,8 @@
     "@umijs/openapi": ["@umijs/openapi@1.13.0", "", { "dependencies": { "chalk": "^4.1.2", "cosmiconfig": "^9.0.0", "dayjs": "^1.10.3", "glob": "^7.1.6", "lodash": "^4.17.21", "memoizee": "^0.4.15", "mock.js": "^0.2.0", "mockjs": "^1.1.0", "node-fetch": "^2.6.1", "nunjucks": "^3.2.2", "openapi3-ts": "^2.0.1", "prettier": "^2.2.1", "reserved-words": "^0.1.2", "rimraf": "^3.0.2", "swagger2openapi": "^7.0.4", "tiny-pinyin": "^1.3.2" }, "bin": { "openapi2ts": "dist/cli.js" } }, "sha512-hIilb15A8Md0aUBsuvX2nH24oVjue9OIBETapKbtanWqYCqUBcOvNZ5SBAtzVD1kVx80Q6oNlCRYKBsS80W31w=="],
 
     "@ungap/structured-clone": ["@ungap/structured-clone@1.3.0", "", {}, "sha512-WmoN8qaIAo7WTYWbAZuG8PYEhn5fkz7dZrqTBZ7dtt//lL2Gwms1IcnQ5yHqjDfX8Ft5j4YzDM23f87zBfDe9g=="],
+
+    "@vercel/analytics": ["@vercel/analytics@1.5.0", "", { "peerDependencies": { "@remix-run/react": "^2", "@sveltejs/kit": "^1 || ^2", "next": ">= 13", "react": "^18 || ^19 || ^19.0.0-rc", "svelte": ">= 4", "vue": "^3", "vue-router": "^4" }, "optionalPeers": ["@remix-run/react", "@sveltejs/kit", "next", "react", "svelte", "vue", "vue-router"] }, "sha512-MYsBzfPki4gthY5HnYN7jgInhAZ7Ac1cYDoRWFomwGHWEX7odTEzbtg9kf/QSo7XEsEAqlQugA6gJ2WS2DEa3g=="],
 
     "@workspace/commitlint-config": ["@workspace/commitlint-config@workspace:packages/commitlint-config"],
 
