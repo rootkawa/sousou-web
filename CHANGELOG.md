@@ -1,6 +1,13 @@
 <a name="readme-top"></a>
 # Changelog
 
+# [1.2.0](https://github.com/Saxxon-Usagi/sousou-web/compare/v1.1.0...v1.2.0) (2025-04-28)
+
+
+### ✨ Features
+
+* **analytics**: Replace Vercel Web Analytics with Vercel Speed Insights ([9b4e4df](https://github.com/Saxxon-Usagi/sousou-web/commit/9b4e4df))
+
 # [1.1.0](https://github.com/Saxxon-Usagi/sousou-web/compare/v1.0.4...v1.1.0) (2025-04-28)
 
 
