@@ -2,7 +2,7 @@ import { ClarityAnalytics } from '@/components/analytics/clarity';
 import Providers from '@/components/providers';
 import { getGlobalConfig } from '@/services/common/common';
 import { queryUserInfo } from '@/services/user/user';
-import { Analytics as VercelAnalytics } from '@vercel/analytics/react';
+import { SpeedInsights as VercelSpeedInsights } from '@vercel/speed-insights/next';
 import { Toaster } from '@workspace/ui/components/sonner';
 import '@workspace/ui/globals.css';
 import { getLangDir } from '@workspace/ui/hooks/use-lang-dir';
@@ -120,7 +120,7 @@ export default async function RootLayout({
           id='custom_html'
           dangerouslySetInnerHTML={{ __html: config?.site.custom_html || '' }}
         />
-        <VercelAnalytics />
+        <VercelSpeedInsights />
         <ClarityAnalytics />
       </body>
     </html>
