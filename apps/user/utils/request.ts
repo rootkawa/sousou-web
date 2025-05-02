@@ -11,6 +11,9 @@ async function handleError(response: any) {
   if (response?.config?.skipErrorHandler) return;
   if (!isBrowser()) return;
 
+  // Skip showing error for invalid coupon (50001) during preorder creation
+  if (code === 50001 && response.config?.url?.includes('/v1/public/order/pre')) return;
+
   const t = await getTranslations('common');
   const message =
     t(`request.${code}`) !== `request.${code}`
