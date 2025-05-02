@@ -24,7 +24,7 @@ export default function Header() {
   );
   return (
     <header className='sticky top-0 z-50 border-b backdrop-blur-md'>
-      <div className='container flex h-16 items-center justify-between'>
+      <div className='mx-auto flex h-16 max-w-[95%] items-center justify-between 2xl:max-w-[90%]'>
         <nav className='flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6'>
           {Logo}
         </nav>

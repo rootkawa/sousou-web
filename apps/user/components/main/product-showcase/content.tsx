@@ -45,13 +45,13 @@ export function Content({ subscriptionData }: ProductShowcaseProps) {
   }, [subscriptionData]);
 
   return (
-    <div className='flex flex-col items-center'>
+    <div className='flex w-full flex-col items-center'>
       <h2 className='mb-2 text-center text-3xl font-bold'>{t('product_showcase_title')}</h2>
-      <p className='text-muted-foreground mb-16 text-center text-lg'>
+      <p className='text-muted-foreground mb-16 max-w-3xl text-center text-lg'>
         {t('product_showcase_description')}
       </p>
 
-      <div className='mx-auto grid max-w-7xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
+      <div className='grid w-full grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4'>
         {processedSubscriptionData?.map((item, index) => {
           return (
             <div key={`${item.id}-${item.name}`} className='w-full'>

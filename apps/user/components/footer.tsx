@@ -54,7 +54,7 @@ export default function Footer() {
   return (
     <footer>
       <Separator className='my-14' />
-      <div className='text-muted-foreground container mb-14 flex flex-wrap justify-between gap-4 text-sm'>
+      <div className='text-muted-foreground mx-auto mb-14 flex max-w-[95%] flex-wrap justify-between gap-4 text-sm 2xl:max-w-[90%]'>
         <nav className='flex flex-wrap items-center gap-2'>
           {Links.filter((item) => item.href).map((item, index) => (
             <Fragment key={index}>
