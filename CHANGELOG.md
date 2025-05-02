@@ -1,6 +1,25 @@
 <a name="readme-top"></a>
 # Changelog
 
+# [1.3.0](https://github.com/Saxxon-Usagi/sousou-web/compare/v1.2.0...v1.3.0) (2025-05-02)
+
+
+### ✨ Features
+
+* **subscribe**: Add button to direct to document page based on platform ([a63e92c](https://github.com/Saxxon-Usagi/sousou-web/commit/a63e92c))
+
+
+### 🐛 Bug Fixes
+
+* **coupon**: Only show error message for invalid coupon during purchase ([b06dade](https://github.com/Saxxon-Usagi/sousou-web/commit/b06dade))
+* **responsiveness**: Update overall responsiveness when displaying on different devices with different screen sizes ([32c0c18](https://github.com/Saxxon-Usagi/sousou-web/commit/32c0c18))
+
+
+### 💄 Styles
+
+* **dashboard**: Update Icon and Tab ([1229025](https://github.com/Saxxon-Usagi/sousou-web/commit/1229025))
+* **ui**: Update the lottie animation for the hero and global map ([5388fc0](https://github.com/Saxxon-Usagi/sousou-web/commit/5388fc0))
+
 # [1.2.0](https://github.com/Saxxon-Usagi/sousou-web/compare/v1.1.0...v1.2.0) (2025-04-28)
 
 
