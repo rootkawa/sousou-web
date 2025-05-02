@@ -5,12 +5,27 @@ import { getTutorialList } from '@/utils/tutorial';
 import { useQuery } from '@tanstack/react-query';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@workspace/ui/components/tabs';
 import { useLocale, useTranslations } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
+import { useState } from 'react';
 import { DocumentButton } from './document-button';
 import { TutorialButton } from './tutorial-button';
+
+const platformMap = {
+  windows: 'Windows',
+  macos: 'macOS',
+  android: 'Android',
+  ios: 'iOS / iPadOS',
+  harmony: 'Android',
+  linux: 'Router',
+};
 
 export default function Page() {
   const locale = useLocale();
   const t = useTranslations('document');
+  const searchParams = useSearchParams();
+  const platformParam = searchParams.get('platform') || 'Windows';
+  const platform = platformMap[platformParam as keyof typeof platformMap] || 'Windows';
+  const [tutorialDefaultTab, setTutorialDefaultTab] = useState(platform);
 
   const { data } = useQuery({
     queryKey: ['queryDocumentList'],
@@ -64,7 +79,7 @@ export default function Page() {
       {TutorialList && TutorialList?.length > 0 && (
         <>
           <h2 className='flex items-center gap-1.5 font-semibold'>{t('tutorial')}</h2>
-          <Tabs defaultValue={TutorialList?.[0]?.title}>
+          <Tabs defaultValue={tutorialDefaultTab}>
             <TabsList className='h-full flex-wrap'>
               {TutorialList?.map((tutorial) => (
                 <TabsTrigger key={tutorial.title} value={tutorial.title}>

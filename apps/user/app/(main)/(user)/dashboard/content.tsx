@@ -95,6 +95,7 @@ export default function Content() {
       return data.data?.applications || [];
     },
   });
+
   const [platform, setPlatform] = useState<keyof API.ApplicationPlatform>(getPlatform());
 
   const { data } = useQuery({
@@ -281,8 +282,13 @@ export default function Content() {
                       </AlertDialog>
                       <ResetTraffic id={item.id} replacement={item.subscribe.replacement} />
                       <Renewal id={item.id} subscribe={item.subscribe} />
-
                       <Unsubscribe id={item.id} allowDeduction={item.subscribe.allow_deduction} />
+                      <Button size='sm' variant='outline' asChild>
+                        <Link href={`/document?platform=${platform}`}>
+                          <Icon icon='uil:book-alt' className='mr-1 size-4' />
+                          {t('instruction')}
+                        </Link>
+                      </Button>
                     </div>
                   )}
                 </CardHeader>
