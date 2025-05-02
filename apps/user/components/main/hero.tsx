@@ -20,7 +20,7 @@ export function Hero() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: 'spring', stiffness: 100, damping: 20 }}
       viewport={{ once: true, amount: 0.2 }}
-      className='grid gap-8 pt-16 sm:grid-cols-2'
+      className='grid gap-8 pt-8 sm:grid-cols-2 md:pt-16'
     >
       <motion.div
         initial={{ opacity: 0, y: 50 }}
@@ -29,13 +29,13 @@ export function Hero() {
         viewport={{ once: true, amount: 0.3 }}
         className='flex flex-col items-start justify-center'
       >
-        <h1 className='my-6 text-4xl font-bold lg:text-6xl'>
+        <h1 className='my-4 text-3xl font-bold md:my-6 md:text-4xl lg:text-6xl'>
           {t('welcome')} {site.site_name}
         </h1>
         {site.site_desc && (
           <TextGenerateEffect
             words={site.site_desc}
-            className='*:text-muted-foreground mb-8 max-w-xl'
+            className='*:text-muted-foreground mb-6 max-w-xl md:mb-8'
           />
         )}
         {user ? (
@@ -65,9 +65,11 @@ export function Hero() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: 'spring', stiffness: 80, damping: 15, delay: 0.5 }}
         viewport={{ once: true, amount: 0.3 }}
-        className='flex w-full'
+        className='flex w-full items-center justify-center'
       >
-        <DotLottieReact data={NetworkSecurityLottie} autoplay loop />
+        <div className='w-full max-w-[300px] sm:max-w-none'>
+          <DotLottieReact data={NetworkSecurityLottie} autoplay loop />
+        </div>
       </motion.div>
     </motion.div>
   );

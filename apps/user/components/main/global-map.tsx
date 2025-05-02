@@ -31,7 +31,7 @@ export function GlobalMap() {
         {t('global_map_description')}
       </motion.p>
       <motion.div
-        className='-mb-32 -mt-20 aspect-video w-full overflow-hidden'
+        className='-mb-8 -mt-4 aspect-video w-full overflow-hidden md:-mb-32 md:-mt-20'
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{
@@ -41,7 +41,12 @@ export function GlobalMap() {
           delay: 0.4,
         }}
       >
-        <DotLottieReact className='w-full scale-150' data={GlobalMapLottie} autoplay loop />
+        <DotLottieReact
+          className='w-full scale-[1.8] md:scale-150'
+          data={GlobalMapLottie}
+          autoplay
+          loop
+        />
       </motion.div>
     </motion.section>
   );
