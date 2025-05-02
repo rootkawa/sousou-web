@@ -13,11 +13,13 @@ import { TutorialButton } from './tutorial-button';
 const platformMap = {
   windows: 'Windows',
   macos: 'macOS',
-  android: 'Android',
   ios: 'iOS / iPadOS',
+  android: 'Android',
   harmony: 'Android',
   linux: 'Router',
 };
+
+const tabOrder = ['Windows', 'macOS', 'iOS / iPadOS', 'Android', 'Router'];
 
 export default function Page() {
   const locale = useLocale();
@@ -81,7 +83,9 @@ export default function Page() {
           <h2 className='flex items-center gap-1.5 font-semibold'>{t('tutorial')}</h2>
           <Tabs defaultValue={tutorialDefaultTab}>
             <TabsList className='h-full flex-wrap'>
-              {TutorialList?.map((tutorial) => (
+              {TutorialList?.sort(
+                (a, b) => tabOrder.indexOf(a.title) - tabOrder.indexOf(b.title),
+              ).map((tutorial) => (
                 <TabsTrigger key={tutorial.title} value={tutorial.title}>
                   {tutorial.title}
                 </TabsTrigger>

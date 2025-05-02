@@ -50,10 +50,10 @@ import Subscribe from '../subscribe/page';
 const platforms: (keyof API.ApplicationPlatform)[] = [
   'windows',
   'macos',
-  'linux',
   'ios',
   'android',
   'harmony',
+  'linux',
 ];
 
 export default function Content() {
@@ -154,20 +154,19 @@ export default function Content() {
             >
               <TabsList className='flex *:flex-auto'>
                 {platforms.map((item) => (
-                  <TabsTrigger value={item} key={item} className='px-1 lg:px-3'>
-                    <Icon
-                      icon={`${
+                  <TabsTrigger value={item} key={item} className='min-w-[80px] px-1 lg:px-3'>
+                    <span className='text-xs font-medium'>
+                      {
                         {
-                          windows: 'mdi:microsoft-windows',
-                          macos: 'uil:apple',
-                          linux: 'uil:linux',
-                          ios: 'simple-icons:ios',
-                          android: 'uil:android',
-                          harmony: 'simple-icons:harmonyos',
+                          windows: 'Windows',
+                          macos: 'Mac',
+                          ios: 'iPhone/iPad',
+                          android: 'Android',
+                          harmony: 'HarmonyOS',
+                          linux: 'Linux',
                         }[item]
-                      }`}
-                      className='size-5'
-                    />
+                      }
+                    </span>
                   </TabsTrigger>
                 ))}
               </TabsList>
