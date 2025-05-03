@@ -34,7 +34,7 @@ export const NEXT_PUBLIC_API_URL = env('NEXT_PUBLIC_API_URL') ?? process.env.NEX
 export const NEXT_PUBLIC_SURVEY_URL =
   env('NEXT_PUBLIC_SURVEY_URL') ?? process.env.NEXT_PUBLIC_SURVEY_URL;
 export const NEXT_PUBLIC_CDN_URL =
-  env('NEXT_PUBLIC_CDN_URL') || process.env.NEXT_PUBLIC_CDN_URL || 'https://fastly.jsdelivr.net';
+  env('NEXT_PUBLIC_CDN_URL') || process.env.NEXT_PUBLIC_CDN_URL || 'https://cdn.jsdelivr.net';
 export const NEXT_PUBLIC_CLARITY_PROJECT_ID =
   env('NEXT_PUBLIC_CLARITY_PROJECT_ID') ?? process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID ?? '';
 
