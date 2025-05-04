@@ -13,6 +13,14 @@ import { useTranslations } from 'next-intl';
 import { RefObject, useEffect, useId, useRef, useState } from 'react';
 import { CloseIcon } from './close-icon';
 
+// Helper function to extract URL and clean title
+function extractUrlFromTitle(title: string): { iconURL: string | null; cleanTitle: string } {
+  const urlMatch = title.match(/\((.*?)\)/);
+  const iconURL = urlMatch?.[1] ?? null;
+  const cleanTitle = iconURL ? title.replace(/\s*\((.*?)\)/, '') : title;
+  return { iconURL, cleanTitle };
+}
+
 export function DocumentButton({ items }: { items: API.Document[] }) {
   const t = useTranslations('document');
   const [active, setActive] = useState<API.Document | boolean | null>(null);
@@ -95,46 +103,59 @@ export function DocumentButton({ items }: { items: API.Document[] }) {
         ) : null}
       </AnimatePresence>
       <ul className='flex w-full flex-col gap-4'>
-        {items.map((item, index) => (
-          <motion.div
-            layoutId={`card-${item.id}-${id}`}
-            key={`card-${item.id}-${id}`}
-            onClick={() => setActive(item)}
-            className='bg-background hover:bg-accent flex cursor-pointer items-center justify-between rounded border p-4'
-          >
-            <div className='flex flex-row items-center gap-4'>
-              <motion.div layoutId={`image-${item.id}-${id}`}>
-                <Avatar className='size-12'>
-                  <AvatarFallback className='bg-primary/80 text-white'>
-                    {item.title.split('')[0]}
-                  </AvatarFallback>
-                </Avatar>
-              </motion.div>
-              <div className=''>
-                <motion.h3 layoutId={`title-${item.id}-${id}`} className='font-medium'>
-                  {item.title}
-                </motion.h3>
-                <motion.p
-                  layoutId={`description-${item.id}-${id}`}
-                  className='text-sm text-neutral-600 dark:text-neutral-400'
-                >
-                  {formatDate(item.updated_at)}
-                </motion.p>
-              </div>
-            </div>
-            <motion.button
-              layoutId={`button-${item.id}-${id}`}
-              className={cn(
-                buttonVariants({
-                  variant: 'secondary',
-                }),
-                'rounded-full',
-              )}
+        {items.map((item, index) => {
+          const { iconURL, cleanTitle } = extractUrlFromTitle(item.title);
+          return (
+            <motion.div
+              layoutId={`card-${item.id}-${id}`}
+              key={`card-${item.id}-${id}`}
+              onClick={() => setActive(item)}
+              className='bg-background hover:bg-accent flex cursor-pointer items-center justify-between rounded border p-4'
             >
-              {t('read')}
-            </motion.button>
-          </motion.div>
-        ))}
+              <div className='flex flex-row items-center gap-4'>
+                <motion.div layoutId={`image-${item.id}-${id}`}>
+                  {iconURL ? (
+                    <img
+                      src={iconURL}
+                      alt={cleanTitle}
+                      className='size-12 rounded object-cover'
+                      width={48}
+                      height={48}
+                    />
+                  ) : (
+                    <Avatar className='size-12'>
+                      <AvatarFallback className='bg-primary/80 text-white'>
+                        {cleanTitle.split('')[0]}
+                      </AvatarFallback>
+                    </Avatar>
+                  )}
+                </motion.div>
+                <div className=''>
+                  <motion.h3 layoutId={`title-${item.id}-${id}`} className='font-medium'>
+                    {cleanTitle}
+                  </motion.h3>
+                  <motion.p
+                    layoutId={`description-${item.id}-${id}`}
+                    className='text-sm text-neutral-600 dark:text-neutral-400'
+                  >
+                    {formatDate(item.updated_at)}
+                  </motion.p>
+                </div>
+              </div>
+              <motion.button
+                layoutId={`button-${item.id}-${id}`}
+                className={cn(
+                  buttonVariants({
+                    variant: 'secondary',
+                  }),
+                  'rounded-full',
+                )}
+              >
+                {t('read')}
+              </motion.button>
+            </motion.div>
+          );
+        })}
       </ul>
     </>
   );

@@ -50,14 +50,16 @@ export default function Page() {
     },
   });
 
+  console.log(TutorialList);
+
   return (
     <div className='space-y-4'>
       {DocumentList?.length > 0 && (
         <>
           <h2 className='flex items-center gap-1.5 font-semibold'>{t('document')}</h2>
-          <Tabs defaultValue='all'>
+          <Tabs defaultValue={tutorialDefaultTab}>
             <TabsList className='h-full flex-wrap'>
-              <TabsTrigger value='all'>{t('all')}</TabsTrigger>
+              {/* <TabsTrigger value='all'>{t('all')}</TabsTrigger> */}
               {tags?.map((item) => (
                 <TabsTrigger key={item} value={item}>
                   {item}

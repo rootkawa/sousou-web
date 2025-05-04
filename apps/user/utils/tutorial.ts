@@ -1,7 +1,7 @@
 import { NEXT_PUBLIC_CDN_URL } from '@/config/constants';
 import matter from 'gray-matter';
 
-const BASE_URL = `${NEXT_PUBLIC_CDN_URL}/gh/rootkawa/sousou-tutorial/`;
+const BASE_URL = `${NEXT_PUBLIC_CDN_URL}/gh/rootkawa/sousou-tutorial`;
 
 async function getVersion() {
   // API rate limit: 60 requests per hour
