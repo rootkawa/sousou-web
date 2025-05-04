@@ -1,6 +1,18 @@
 <a name="readme-top"></a>
 # Changelog
 
+# [1.4.0](https://github.com/Saxxon-Usagi/sousou-web/compare/v1.3.0...v1.4.0) (2025-05-04)
+
+
+### ✨ Features
+
+* **document**: Update document button to use extract and render icon URL from title ([f091eb9](https://github.com/Saxxon-Usagi/sousou-web/commit/f091eb9))
+
+
+### 🐛 Bug Fixes
+
+* **tutorial**: Update tutorial CDN URL ([f98dea0](https://github.com/Saxxon-Usagi/sousou-web/commit/f98dea0))
+
 # [1.3.0](https://github.com/Saxxon-Usagi/sousou-web/compare/v1.2.0...v1.3.0) (2025-05-02)
 
 
