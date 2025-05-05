@@ -4,12 +4,13 @@ import matter from 'gray-matter';
 const BASE_URL = `${NEXT_PUBLIC_CDN_URL}/gh/rootkawa/sousou-tutorial`;
 
 async function getVersion() {
-  // API rate limit: 60 requests per hour
-  const response = await fetch(
-    'https://data.jsdelivr.com/v1/stats/packages/gh/rootkawa/sousou-tutorial/versions',
-  );
-  const json = await response.json();
-  return json[0].version;
+  // // API rate limit: 60 requests per hour
+  // const response = await fetch(
+  //   'https://data.jsdelivr.com/v1/stats/packages/gh/rootkawa/sousou-tutorial/versions',
+  // );
+  // const json = await response.json();
+  // return json[0].version;
+  return 'latest';
 }
 
 async function getVersionPath() {

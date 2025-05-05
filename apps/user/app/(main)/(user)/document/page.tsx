@@ -50,8 +50,6 @@ export default function Page() {
     },
   });
 
-  console.log(TutorialList);
-
   return (
     <div className='space-y-4'>
       {DocumentList?.length > 0 && (
