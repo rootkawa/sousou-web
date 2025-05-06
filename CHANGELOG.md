@@ -1,6 +1,13 @@
 <a name="readme-top"></a>
 # Changelog
 
+## [1.4.2](https://github.com/Saxxon-Usagi/sousou-web/compare/v1.4.1...v1.4.2) (2025-05-06)
+
+
+### 🐛 Bug Fixes
+
+* **tutorial**: Update CDN URL to cloudflare pages ([1e1d603](https://github.com/Saxxon-Usagi/sousou-web/commit/1e1d603))
+
 ## [1.4.1](https://github.com/Saxxon-Usagi/sousou-web/compare/v1.4.0...v1.4.1) (2025-05-05)
 
 
