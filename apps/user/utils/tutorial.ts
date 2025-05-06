@@ -1,16 +1,15 @@
 import { NEXT_PUBLIC_CDN_URL } from '@/config/constants';
 import matter from 'gray-matter';
 
-const BASE_URL = `${NEXT_PUBLIC_CDN_URL}/gh/rootkawa/sousou-tutorial`;
+const BASE_URL = `${NEXT_PUBLIC_CDN_URL}`;
 
 async function getVersion() {
-  // // API rate limit: 60 requests per hour
-  // const response = await fetch(
-  //   'https://data.jsdelivr.com/v1/stats/packages/gh/rootkawa/sousou-tutorial/versions',
-  // );
-  // const json = await response.json();
-  // return json[0].version;
-  return 'latest';
+  // API rate limit: 60 requests per hour
+  const response = await fetch(
+    'https://data.jsdelivr.com/v1/stats/packages/gh/rootkawa/sousou-tutorial/versions',
+  );
+  const json = await response.json();
+  return json[0].version;
 }
 
 async function getVersionPath() {
@@ -26,7 +25,7 @@ export async function getTutorial(path: string): Promise<{
   config?: Record<string, unknown>;
   content: string;
 }> {
-  const versionPath = await getVersionPath();
+  const versionPath = BASE_URL; // await getVersionPath();
   try {
     const url = `${versionPath}/${path}`;
     const response = await fetch(url);
@@ -53,6 +52,7 @@ type TutorialItem = {
 };
 
 const processIcon = (item: TutorialItem) => {
+  console.log(item);
   if ('icon' in item && typeof item.icon === 'string' && !item.icon.startsWith('http')) {
     item.icon = `${BASE_URL}/${item.icon}`;
   }
