@@ -1,6 +1,13 @@
 <a name="readme-top"></a>
 # Changelog
 
+## [1.4.3](https://github.com/Saxxon-Usagi/sousou-web/compare/v1.4.2...v1.4.3) (2025-06-20)
+
+
+### 🐛 Bug Fixes
+
+* **bun.lock**: Update bun.lock for cloudflare worker ([895e8fa](https://github.com/Saxxon-Usagi/sousou-web/commit/895e8fa))
+
 ## [1.4.2](https://github.com/Saxxon-Usagi/sousou-web/compare/v1.4.1...v1.4.2) (2025-05-06)
 
 
