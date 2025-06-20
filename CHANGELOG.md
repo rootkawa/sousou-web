@@ -1,6 +1,13 @@
 <a name="readme-top"></a>
 # Changelog
 
+# [1.6.0](https://github.com/rootkawa/sousou-web/compare/v1.5.0...v1.6.0) (2025-06-20)
+
+
+### ✨ Features
+
+* **wrangler.jsonc**: Add wrangler.jsonc for cloudflare worker ([325cf6a](https://github.com/rootkawa/sousou-web/commit/325cf6a))
+
 # [1.5.0](https://github.com/rootkawa/sousou-web/compare/v1.4.7...v1.5.0) (2025-06-20)
 
 
