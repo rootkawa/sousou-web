@@ -1,6 +1,13 @@
 <a name="readme-top"></a>
 # Changelog
 
+# [1.5.0](https://github.com/rootkawa/sousou-web/compare/v1.4.7...v1.5.0) (2025-06-20)
+
+
+### ✨ Features
+
+* **next.config**: Update next.config.ts to export for cloudflare worker ([6a8441d](https://github.com/rootkawa/sousou-web/commit/6a8441d))
+
 ## [1.4.7](https://github.com/rootkawa/sousou-web/compare/v1.4.6...v1.4.7) (2025-06-20)
 
 
