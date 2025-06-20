@@ -1,14 +1,14 @@
 {
   "name": "sousou-web",
-  "version": "1.4.6",
+  "version": "1.4.5",
   "private": true,
-  "homepage": "https://github.com/Saxxon-Usagi/sousou-web",
+  "homepage": "https://github.com/rootkawa/sousou-web",
   "bugs": {
-    "url": "https://github.com/Saxxon-Usagi/sousou-web/issues/new"
+    "url": "https://github.com/rootkawa/sousou-web/issues/new"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Saxxon-Usagi/sousou-web.git"
+    "url": "https://github.com/rootkawa/sousou-web.git"
   },
   "license": "GUN",
   "workspaces": [
