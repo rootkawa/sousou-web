@@ -1,6 +1,13 @@
 <a name="readme-top"></a>
 # Changelog
 
+## [1.6.1](https://github.com/rootkawa/sousou-web/compare/v1.6.0...v1.6.1) (2025-06-20)
+
+
+### 🐛 Bug Fixes
+
+* **next.config**: Update next.config.ts back to standalone for vercel ([5a94fbb](https://github.com/rootkawa/sousou-web/commit/5a94fbb))
+
 # [1.6.0](https://github.com/rootkawa/sousou-web/compare/v1.5.0...v1.6.0) (2025-06-20)
 
 
