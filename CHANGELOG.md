@@ -1,6 +1,13 @@
 <a name="readme-top"></a>
 # Changelog
 
+## [1.4.7](https://github.com/rootkawa/sousou-web/compare/v1.4.6...v1.4.7) (2025-06-20)
+
+
+### 🐛 Bug Fixes
+
+* **package.json**: Update homepage url ([d8b4c79](https://github.com/rootkawa/sousou-web/commit/d8b4c79))
+
 ## [1.4.6](https://github.com/Saxxon-Usagi/sousou-web/compare/v1.4.5...v1.4.6) (2025-06-20)
 
 
