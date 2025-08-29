@@ -48,7 +48,7 @@ import Subscribe from '../subscribe/page';
 
 const platforms: (keyof API.DownloadLink)[] = [
   'windows',
-  'macos',
+  'mac',
   'ios',
   'android',
   'harmony',
@@ -158,16 +158,14 @@ export default function Content() {
                       {
                         {
                           windows: 'Windows',
-                          macos: 'Mac',
+                          mac: 'Mac',
                           ios: 'iPhone/iPad',
                           android: 'Android',
                           harmony: 'HarmonyOS',
                           linux: 'Linux',
-                        }[item]
+                        }[item as keyof typeof platformsMap]
                       }
                     </span>
-                  </TabsTrigger>
-                ))}
               </TabsList>
             </Tabs>
             {data?.protocol && data?.protocol.length > 1 && (
