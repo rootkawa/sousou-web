@@ -32,7 +32,7 @@ interface CardPaymentFormProps {
   onError: (message: string) => void;
 }
 
-const CardPaymentForm: React.FC<CardPaymentFormProps> = ({ clientSecret, onError }) => {
+const CardPaymentForm = ({ clientSecret, onError }: CardPaymentFormProps) => {
   const stripe = useStripe();
   const { theme, systemTheme } = useTheme();
   const elements = useElements();
@@ -219,11 +219,7 @@ const CardPaymentForm: React.FC<CardPaymentFormProps> = ({ clientSecret, onError
   );
 };
 
-const StripePayment: React.FC<StripePaymentProps> = ({
-  method,
-  client_secret,
-  publishable_key,
-}) => {
+const StripePayment = ({ method, client_secret, publishable_key }: StripePaymentProps) => {
   const stripePromise = useMemo(() => loadStripe(publishable_key), [publishable_key]);
 
   return (
@@ -233,10 +229,7 @@ const StripePayment: React.FC<StripePaymentProps> = ({
   );
 };
 
-const CheckoutForm: React.FC<Omit<StripePaymentProps, 'publishable_key'>> = ({
-  client_secret,
-  method,
-}) => {
+const CheckoutForm = ({ client_secret, method }: Omit<StripePaymentProps, 'publishable_key'>) => {
   const stripe = useStripe();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
