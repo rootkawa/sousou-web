@@ -13,12 +13,13 @@ async function getVersion() {
 }
 
 async function getVersionPath() {
-  return getVersion()
-    .then((version) => `${BASE_URL}@${version}`)
-    .catch((error) => {
-      console.warn('Error fetching the version:', error);
-      return BASE_URL;
-    });
+  // return getVersion()
+  //   .then((version) => `${BASE_URL}@${version}`)
+  //   .catch((error) => {
+  //     console.warn('Error fetching the version:', error);
+  //     return `${BASE_URL}@latest`;
+  //   });
+  return `${BASE_URL}@latest`;
 }
 
 export async function getTutorial(path: string): Promise<{

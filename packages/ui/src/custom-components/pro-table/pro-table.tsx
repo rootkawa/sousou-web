@@ -30,6 +30,7 @@ import { ColumnToggle } from '@workspace/ui/custom-components/pro-table/column-t
 import { Pagination } from '@workspace/ui/custom-components/pro-table/pagination';
 import { SortableRow } from '@workspace/ui/custom-components/pro-table/sortable-row';
 import { ProTableWrapper } from '@workspace/ui/custom-components/pro-table/wrapper';
+import { cn } from '@workspace/ui/lib/utils';
 import { useSize } from 'ahooks';
 import { GripVertical, ListRestart, Loader, RefreshCcw } from 'lucide-react';
 import React, { Fragment, useEffect, useImperativeHandle, useRef, useState } from 'react';
@@ -47,6 +48,7 @@ export interface ProTableProps<TData, TValue> {
   header?: {
     title?: React.ReactNode;
     toolbar?: React.ReactNode | React.ReactNode[];
+    hidden?: boolean;
   };
   actions?: {
     render?: (row: TData) => React.ReactNode[];
@@ -68,6 +70,7 @@ export interface ProTableProps<TData, TValue> {
     targetId: string | number | null,
     items: TData[],
   ) => Promise<TData[]>;
+  initialFilters?: Record<string, unknown>;
 }
 
 export interface ProTableActions {
@@ -88,16 +91,21 @@ export function ProTable<
   texts,
   empty,
   onSort,
+  initialFilters,
 }: ProTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(() =>
+    initialFilters
+      ? (Object.entries(initialFilters).map(([id, value]) => ({ id, value })) as ColumnFiltersState)
+      : [],
+  );
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
   const [data, setData] = useState<TData[]>([]);
   const [rowCount, setRowCount] = useState<number>(0);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
-    pageSize: 50,
+    pageSize: 10,
   });
   const [loading, setLoading] = useState(false);
 
@@ -208,29 +216,31 @@ export function ProTable<
 
   return (
     <div className='flex flex-col gap-4' ref={ref}>
-      <div className='flex flex-wrap-reverse items-center justify-between gap-4'>
-        <div>
-          {params ? (
-            <ColumnFilter
-              table={table}
-              params={params}
-              filters={Object.fromEntries(columnFilters.map((item) => [item.id, item.value]))}
-            />
-          ) : (
-            header?.title
-          )}
+      {!header?.hidden && (
+        <div className='flex flex-wrap-reverse items-center justify-between gap-4'>
+          <div>
+            {params ? (
+              <ColumnFilter
+                table={table}
+                params={params}
+                filters={Object.fromEntries(columnFilters.map((item) => [item.id, item.value]))}
+              />
+            ) : (
+              header?.title
+            )}
+          </div>
+          <div className='flex flex-1 items-center justify-end gap-2'>
+            <Button variant='outline' size='icon' onClick={fetchData}>
+              <RefreshCcw />
+            </Button>
+            <ColumnToggle table={table} />
+            <Button variant='outline' size='icon' onClick={reset}>
+              <ListRestart />
+            </Button>
+            {header?.toolbar}
+          </div>
         </div>
-        <div className='flex flex-1 items-center justify-end gap-2'>
-          <Button variant='outline' size='icon' onClick={fetchData}>
-            <RefreshCcw />
-          </Button>
-          <ColumnToggle table={table} />
-          <Button variant='outline' size='icon' onClick={reset}>
-            <ListRestart />
-          </Button>
-          {header?.toolbar}
-        </div>
-      </div>
+      )}
 
       {selectedCount > 0 && actions?.batchRender && (
         <Alert className='flex items-center justify-between'>
@@ -255,7 +265,10 @@ export function ProTable<
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id} className={getTableHeaderClass(header.column.id)}>
+                    <TableHead
+                      key={header.id}
+                      className={cn('!z-auto', getTableHeaderClass(header.column.id))}
+                    >
                       <ColumnHeader
                         header={header}
                         text={{

@@ -8,7 +8,7 @@ interface SubscribeBillingProps {
   order?: Partial<
     API.OrderDetail & {
       unit_price: number;
-      unit_time: number;
+      unit_time: string;
       subscribe_discount: number;
     }
   >;
@@ -51,6 +51,12 @@ export function SubscribeBilling({ order }: Readonly<SubscribeBillingProps>) {
           <span className='text-muted-foreground'>{t('billing.fee')}</span>
           <span>
             <Display type='currency' value={order?.fee_amount} />
+          </span>
+        </li>
+        <li>
+          <span className='text-muted-foreground'>{t('billing.gift')}</span>
+          <span>
+            <Display type='currency' value={order?.gift_amount} />
           </span>
         </li>
       </ul>

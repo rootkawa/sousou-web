@@ -17,14 +17,6 @@ export async function getAds(
   });
 }
 
-/** Get Tos Content GET /v1/common/application */
-export async function getApplication(options?: { [key: string]: any }) {
-  return request<API.Response & { data?: API.GetAppcationResponse }>('/v1/common/application', {
-    method: 'GET',
-    ...(options || {}),
-  });
-}
-
 /** Check verification code POST /v1/common/check_verification_code */
 export async function checkVerificationCode(
   body: API.CheckVerificationCodeRequest,
@@ -41,6 +33,14 @@ export async function checkVerificationCode(
       ...(options || {}),
     },
   );
+}
+
+/** Get Client GET /v1/common/client */
+export async function getClient(options?: { [key: string]: any }) {
+  return request<API.Response & { data?: API.GetSubscribeClientResponse }>('/v1/common/client', {
+    method: 'GET',
+    ...(options || {}),
+  });
 }
 
 /** Get verification code POST /v1/common/send_code */

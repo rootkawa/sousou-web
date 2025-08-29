@@ -8,7 +8,6 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from '@workspace/ui/com
 import { formatBytes, formatDate } from '@workspace/ui/utils';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
-import { useState } from 'react';
 
 export function UserSubscribeDetail({ id, enabled }: { id: number; enabled: boolean }) {
   const t = useTranslations('user');
@@ -72,16 +71,7 @@ export function UserSubscribeDetail({ id, enabled }: { id: number; enabled: bool
       <div>
         <h3 className='mb-2 text-sm font-medium'>
           {t('userInfo')}
-          {data?.user_id && (
-            <Button
-              variant='link'
-              size='sm'
-              className='text-primary ml-2 h-auto p-0 text-xs'
-              asChild
-            >
-              <Link href={`/dashboard/user/${data.user_id}`}>{t('viewDetails')}</Link>
-            </Button>
-          )}
+          {/* Removed link to legacy user detail page */}
         </h3>
         <ul className='grid gap-3'>
           <li className='flex items-center justify-between font-semibold'>
@@ -118,10 +108,9 @@ export function UserSubscribeDetail({ id, enabled }: { id: number; enabled: bool
 
 export function UserDetail({ id }: { id: number }) {
   const t = useTranslations('user');
-  const [shouldFetch, setShouldFetch] = useState(false);
 
   const { data } = useQuery({
-    enabled: id !== 0 && shouldFetch,
+    enabled: id !== 0,
     queryKey: ['getUserDetail', id],
     queryFn: async () => {
       const { data } = await getUserDetail({ id });
@@ -133,9 +122,9 @@ export function UserDetail({ id }: { id: number }) {
 
   return (
     <HoverCard>
-      <HoverCardTrigger asChild onMouseEnter={() => setShouldFetch(true)}>
+      <HoverCardTrigger asChild>
         <Button variant='link' className='p-0' asChild>
-          <Link href={`/dashboard/user/${id}`}>
+          <Link href={`/dashboard/user?user_id=${id}`}>
             {data?.auth_methods[0]?.auth_identifier || t('loading')}
           </Link>
         </Button>

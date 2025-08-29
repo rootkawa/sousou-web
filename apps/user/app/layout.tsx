@@ -10,7 +10,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
 import { PublicEnvScript } from 'next-runtime-env';
 import { unstable_noStore as noStore } from 'next/cache';
-import { Geist, Geist_Mono } from 'next/font/google';
+// import { Geist, Geist_Mono } from "next/font/google";
 import { cookies } from 'next/headers';
 import { Metadata, Viewport } from 'next/types';
 import NextTopLoader from 'nextjs-toploader';
@@ -20,10 +20,10 @@ const fontSans = Geist({
   variable: '--font-sans',
 });
 
-const fontMono = Geist_Mono({
-  subsets: ['latin'],
-  variable: '--font-mono',
-});
+// const geistMono = Geist_Mono({
+//   variable: "--font-geist-mono",
+//   subsets: ["latin"],
+// });
 
 export async function generateMetadata(): Promise<Metadata> {
   noStore();
@@ -107,7 +107,8 @@ export default async function RootLayout({
       </head>
       <body
         suppressHydrationWarning
-        className={`${fontSans.variable} ${fontMono.variable} size-full min-h-[calc(100dvh-env(safe-area-inset-top))] font-sans antialiased`}
+        // ${geistSans.variable} ${geistMono.variable}
+        className={`size-full min-h-[calc(100dvh-env(safe-area-inset-top))] font-sans antialiased`}
       >
         <NextIntlClientProvider messages={messages}>
           <NextTopLoader showSpinner={false} />
