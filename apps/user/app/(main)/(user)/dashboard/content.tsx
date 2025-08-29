@@ -166,6 +166,8 @@ export default function Content() {
                         }[item as keyof typeof platformsMap]
                       }
                     </span>
+                  </TabsTrigger>
+                ))}
               </TabsList>
             </Tabs>
             {data?.protocol && data?.protocol.length > 1 && (
