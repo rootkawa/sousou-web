@@ -21,7 +21,7 @@ const ENABLE_GROUP_FILTERING = false;
 export default function SubscribePage() {
   const t = useTranslations('subscribe');
   const searchParams = useSearchParams();
-  const idParam = searchParams.get('id');
+  const idParam = searchParams?.get('id');
 
   const [subscribe, setSubscribe] = useState<API.Subscribe>();
   const [group, setGroup] = useState<string>('');

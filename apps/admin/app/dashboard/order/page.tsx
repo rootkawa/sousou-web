@@ -44,10 +44,11 @@ export default function Page() {
   });
 
   const initialFilters = {
-    search: sp.get('search') || undefined,
-    status: sp.get('status') || undefined,
-    subscribe_id: sp.get('subscribe_id') || undefined,
-    user_id: sp.get('user_id') || undefined,
+    search: sp?.get('search') || undefined,
+    date: sp?.get('date') || undefined,
+    user_id: sp?.get('user_id') ? Number(sp.get('user_id')) : undefined,
+    subscribe_id: sp?.get('subscribe_id') ? Number(sp.get('subscribe_id')) : undefined,
+    status: sp?.get('status') ? Number(sp.get('status')) : undefined,
   };
 
   return (

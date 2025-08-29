@@ -3,21 +3,21 @@
 import { Label } from '@workspace/ui/components/label';
 import { RadioGroup, RadioGroupItem } from '@workspace/ui/components/radio-group';
 import { useTranslations } from 'next-intl';
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 
 interface DurationSelectorProps {
   quantity: number;
   unitTime?: string;
-  discounts?: Array<{ quantity: number; discount: number }>;
+  discounts?: { quantity: number; discount: number }[];
   onChange: (value: number) => void;
 }
 
-const DurationSelector: React.FC<DurationSelectorProps> = ({
+const DurationSelector = ({
   quantity,
   unitTime = 'Month',
   discounts = [],
   onChange,
-}) => {
+}: DurationSelectorProps) => {
   const t = useTranslations('subscribe');
   const handleChange = useCallback(
     (value: string) => {
@@ -26,7 +26,7 @@ const DurationSelector: React.FC<DurationSelectorProps> = ({
     [onChange],
   );
 
-  const DurationOption: React.FC<{ value: string; label: string }> = ({ value, label }) => (
+  const DurationOption = ({ value, label }: { value: string; label: string }) => (
     <div className='relative'>
       <RadioGroupItem value={value} id={value} className='peer sr-only' />
       <Label

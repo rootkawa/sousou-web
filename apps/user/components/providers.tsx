@@ -5,7 +5,7 @@ import { Logout } from '@/utils/common';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryStreamedHydration } from '@tanstack/react-query-next-experimental';
 import { ThemeProvider as NextThemesProvider } from 'next-themes';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Loading from './loading';
 
 export default function Providers({
@@ -13,7 +13,7 @@ export default function Providers({
   common,
   user,
 }: {
-  children: React.ReactNode;
+  children: any;
   common: Partial<GlobalStore['common']>;
   user: GlobalStore['user'];
 }) {
@@ -38,7 +38,10 @@ export default function Providers({
         if (user) {
           setUser(user);
         } else {
-          Logout();
+          // Only call Logout on client side and if we have a user session to logout
+          if (typeof window !== 'undefined') {
+            Logout();
+          }
         }
         setCommon(common);
       } finally {
@@ -52,10 +55,13 @@ export default function Providers({
   }, [setUser, setCommon, user, common]);
 
   useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
-    const invite = searchParams.get('invite');
-    if (invite) {
-      localStorage.setItem('invite', invite);
+    // Only access location in browser environment
+    if (typeof window !== 'undefined') {
+      const searchParams = new URLSearchParams(location.search);
+      const invite = searchParams.get('invite');
+      if (invite) {
+        localStorage.setItem('invite', invite);
+      }
     }
   }, []);
 

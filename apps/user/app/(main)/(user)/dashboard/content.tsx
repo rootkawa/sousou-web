@@ -84,7 +84,7 @@ export default function Content() {
 
   // Check for surveyCompleted parameter and clear pending flag
   useEffect(() => {
-    if (isBrowser() && searchParams.get('surveyCompleted') === 'true') {
+    if (isBrowser() && searchParams?.get('surveyCompleted') === 'true') {
       window.localStorage.removeItem('surveyPending');
     }
   }, [searchParams]);

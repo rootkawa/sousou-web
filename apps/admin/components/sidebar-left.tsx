@@ -54,7 +54,7 @@ export function SidebarLeft({ ...props }: React.ComponentProps<typeof Sidebar>) 
 
   const normalize = (p: string) => (p.endsWith('/') && p !== '/' ? p.replace(/\/+$/, '') : p);
   const isActiveUrl = (url: string) => {
-    const path = normalize(pathname);
+    const path = normalize(pathname || '');
     const target = normalize(url);
     if (target === '/dashboard') return path === target;
     if (path === target) return true;

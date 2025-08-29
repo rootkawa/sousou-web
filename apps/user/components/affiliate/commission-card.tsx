@@ -2,7 +2,7 @@
 
 import { Display } from '@/components/display';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
-import { TrendingUpIcon } from 'lucide-react';
+import { Icon } from '@workspace/ui/custom-components/icon';
 import { useTranslations } from 'next-intl';
 
 interface CommissionCardProps {
@@ -17,7 +17,7 @@ export function CommissionCard({ totalCommission }: CommissionCardProps) {
       <CardHeader className='bg-gradient-to-r from-blue-50 to-indigo-50 pb-4 dark:from-blue-950/40 dark:to-indigo-950/30'>
         <div className='flex items-center gap-3'>
           <div className='bg-primary/10 rounded-full p-2'>
-            <TrendingUpIcon className='text-primary h-5 w-5' />
+            <Icon icon='uil:chart-line' className='text-primary h-5 w-5' />
           </div>
           <CardTitle className='text-xl font-semibold'>{t('totalCommission')}</CardTitle>
         </div>

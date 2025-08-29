@@ -14,7 +14,6 @@ import { Separator } from '@workspace/ui/components/separator';
 import { Icon } from '@workspace/ui/custom-components/icon';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
-import { Fragment } from 'react';
 
 const Links = [
   {
@@ -57,12 +56,12 @@ export default function Footer() {
       <div className='text-muted-foreground mx-auto mb-14 flex max-w-[95%] flex-wrap justify-between gap-4 text-sm 2xl:max-w-[90%]'>
         <nav className='flex flex-wrap items-center gap-2'>
           {Links.filter((item) => item.href).map((item, index) => (
-            <Fragment key={index}>
+            <div key={index} className='flex items-center gap-2'>
               {index !== 0 && <Separator orientation='vertical' />}
               <Link href={item.href!}>
                 <Icon icon={item.icon} className='text-foreground size-5' />
               </Link>
-            </Fragment>
+            </div>
           ))}
         </nav>
         <div>

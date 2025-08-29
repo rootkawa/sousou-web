@@ -10,11 +10,9 @@ export default function TrafficDetailsPage() {
   const t = useTranslations('log');
   const sp = useSearchParams();
   const initialFilters = {
-    search: sp.get('search') || undefined,
-    date: sp.get('date') || undefined,
-    server_id: sp.get('server_id') ? Number(sp.get('server_id')) : undefined,
-    user_id: sp.get('user_id') ? Number(sp.get('user_id')) : undefined,
-    subscribe_id: sp.get('subscribe_id') ? Number(sp.get('subscribe_id')) : undefined,
+    search: sp?.get('search') || undefined,
+    date: sp?.get('date') || undefined,
+    user_id: sp?.get('user_id') ? Number(sp.get('user_id')) : undefined,
   };
   return (
     <ProTable<API.TrafficLogDetails, { search?: string }>

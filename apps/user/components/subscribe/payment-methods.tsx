@@ -7,7 +7,7 @@ import { RadioGroup, RadioGroupItem } from '@workspace/ui/components/radio-group
 import { cn } from '@workspace/ui/lib/utils';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import React, { memo } from 'react';
+import { memo } from 'react';
 
 interface PaymentMethodsProps {
   value: number;
@@ -15,7 +15,7 @@ interface PaymentMethodsProps {
   balance?: boolean;
 }
 
-const PaymentMethods: React.FC<PaymentMethodsProps> = ({ value, onChange, balance = true }) => {
+const PaymentMethods = ({ value, onChange, balance = true }: PaymentMethodsProps) => {
   const t = useTranslations('subscribe');
 
   const { data } = useQuery({
@@ -73,4 +73,4 @@ const PaymentMethods: React.FC<PaymentMethodsProps> = ({ value, onChange, balanc
   );
 };
 
-export default memo(PaymentMethods);
+export default memo(PaymentMethods) as typeof PaymentMethods;

@@ -10,7 +10,7 @@ import { Button } from '@workspace/ui/components/button';
 import { Card, CardContent } from '@workspace/ui/components/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@workspace/ui/components/dialog';
 import { Separator } from '@workspace/ui/components/separator';
-import { LoaderCircle } from 'lucide-react';
+import { Icon } from '@workspace/ui/custom-components/icon';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useCallback, useRef, useState, useTransition } from 'react';
@@ -132,7 +132,7 @@ export default function Purchase({ subscribe, setSubscribe }: Readonly<PurchaseP
               disabled={loading}
               onClick={handleSubmit}
             >
-              {loading && <LoaderCircle className='mr-2 animate-spin' />}
+              {loading && <Icon icon='uil:spinner' className='mr-2 animate-spin' />}
               {t('buyNow')}
             </Button>
           </div>

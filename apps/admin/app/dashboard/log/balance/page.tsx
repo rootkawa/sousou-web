@@ -11,9 +11,9 @@ export default function BalanceLogPage() {
   const t = useTranslations('log');
   const sp = useSearchParams();
   const initialFilters = {
-    search: sp.get('search') || undefined,
-    date: sp.get('date') || undefined,
-    user_id: sp.get('user_id') ? Number(sp.get('user_id')) : undefined,
+    search: sp?.get('search') || undefined,
+    date: sp?.get('date') || undefined,
+    user_id: sp?.get('user_id') ? Number(sp.get('user_id')) : undefined,
   };
   return (
     <ProTable<API.BalanceLog, { search?: string }>

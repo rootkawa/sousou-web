@@ -5,14 +5,14 @@ import { Logout } from '@/utils/common';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryStreamedHydration } from '@tanstack/react-query-next-experimental';
 import { ThemeProvider as NextThemesProvider } from 'next-themes';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function Providers({
   children,
   common,
   user,
 }: {
-  children: React.ReactNode;
+  children: any;
   common: Partial<GlobalStore['common']>;
   user: GlobalStore['user'];
 }) {
@@ -34,7 +34,10 @@ export default function Providers({
     if (user) {
       setUser(user);
     } else {
-      Logout();
+      // Only call Logout on client side
+      if (typeof window !== 'undefined') {
+        Logout();
+      }
     }
   }, [setUser, user]);
 

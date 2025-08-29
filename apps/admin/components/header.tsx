@@ -12,7 +12,7 @@ import { Separator } from '@workspace/ui/components/separator';
 import { SidebarTrigger } from '@workspace/ui/components/sidebar';
 import { useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
-import { Fragment, useMemo } from 'react';
+import { useMemo } from 'react';
 import LanguageSwitch from './language-switch';
 import ThemeSwitch from './theme-switch';
 import { UserNav } from './user-nav';
@@ -20,7 +20,7 @@ import { UserNav } from './user-nav';
 export function Header() {
   const t = useTranslations('menu');
   const pathname = usePathname();
-  const items = useMemo(() => findNavByUrl(pathname), [pathname]);
+  const items = useMemo(() => findNavByUrl(pathname || ''), [pathname]);
   return (
     <header className='bg-background sticky top-0 z-50 flex h-14 shrink-0 items-center gap-2'>
       <div className='flex flex-1 items-center gap-2 px-3'>
@@ -30,7 +30,7 @@ export function Header() {
           <BreadcrumbList>
             {items.map((item, index) => {
               return (
-                <Fragment key={item?.title}>
+                <div key={item?.title}>
                   {index !== items.length - 1 && (
                     <BreadcrumbItem>
                       <BreadcrumbLink href={item?.url || '/dashboard'}>
@@ -40,7 +40,7 @@ export function Header() {
                   )}
                   {index < items.length - 1 && <BreadcrumbSeparator />}
                   {index === items.length - 1 && <BreadcrumbPage>{t(item?.title)}</BreadcrumbPage>}
-                </Fragment>
+                </div>
               );
             })}
           </BreadcrumbList>

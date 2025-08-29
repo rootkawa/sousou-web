@@ -63,6 +63,6 @@ const CloudFlareTurnstile = forwardRef<
       />
     )
   );
-});
+}) as any;
 
 export default CloudFlareTurnstile;

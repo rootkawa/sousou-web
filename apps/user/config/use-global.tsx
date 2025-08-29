@@ -92,26 +92,32 @@ export const useGlobalStore = create<GlobalStore>((set, get) => ({
     }
   },
   getUserSubscribe: (uuid: string, type?: string) => {
-    const { pan_domain, subscribe_domain, subscribe_path } = get().common.subscribe || {};
-    const domains = subscribe_domain
-      ? subscribe_domain.split('\n')
-      : [extractDomain(NEXT_PUBLIC_API_URL || NEXT_PUBLIC_SITE_URL || '', pan_domain)];
+    try {
+      const { pan_domain, subscribe_domain, subscribe_path } = get().common.subscribe;
+      const domains = subscribe_domain
+        ? subscribe_domain.split('\n')
+        : [extractDomain(NEXT_PUBLIC_API_URL || NEXT_PUBLIC_SITE_URL || '', pan_domain)];
 
-    return domains.map((domain) => {
-      if (pan_domain) {
-        if (type) return `https://${uuid}.${type}.${domain}`;
-        return `https://${uuid}.${domain}`;
-      } else {
-        if (type) return `https://${domain}${subscribe_path}?token=${uuid}&type=${type}`;
-        return `https://${domain}${subscribe_path}?token=${uuid}`;
-      }
-    });
+      return domains.map((domain) => {
+        if (pan_domain) {
+          if (type) return `https://${uuid}.${type}.${domain}`;
+          return `https://${uuid}.${domain}`;
+        } else {
+          if (type) return `https://${domain}${subscribe_path}?token=${uuid}&type=${type}`;
+          return `https://${domain}${subscribe_path}?token=${uuid}`;
+        }
+      });
+    } catch (error) {
+      console.error('Error generating subscription URLs:', error);
+      return [];
+    }
   },
   getAppSubLink: (url: string, schema?: string) => {
-    const name = get().common?.site?.site_name || '';
-
-    if (!schema) return url;
     try {
+      const name = get().common?.site?.site_name || '';
+
+      if (!schema) return url;
+
       let result = schema;
 
       result = result.replace(/\${url}/g, url);
@@ -148,6 +154,7 @@ export const useGlobalStore = create<GlobalStore>((set, get) => ({
 
       return result;
     } catch (error) {
+      console.error('Error generating app sub link:', error);
       return url;
     }
   },

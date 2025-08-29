@@ -8,7 +8,7 @@ import {
 import { getRedirectUrl, setAuthorization } from '@/utils/common';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import { ReactNode, useState, useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import LoginForm from './login-form';
 import RegisterForm from './register-form';
@@ -60,10 +60,9 @@ export default function PhoneAuthForm() {
     });
   };
 
-  let UserForm: ReactNode = null;
   switch (type) {
     case 'login':
-      UserForm = (
+      return (
         <LoginForm
           loading={loading}
           onSubmit={handleFormSubmit}
@@ -72,9 +71,8 @@ export default function PhoneAuthForm() {
           onSwitchForm={setType}
         />
       );
-      break;
     case 'register':
-      UserForm = (
+      return (
         <RegisterForm
           loading={loading}
           onSubmit={handleFormSubmit}
@@ -83,9 +81,8 @@ export default function PhoneAuthForm() {
           onSwitchForm={setType}
         />
       );
-      break;
     case 'reset':
-      UserForm = (
+      return (
         <ResetForm
           loading={loading}
           onSubmit={handleFormSubmit}
@@ -94,8 +91,7 @@ export default function PhoneAuthForm() {
           onSwitchForm={setType}
         />
       );
-      break;
   }
 
-  return UserForm;
+  return null;
 }

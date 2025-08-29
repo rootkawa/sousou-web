@@ -10,9 +10,9 @@ export default function ServerTrafficLogPage() {
   const t = useTranslations('log');
   const sp = useSearchParams();
   const initialFilters = {
-    search: sp.get('search') || undefined,
-    date: sp.get('date') || undefined,
-    server_id: sp.get('server_id') ? Number(sp.get('server_id')) : undefined,
+    search: sp?.get('search') || undefined,
+    date: sp?.get('date') || undefined,
+    server_id: sp?.get('server_id') ? Number(sp?.get('server_id')) : undefined,
   };
   return (
     <ProTable<API.ServerTrafficLog, { search?: string }>

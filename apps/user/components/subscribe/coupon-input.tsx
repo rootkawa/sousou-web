@@ -2,14 +2,13 @@
 
 import { Input } from '@workspace/ui/components/input';
 import { useTranslations } from 'next-intl';
-import React from 'react';
 
 interface CouponInputProps {
   coupon?: string;
   onChange: (value: string) => void;
 }
 
-const CouponInput: React.FC<CouponInputProps> = ({ coupon, onChange }) => {
+const CouponInput = ({ coupon, onChange }: CouponInputProps) => {
   const t = useTranslations('subscribe');
 
   return (

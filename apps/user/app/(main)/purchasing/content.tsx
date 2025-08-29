@@ -13,8 +13,8 @@ import { Button } from '@workspace/ui/components/button';
 import { Card, CardContent, CardHeader } from '@workspace/ui/components/card';
 import { Separator } from '@workspace/ui/components/separator';
 import { EnhancedInput } from '@workspace/ui/custom-components/enhanced-input';
+import { Icon } from '@workspace/ui/custom-components/icon';
 import { cn } from '@workspace/ui/lib/utils';
-import { LoaderCircle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState, useTransition } from 'react';
@@ -230,7 +230,7 @@ export default function Content({ subscription }: { subscription?: API.Subscribe
           disabled={!isEmailValid.valid || loading}
           onClick={handleSubmit}
         >
-          {loading && <LoaderCircle className='mr-2 animate-spin' />}
+          {loading && <Icon icon='uil:spinner' className='mr-2 animate-spin' />}
           {t('buyNow')}
         </Button>
       </div>

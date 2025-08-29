@@ -12,8 +12,8 @@ import {
   DialogTrigger,
 } from '@workspace/ui/components/dialog';
 import { EnhancedInput } from '@workspace/ui/custom-components/enhanced-input';
+import { Icon } from '@workspace/ui/custom-components/icon';
 import { unitConversion } from '@workspace/ui/utils';
-import { LoaderCircle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
@@ -67,7 +67,6 @@ export default function Recharge(props: Readonly<ButtonProps>) {
             <PaymentMethods
               balance={false}
               value={params.payment}
-              balance={false}
               onChange={(value) => setParams({ ...params, payment: value })}
             />
           </div>
@@ -89,7 +88,7 @@ export default function Recharge(props: Readonly<ButtonProps>) {
               });
             }}
           >
-            {loading && <LoaderCircle className='mr-2 animate-spin' />}
+            {loading && <Icon icon='uil:spinner' className='mr-2 animate-spin' />}
             {t('rechargeNow')}
           </Button>
         </div>

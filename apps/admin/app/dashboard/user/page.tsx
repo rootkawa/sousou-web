@@ -61,10 +61,10 @@ export default function Page() {
   });
 
   const initialFilters = {
-    search: sp.get('search') || undefined,
-    user_id: sp.get('user_id') || undefined,
-    subscribe_id: sp.get('subscribe_id') || undefined,
-    user_subscribe_id: sp.get('user_subscribe_id') || undefined,
+    search: sp?.get('search') || undefined,
+    date: sp?.get('date') || undefined,
+    invite_user_id: sp?.get('invite_user_id') ? Number(sp.get('invite_user_id')) : undefined,
+    subscribe_id: sp?.get('subscribe_id') ? Number(sp.get('subscribe_id')) : undefined,
   };
 
   return (

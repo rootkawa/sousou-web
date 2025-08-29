@@ -25,7 +25,7 @@ export default function Page() {
   const locale = useLocale();
   const t = useTranslations('document');
   const searchParams = useSearchParams();
-  const platformParam = searchParams.get('platform') || 'Windows';
+  const platformParam = searchParams?.get('platform') || 'Windows';
   const platform = platformMap[platformParam as keyof typeof platformMap] || 'Windows';
   const [tutorialDefaultTab, setTutorialDefaultTab] = useState(platform);
 

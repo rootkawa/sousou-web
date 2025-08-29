@@ -18,7 +18,7 @@ import {
   DialogTrigger,
 } from '@workspace/ui/components/dialog';
 import { Separator } from '@workspace/ui/components/separator';
-import { LoaderCircle } from 'lucide-react';
+import { Icon } from '@workspace/ui/custom-components/icon';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState, useTransition } from 'react';
@@ -166,7 +166,7 @@ export default function Renewal({ id, subscribe }: Readonly<RenewalProps>) {
               disabled={loading}
               onClick={handleSubmit}
             >
-              {loading && <LoaderCircle className='mr-2 animate-spin' />}
+              {loading && <Icon icon='uil:spinner' className='mr-2 animate-spin' />}
               {t('buyNow')}
             </Button>
           </div>

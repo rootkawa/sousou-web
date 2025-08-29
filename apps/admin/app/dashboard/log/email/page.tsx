@@ -11,8 +11,8 @@ export default function EmailLogPage() {
   const t = useTranslations('log');
   const sp = useSearchParams();
   const initialFilters = {
-    search: sp.get('search') || undefined,
-    date: sp.get('date') || undefined,
+    search: sp?.get('search') || undefined,
+    date: sp?.get('date') || undefined,
   };
   return (
     <ProTable<API.MessageLog, { search?: string }>

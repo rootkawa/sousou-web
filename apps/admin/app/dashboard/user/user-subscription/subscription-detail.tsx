@@ -16,7 +16,7 @@ import { Switch } from '@workspace/ui/components/switch';
 import { ConfirmButton } from '@workspace/ui/custom-components/confirm-button';
 import { formatDate } from '@workspace/ui/utils';
 import { useTranslations } from 'next-intl';
-import { ReactNode, useState } from 'react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 
 export function SubscriptionDetail({
@@ -24,7 +24,7 @@ export function SubscriptionDetail({
   userId,
   subscriptionId,
 }: {
-  trigger: ReactNode;
+  trigger: any;
   userId: number;
   subscriptionId: number;
 }) {

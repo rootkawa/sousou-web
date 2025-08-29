@@ -2,7 +2,7 @@
 
 import { Button } from '@workspace/ui/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
-import { Copy, Gift, TrendingUp } from 'lucide-react';
+import { Icon } from '@workspace/ui/custom-components/icon';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
@@ -46,7 +46,7 @@ export function ReferralCodeCard({ referCode, referralPercentage }: ReferralCode
         <div className='flex items-center justify-between'>
           <div className='flex flex-col'>
             <div className='flex items-center gap-2'>
-              <Gift className='h-5 w-5 text-indigo-500' />
+              <Icon icon='uil:gift' className='h-5 w-5 text-indigo-500' />
               <CardTitle className='text-lg font-semibold'>{t('inviteCode')}</CardTitle>
             </div>
             <p className='text-muted-foreground mt-1 text-sm'>
@@ -58,7 +58,10 @@ export function ReferralCodeCard({ referCode, referralPercentage }: ReferralCode
           <div className='relative inline-flex items-center'>
             <div className='absolute -inset-1 animate-pulse rounded-full bg-gradient-to-r from-yellow-300 via-amber-400 to-yellow-300 opacity-70 blur-sm'></div>
             <div className='relative flex items-center gap-1.5 rounded-full border border-amber-200 bg-gradient-to-br from-amber-50 to-amber-100 px-3 py-1.5 font-semibold text-amber-800 shadow-sm dark:border-amber-700/50 dark:from-amber-900/80 dark:to-amber-800/90 dark:text-amber-100'>
-              <TrendingUp className='h-3.5 w-3.5 text-amber-600 dark:text-amber-300' />
+              <Icon
+                icon='uil:chart-line'
+                className='h-3.5 w-3.5 text-amber-600 dark:text-amber-300'
+              />
               <span>{referralPercentage}%</span>
               <span className='text-xs font-medium opacity-90'>{t('commissionRate')}</span>
             </div>
@@ -77,7 +80,7 @@ export function ReferralCodeCard({ referCode, referralPercentage }: ReferralCode
               size='default'
               className='w-full gap-2 font-medium transition-all duration-300'
             >
-              <Copy className={`h-4 w-4 ${codeCopied ? 'text-white' : ''}`} />
+              <Icon icon='uil:copy' className={`h-4 w-4 ${codeCopied ? 'text-white' : ''}`} />
               {codeCopied ? t('copySuccess') : t('copyInviteCode')}
             </Button>
           </CopyToClipboard>
@@ -88,7 +91,7 @@ export function ReferralCodeCard({ referCode, referralPercentage }: ReferralCode
               size='default'
               className='w-full gap-2 font-medium transition-all duration-300'
             >
-              <Copy className={`h-4 w-4 ${linkCopied ? 'text-white' : ''}`} />
+              <Icon icon='uil:copy' className={`h-4 w-4 ${linkCopied ? 'text-white' : ''}`} />
               {linkCopied ? t('copySuccess') : t('copyInviteLink')}
             </Button>
           </CopyToClipboard>
