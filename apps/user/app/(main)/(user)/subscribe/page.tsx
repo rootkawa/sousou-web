@@ -13,7 +13,7 @@ import parseSubscriptionFeatures from '@/components/main/product-showcase/subscr
 import Purchase from '@/components/subscribe/purchase';
 
 // Memoize the SubscriptionCard component to prevent unnecessary re-renders
-const MemoizedSubscriptionCard = memo(SubscriptionCard);
+const MemoizedSubscriptionCard = memo(SubscriptionCard) as typeof SubscriptionCard;
 
 // Feature flag to control group filtering UI visibility
 const ENABLE_GROUP_FILTERING = false;

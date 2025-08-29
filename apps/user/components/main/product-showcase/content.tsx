@@ -11,7 +11,7 @@ interface ProductShowcaseProps {
   subscriptionData: API.Subscribe[];
 }
 
-const MemoizedSubscriptionCard = memo(SubscriptionCard);
+const MemoizedSubscriptionCard = memo(SubscriptionCard) as typeof SubscriptionCard;
 
 export function Content({ subscriptionData }: ProductShowcaseProps) {
   const t = useTranslations('index');
