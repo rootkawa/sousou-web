@@ -14,11 +14,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Fetch all tags
+        run: git fetch --tags --force
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
         with:
-          bun-version: 'latest'
+          bun-version: "latest"
 
       - name: Cache Bun dependencies
         uses: actions/cache@v3
