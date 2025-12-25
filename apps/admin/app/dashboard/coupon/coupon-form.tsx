@@ -1,8 +1,7 @@
 'use client';
 
-import { getSubscribeList } from '@/services/admin/subscribe';
+import { useSubscribe } from '@/store/subscribe';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useQuery } from '@tanstack/react-query';
 import { Button } from '@workspace/ui/components/button';
 import {
   Form,
@@ -81,16 +80,7 @@ export default function CouponForm<T extends Record<string, any>>({
 
   const type = form.watch('type');
 
-  const { data: subscribe } = useQuery({
-    queryKey: ['getSubscribeList', 'all'],
-    queryFn: async () => {
-      const { data } = await getSubscribeList({
-        page: 1,
-        size: 9999,
-      });
-      return data.data?.list as API.Subscribe[];
-    },
-  });
+  const { subscribes } = useSubscribe();
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -247,9 +237,9 @@ export default function CouponForm<T extends Record<string, any>>({
                         onChange={(value) => {
                           form.setValue(field.name, value);
                         }}
-                        options={subscribe?.map((item: API.Subscribe) => ({
-                          value: item.id,
-                          label: item.name,
+                        options={subscribes?.map((item) => ({
+                          value: item.id!,
+                          label: item.name!,
                         }))}
                       />
                     </FormControl>
@@ -267,7 +257,7 @@ export default function CouponForm<T extends Record<string, any>>({
                       <DatePicker
                         placeholder={t('form.enterValue')}
                         value={field.value}
-                        disabled={(date) => date < new Date(Date.now() - 24 * 60 * 60 * 1000)}
+                        disabled={(date: Date) => date < new Date(Date.now() - 24 * 60 * 60 * 1000)}
                         onChange={(value) => {
                           form.setValue(field.name, value);
                         }}
@@ -307,6 +297,7 @@ export default function CouponForm<T extends Record<string, any>>({
                       <EnhancedInput
                         placeholder={t('form.countPlaceholder')}
                         type='number'
+                        min={0}
                         step={1}
                         {...field}
                         onValueChange={(value) => {
@@ -328,6 +319,7 @@ export default function CouponForm<T extends Record<string, any>>({
                       <EnhancedInput
                         placeholder={t('form.userLimitPlaceholder')}
                         type='number'
+                        min={0}
                         step={1}
                         {...field}
                         onValueChange={(value) => {

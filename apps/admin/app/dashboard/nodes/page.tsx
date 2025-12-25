@@ -5,11 +5,12 @@ import {
   createNode,
   deleteNode,
   filterNodeList,
-  filterServerList,
+  resetSortWithNode,
   toggleNodeStatus,
   updateNode,
 } from '@/services/admin/server';
-import { useQuery } from '@tanstack/react-query';
+import { useNode } from '@/store/node';
+import { useServer } from '@/store/server';
 import { Badge } from '@workspace/ui/components/badge';
 import { Button } from '@workspace/ui/components/button';
 import { Switch } from '@workspace/ui/components/switch';
@@ -24,24 +25,9 @@ export default function NodesPage() {
   const ref = useRef<ProTableActions>(null);
   const [loading, setLoading] = useState(false);
 
-  const { data: servers = [] } = useQuery({
-    queryKey: ['filterServerListAll', { page: 1, size: 1000 }],
-    queryFn: async () => {
-      const { data } = await filterServerList({ page: 1, size: 1000 });
-      return data?.data?.list || [];
-    },
-  });
-
-  const getServerName = (id?: number) =>
-    id ? (servers.find((s) => s.id === id)?.name ?? `#${id}`) : '—';
-  const getServerOriginAddr = (id?: number) =>
-    id ? (servers.find((s) => s.id === id)?.address ?? '—') : '—';
-  const getProtocolOriginPort = (id?: number, proto?: string) => {
-    if (!id || !proto) return '—';
-    const hit = servers.find((s) => s.id === id)?.protocols?.find((p) => (p as any).type === proto);
-    const p = (hit as any)?.port as number | undefined;
-    return typeof p === 'number' ? String(p) : '—';
-  };
+  // Use our zustand store for server data
+  const { getServerName, getServerAddress, getProtocolPort } = useServer();
+  const { fetchNodes, fetchTags } = useNode();
 
   return (
     <ProTable<API.Node, { search: string }>
@@ -68,6 +54,8 @@ export default function NodesPage() {
                 await createNode(body);
                 toast.success(t('created'));
                 ref.current?.refresh();
+                fetchNodes();
+                fetchTags();
                 setLoading(false);
                 return true;
               } catch (e) {
@@ -89,6 +77,8 @@ export default function NodesPage() {
                 await toggleNodeStatus({ id: row.original.id, enable: v });
                 toast.success(v ? t('enabled_on') : t('enabled_off'));
                 ref.current?.refresh();
+                fetchNodes();
+                fetchTags();
               }}
             />
           ),
@@ -98,24 +88,20 @@ export default function NodesPage() {
         {
           id: 'address_port',
           header: `${t('address')}:${t('port')}`,
-          cell: ({ row }) => (row.original.address || '—') + ':' + (row.original.port ?? '—'),
+          cell: ({ row }) => `${row.original.address || '—'}:${row.original.port || '—'}`,
         },
 
         {
-          id: 'server_combined',
+          id: 'server_id',
           header: t('server'),
-          cell: ({ row }) => (
-            <div className='flex flex-wrap gap-2'>
-              <Badge variant='outline'>
-                {getServerName(row.original.server_id)} ·{' '}
-                {getServerOriginAddr(row.original.server_id)}
-              </Badge>
-              <Badge variant='outline'>
-                {row.original.protocol || '—'} ·{' '}
-                {getProtocolOriginPort(row.original.server_id, row.original.protocol)}
-              </Badge>
-            </div>
-          ),
+          cell: ({ row }) =>
+            `${getServerName(row.original.server_id)}:${getServerAddress(row.original.server_id)}`,
+        },
+        {
+          id: 'protocol',
+          header: ` ${t('protocol')}:${t('port')}`,
+          cell: ({ row }) =>
+            `${row.original.protocol}:${getProtocolPort(row.original.server_id, row.original.protocol)}`,
         },
         {
           accessorKey: 'tags',
@@ -151,30 +137,19 @@ export default function NodesPage() {
             trigger={t('edit')}
             title={t('drawerEditTitle')}
             loading={loading}
-            initialValues={{
-              name: row.name,
-              server_id: row.server_id,
-              protocol: row.protocol as any,
-              address: row.address as any,
-              port: row.port as any,
-              tags: (row.tags as any) || [],
-            }}
+            initialValues={row}
             onSubmit={async (values) => {
               setLoading(true);
               try {
                 const body: API.UpdateNodeRequest = {
-                  id: row.id,
-                  name: values.name,
-                  server_id: Number(values.server_id!),
-                  protocol: values.protocol,
-                  address: values.address,
-                  port: Number(values.port!),
-                  tags: values.tags || [],
-                  enabled: row.enabled,
+                  ...row,
+                  ...values,
                 } as any;
                 await updateNode(body);
                 toast.success(t('updated'));
                 ref.current?.refresh();
+                fetchNodes();
+                fetchTags();
                 setLoading(false);
                 return true;
               } catch (e) {
@@ -192,6 +167,8 @@ export default function NodesPage() {
               await deleteNode({ id: row.id } as any);
               toast.success(t('deleted'));
               ref.current?.refresh();
+              fetchNodes();
+              fetchTags();
             }}
             cancelText={t('cancel')}
             confirmText={t('confirm')}
@@ -200,18 +177,15 @@ export default function NodesPage() {
             key='copy'
             variant='outline'
             onClick={async () => {
-              const { id, enabled, created_at, updated_at, ...rest } = row as any;
+              const { id, enabled, created_at, updated_at, sort, ...rest } = row as any;
               await createNode({
-                name: rest.name,
-                server_id: rest.server_id,
-                protocol: rest.protocol,
-                address: rest.address,
-                port: rest.port,
-                tags: rest.tags || [],
+                ...rest,
                 enabled: false,
-              } as any);
+              });
               toast.success(t('copied'));
               ref.current?.refresh();
+              fetchNodes();
+              fetchTags();
             }}
           >
             {t('copy')}
@@ -228,12 +202,44 @@ export default function NodesPage() {
                 await Promise.all(rows.map((r) => deleteNode({ id: r.id } as any)));
                 toast.success(t('deleted'));
                 ref.current?.refresh();
+                fetchNodes();
+                fetchTags();
               }}
               cancelText={t('cancel')}
               confirmText={t('confirm')}
             />,
           ];
         },
+      }}
+      onSort={async (source, target, items) => {
+        const sourceIndex = items.findIndex((item) => String(item.id) === source);
+        const targetIndex = items.findIndex((item) => String(item.id) === target);
+
+        const originalSorts = items.map((item) => item.sort);
+
+        const [movedItem] = items.splice(sourceIndex, 1);
+        items.splice(targetIndex, 0, movedItem!);
+
+        const updatedItems = items.map((item, index) => {
+          const originalSort = originalSorts[index];
+          const newSort = originalSort !== undefined ? originalSort : item.sort;
+          return { ...item, sort: newSort };
+        });
+
+        const changedItems = updatedItems.filter((item, index) => {
+          return item.sort !== items[index]?.sort;
+        });
+
+        if (changedItems.length > 0) {
+          resetSortWithNode({
+            sort: changedItems.map((item) => ({
+              id: item.id,
+              sort: item.sort,
+            })) as API.SortItem[],
+          });
+          toast.success(t('sorted_success'));
+        }
+        return updatedItems;
       }}
     />
   );

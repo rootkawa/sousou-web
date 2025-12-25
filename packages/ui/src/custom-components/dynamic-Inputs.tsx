@@ -1,6 +1,7 @@
 import { Button } from '@workspace/ui/components/button';
 import { Label } from '@workspace/ui/components/label';
 import { Switch } from '@workspace/ui/components/switch';
+import { Textarea } from '@workspace/ui/components/textarea';
 import { Combobox } from '@workspace/ui/custom-components/combobox';
 import { EnhancedInput, EnhancedInputProps } from '@workspace/ui/custom-components/enhanced-input';
 import { cn } from '@workspace/ui/lib/utils';
@@ -9,8 +10,10 @@ import { useEffect, useState } from 'react';
 
 interface FieldConfig extends Omit<EnhancedInputProps, 'type'> {
   name: string;
-  type: 'text' | 'number' | 'select' | 'time' | 'boolean';
+  type: 'text' | 'number' | 'select' | 'time' | 'boolean' | 'textarea';
   options?: { label: string; value: string }[];
+  // optional per-item visibility function: returns true to show the field for the given item
+  visible?: (item: Record<string, any>) => boolean;
 }
 
 interface ObjectInputProps<T> {
@@ -39,6 +42,8 @@ export function ObjectInput<T extends Record<string, any>>({
     onChange(updatedInternalState);
   };
   const renderField = (field: FieldConfig) => {
+    // if visible callback exists and returns false for current item, don't render
+    if (field.visible && !field.visible(internalState)) return null;
     switch (field.type) {
       case 'select':
         return (
@@ -61,6 +66,18 @@ export function ObjectInput<T extends Record<string, any>>({
             {field.placeholder && <Label>{field.placeholder}</Label>}
           </div>
         );
+      case 'textarea':
+        return (
+          <div className='w-full space-y-2'>
+            {field.prefix && <Label className='text-sm font-medium'>{field.prefix}</Label>}
+            <Textarea
+              value={internalState[field.name] || ''}
+              onChange={(e) => updateField(field.name, e.target.value)}
+              placeholder={field.placeholder}
+              className='min-h-32'
+            />
+          </div>
+        );
       default:
         return (
           <EnhancedInput
@@ -73,11 +90,15 @@ export function ObjectInput<T extends Record<string, any>>({
   };
   return (
     <div className={cn('flex flex-1 flex-wrap gap-4', className)}>
-      {fields.map((field) => (
-        <div key={field.name} className={cn('flex-1', field.className)}>
-          {renderField(field)}
-        </div>
-      ))}
+      {fields.map((field) => {
+        const node = renderField(field);
+        if (node === null) return null; // don't render wrapper if field hidden
+        return (
+          <div key={field.name} className={cn('flex-1', field.className)}>
+            {node}
+          </div>
+        );
+      })}
     </div>
   );
 }

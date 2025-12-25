@@ -94,11 +94,15 @@ export function ProTable<
   initialFilters,
 }: ProTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(() =>
-    initialFilters
-      ? (Object.entries(initialFilters).map(([id, value]) => ({ id, value })) as ColumnFiltersState)
-      : [],
-  );
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(() => {
+    if (initialFilters) {
+      return Object.entries(initialFilters).map(([id, value]) => ({
+        id,
+        value,
+      })) as ColumnFiltersState;
+    }
+    return [];
+  });
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
   const [data, setData] = useState<TData[]>([]);
@@ -107,7 +111,7 @@ export function ProTable<
     pageIndex: 0,
     pageSize: 10,
   });
-  const [loading, setLoading] = useState(false);
+  const loading = useRef(false);
 
   const table = useReactTable({
     data,
@@ -139,9 +143,9 @@ export function ProTable<
               header: texts?.actions,
               cell: ({ row }) => (
                 <div className='flex items-center justify-end gap-2'>
-                  {actions
-                    ?.render?.(row.original)
-                    .map((item, index) => <Fragment key={index}>{item}</Fragment>)}
+                  {actions?.render?.(row.original).map((item, index) => (
+                    <Fragment key={index}>{item}</Fragment>
+                  ))}
                 </div>
               ),
               enableSorting: false,
@@ -173,7 +177,8 @@ export function ProTable<
   });
 
   const fetchData = async () => {
-    setLoading(true);
+    if (loading.current) return;
+    loading.current = true;
     try {
       const response = await request(
         {
@@ -187,7 +192,7 @@ export function ProTable<
     } catch (error) {
       console.log('Fetch data error:', error);
     } finally {
-      setLoading(false);
+      loading.current = false;
     }
   };
   const reset = async () => {
@@ -209,7 +214,7 @@ export function ProTable<
   useEffect(() => {
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pagination.pageIndex, pagination.pageSize, columnFilters]);
+  }, [pagination.pageIndex, pagination.pageSize, JSON.stringify(columnFilters)]);
 
   const selectedRows = table.getSelectedRowModel().flatRows.map((row) => row.original);
   const selectedCount = selectedRows.length;
@@ -326,7 +331,7 @@ export function ProTable<
           </Table>
         </ProTableWrapper>
 
-        {loading && (
+        {loading.current && (
           <div className='bg-muted/80 absolute top-0 z-20 flex h-full w-full items-center justify-center'>
             <Loader className='h-4 w-4 animate-spin' />
           </div>

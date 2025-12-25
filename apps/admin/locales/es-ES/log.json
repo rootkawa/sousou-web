@@ -15,9 +15,11 @@
     "platform": "Plataforma",
     "remark": "Observación",
     "resetAt": "Restablecido En",
+    "server": "Servidor",
     "serverId": "ID de Servidor",
     "status": "Estado",
     "subject": "Asunto",
+    "subscribe": "Suscribirse",
     "subscribeId": "ID de Suscripción",
     "success": "Éxito",
     "time": "Tiempo",
@@ -32,7 +34,9 @@
     "userId": "ID de Usuario"
   },
   "datePlaceholder": "AAAA-MM-DD",
+  "detail": "Detalle",
   "failed": "Fallido",
+  "pending": "Pendiente",
   "placeholder": {
     "serverName": "Nombre del Servidor",
     "toOrSubject": "Para / Asunto",
@@ -42,6 +46,8 @@
     "userIdOrOrderNoOrSubscribeId": "ID de Usuario / No. de Pedido / ID de Suscripción",
     "userIdOrTokenOrIpOrUa": "ID de Usuario / Token / IP / UA"
   },
+  "sending": "Enviando",
+  "sent": "Enviado",
   "success": "Éxito",
   "title": {
     "balance": "Registro de Saldo",
@@ -56,5 +62,24 @@
     "subscribe": "Registro de Suscripción",
     "subscribeTraffic": "Registro de Tráfico de Suscripción",
     "trafficDetails": "Detalles del Tráfico"
-  }
+  },
+  "type": {
+    "231": "Restablecimiento Automático",
+    "232": "Restablecimiento Adelantado",
+    "233": "Restablecimiento Pagado",
+    "321": "Recarga",
+    "322": "Retiro",
+    "323": "Pago",
+    "324": "Reembolso",
+    "325": "Recompensa",
+    "326": "Ajuste de Administrador",
+    "331": "Compra",
+    "332": "Renovación",
+    "333": "Reembolso",
+    "334": "Retiro",
+    "335": "Ajuste de Administrador",
+    "341": "Aumentar",
+    "342": "Reducir"
+  },
+  "unknown": "Desconocido"
 }

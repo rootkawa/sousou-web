@@ -6,12 +6,11 @@ import {
   batchDeleteSubscribe,
   createSubscribe,
   deleteSubscribe,
-  getSubscribeGroupList,
   getSubscribeList,
   subscribeSort,
   updateSubscribe,
 } from '@/services/admin/subscribe';
-import { useQuery } from '@tanstack/react-query';
+import { useSubscribe } from '@/store/subscribe';
 import { Badge } from '@workspace/ui/components/badge';
 import { Button } from '@workspace/ui/components/button';
 import { Switch } from '@workspace/ui/components/switch';
@@ -24,17 +23,8 @@ import SubscribeForm from './subscribe-form';
 export default function SubscribeTable() {
   const t = useTranslations('product');
   const [loading, setLoading] = useState(false);
-  const { data: groups } = useQuery({
-    queryKey: ['getSubscribeGroupList', 'all'],
-    queryFn: async () => {
-      const { data } = await getSubscribeGroupList({
-        page: 1,
-        size: 9999,
-      });
-      return data.data?.list as API.SubscribeGroup[];
-    },
-  });
   const ref = useRef<ProTableActions>(null);
+  const { fetchSubscribes } = useSubscribe();
   return (
     <ProTable<API.SubscribeItem, { group_id: number; query: string }>
       action={ref}
@@ -54,6 +44,7 @@ export default function SubscribeTable() {
                 });
                 toast.success(t('createSuccess'));
                 ref.current?.refresh();
+                fetchSubscribes();
                 setLoading(false);
 
                 return true;
@@ -67,14 +58,6 @@ export default function SubscribeTable() {
         ),
       }}
       params={[
-        {
-          key: 'group_id',
-          placeholder: t('subscribeGroup'),
-          options: groups?.map((item) => ({
-            label: item.name,
-            value: String(item.id),
-          })),
-        },
         {
           key: 'search',
         },
@@ -103,6 +86,7 @@ export default function SubscribeTable() {
                     show: checked,
                   } as API.UpdateSubscribeRequest);
                   ref.current?.refresh();
+                  fetchSubscribes();
                 }}
               />
             );
@@ -121,6 +105,7 @@ export default function SubscribeTable() {
                     sell: checked,
                   } as API.UpdateSubscribeRequest);
                   ref.current?.refresh();
+                  fetchSubscribes();
                 }}
               />
             );
@@ -176,11 +161,11 @@ export default function SubscribeTable() {
           cell: ({ row }) => <Display type='number' value={row.getValue('quota')} unlimited />,
         },
         {
-          accessorKey: 'group_id',
-          header: t('subscribeGroup'),
+          accessorKey: 'language',
+          header: t('language'),
           cell: ({ row }) => {
-            const name = groups?.find((group) => group.id === row.getValue('group_id'))?.name;
-            return name ? <Badge variant='outline'>{name}</Badge> : '--';
+            const language = row.getValue('language') as string;
+            return language ? <Badge variant='outline'>{language}</Badge> : '--';
           },
         },
         {
@@ -206,6 +191,7 @@ export default function SubscribeTable() {
                 } as API.UpdateSubscribeRequest);
                 toast.success(t('updateSuccess'));
                 ref.current?.refresh();
+                fetchSubscribes();
                 setLoading(false);
                 return true;
               } catch (error) {
@@ -226,6 +212,7 @@ export default function SubscribeTable() {
               });
               toast.success(t('deleteSuccess'));
               ref.current?.refresh();
+              fetchSubscribes();
             }}
             cancelText={t('cancel')}
             confirmText={t('confirm')}
@@ -244,6 +231,7 @@ export default function SubscribeTable() {
                 } as API.CreateSubscribeRequest);
                 toast.success(t('copySuccess'));
                 ref.current?.refresh();
+                fetchSubscribes();
                 setLoading(false);
                 return true;
               } catch (error) {
@@ -268,6 +256,7 @@ export default function SubscribeTable() {
 
               toast.success(t('deleteSuccess'));
               ref.current?.reset();
+              fetchSubscribes();
             }}
             cancelText={t('cancel')}
             confirmText={t('confirm')}

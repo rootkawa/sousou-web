@@ -33,6 +33,7 @@ export default function Affiliate() {
         referralPercentage={common?.invite?.referral_percentage}
       />
 
+
       <ProList<API.UserAffiliate, Record<string, unknown>>
         request={async (pagination, filter) => {
           const response = await queryUserAffiliateList({ ...pagination, ...filter });

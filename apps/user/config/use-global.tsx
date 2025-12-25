@@ -48,6 +48,12 @@ export const useGlobalStore = create<GlobalStore>((set, get) => ({
         ip_register_limit: 0,
         ip_register_limit_duration: 0,
       },
+      device: {
+        enable: false,
+        show_ads: false,
+        enable_security: false,
+        only_real_device: false,
+      },
     },
     invite: {
       forced_invite: false,
@@ -113,45 +119,70 @@ export const useGlobalStore = create<GlobalStore>((set, get) => ({
     }
   },
   getAppSubLink: (url: string, schema?: string) => {
+    const name = get().common?.site?.site_name || '';
+
+    if (!schema) return url;
     try {
-      const name = get().common?.site?.site_name || '';
-
-      if (!schema) return url;
-
       let result = schema;
 
-      result = result.replace(/\${url}/g, url);
-      result = result.replace(/\${name}/g, name);
+      const maxLoop = 10;
+      let prev;
+      let loop = 0;
+      do {
+        prev = result;
+        result = result.replace(
+          /\${encodeURIComponent\(JSON\.stringify\(([^)]+)\)\)}/g,
+          (match, expr) => {
+            try {
+              const processedExpr = expr.replace(/url/g, `"${url}"`).replace(/name/g, `"${name}"`);
+              if (processedExpr.includes('server_remote')) {
+                const serverRemoteValue = `${url}, tag=${name}`;
+                return encodeURIComponent(JSON.stringify({ server_remote: [serverRemoteValue] }));
+              }
+              const obj = eval(`(${processedExpr})`);
+              return encodeURIComponent(JSON.stringify(obj));
+            } catch {
+              return match;
+            }
+          },
+        );
 
-      result = result.replace(/\${encodeURIComponent\(([^)]+)\)}/g, (match, expr) => {
-        if (expr === 'url') return encodeURIComponent(url);
-        if (expr === 'name') return encodeURIComponent(name);
-        return match;
-      });
-
-      result = result.replace(/\${window\.btoa\(([^)]+)\)}/g, (match, expr) => {
-        const btoa = typeof window !== 'undefined' ? window.btoa : (str: string) => str;
-        if (expr === 'url') return btoa(url);
-        if (expr === 'name') return btoa(name);
-        return match;
-      });
-
-      result = result.replace(/\${JSON\.stringify\(([^}]+)\)}/g, (match, expr) => {
-        try {
-          const processedExpr = expr.replace(/url/g, `"${url}"`).replace(/name/g, `"${name}"`);
-
-          if (processedExpr.includes('server_remote')) {
-            const serverRemoteValue = `${url}, tag=${name}`;
-            return JSON.stringify({ server_remote: [serverRemoteValue] });
+        result = result.replace(/\${encodeURIComponent\(([^)]+)\)}/g, (match, expr) => {
+          if (expr === 'url') return encodeURIComponent(url);
+          if (expr === 'name') return encodeURIComponent(name);
+          try {
+            return encodeURIComponent(expr);
+          } catch {
+            return match;
           }
+        });
 
-          const result = eval(`(${processedExpr})`);
-          return JSON.stringify(result);
-        } catch {
-          return match;
-        }
-      });
+        result = result.replace(/\${window\.btoa\(([^)]+)\)}/g, (match, expr) => {
+          const btoa = typeof window !== 'undefined' ? window.btoa : (str: string) => str;
+          if (expr === 'url') return btoa(url);
+          if (expr === 'name') return btoa(name);
+          try {
+            return btoa(expr);
+          } catch {
+            return match;
+          }
+        });
 
+        result = result.replace(/\${JSON\.stringify\(([^}]+)\)}/g, (match, expr) => {
+          try {
+            const processedExpr = expr.replace(/url/g, `"${url}"`).replace(/name/g, `"${name}"`);
+            if (processedExpr.includes('server_remote')) {
+              const serverRemoteValue = `${url}, tag=${name}`;
+              return JSON.stringify({ server_remote: [serverRemoteValue] });
+            }
+            const result = eval(`(${processedExpr})`);
+            return JSON.stringify(result);
+          } catch {
+            return match;
+          }
+        });
+        loop++;
+      } while (result !== prev && loop < maxLoop);
       return result;
     } catch (error) {
       console.error('Error generating app sub link:', error);

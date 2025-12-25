@@ -111,6 +111,21 @@ export async function filterNodeList(
   );
 }
 
+/** Reset node sort POST /v1/admin/server/node/sort */
+export async function resetSortWithNode(
+  body: API.ResetSortRequest,
+  options?: { [key: string]: any },
+) {
+  return request<API.Response & { data?: any }>('/v1/admin/server/node/sort', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
 /** Toggle Node Status POST /v1/admin/server/node/status/toggle */
 export async function toggleNodeStatus(
   body: API.ToggleNodeStatusRequest,
@@ -122,6 +137,14 @@ export async function toggleNodeStatus(
       'Content-Type': 'application/json',
     },
     data: body,
+    ...(options || {}),
+  });
+}
+
+/** Query all node tags GET /v1/admin/server/node/tags */
+export async function queryNodeTag(options?: { [key: string]: any }) {
+  return request<API.Response & { data?: API.QueryNodeTagResponse }>('/v1/admin/server/node/tags', {
+    method: 'GET',
     ...(options || {}),
   });
 }
@@ -154,6 +177,21 @@ export async function getServerProtocols(
       ...(options || {}),
     },
   );
+}
+
+/** Reset server sort POST /v1/admin/server/server/sort */
+export async function resetSortWithServer(
+  body: API.ResetSortRequest,
+  options?: { [key: string]: any },
+) {
+  return request<API.Response & { data?: any }>('/v1/admin/server/server/sort', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
 }
 
 /** Update Server POST /v1/admin/server/update */

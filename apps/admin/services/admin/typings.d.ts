@@ -108,6 +108,7 @@ declare namespace API {
   type AuthConfig = {
     mobile: MobileAuthenticateConfig;
     email: EmailAuthticateConfig;
+    device: DeviceAuthticateConfig;
     register: PubilcRegisterConfig;
   };
 
@@ -122,7 +123,7 @@ declare namespace API {
     type: number;
     user_id: number;
     amount: number;
-    order_id?: number;
+    order_no?: string;
     balance: number;
     timestamp: number;
   };
@@ -152,7 +153,7 @@ declare namespace API {
     subject: string;
     content: string;
     recipients: string;
-    scope: string;
+    scope: number;
     register_start_time: number;
     register_end_time: number;
     additional: string;
@@ -226,7 +227,7 @@ declare namespace API {
   type CreateBatchSendEmailTaskRequest = {
     subject: string;
     content: string;
-    scope: string;
+    scope: number;
     register_start_time?: number;
     register_end_time?: number;
     additional?: string;
@@ -296,11 +297,21 @@ declare namespace API {
     enable: boolean;
   };
 
+  type CreateQuotaTaskRequest = {
+    subscribers: number[];
+    is_active: boolean;
+    start_time: number;
+    end_time: number;
+    reset_traffic: boolean;
+    days: number;
+    gift_type: number;
+    gift_value: number;
+  };
+
   type CreateServerRequest = {
     name: string;
     country?: string;
     city?: string;
-    ratio: number;
     address: string;
     sort?: number;
     protocols: Protocol[];
@@ -325,6 +336,7 @@ declare namespace API {
 
   type CreateSubscribeRequest = {
     name: string;
+    language: string;
     description: string;
     unit_price: number;
     unit_time: string;
@@ -335,7 +347,6 @@ declare namespace API {
     speed_limit: number;
     device_limit: number;
     quota: number;
-    group_id: number;
     nodes: number[];
     node_tags: string[];
     show: boolean;
@@ -366,6 +377,8 @@ declare namespace API {
     password: string;
     product_id: number;
     duration: number;
+    referral_percentage: number;
+    only_first_purchase: boolean;
     referer_user: string;
     refer_code: string;
     balance: number;
@@ -442,6 +455,13 @@ declare namespace API {
 
   type DeleteUserSubscribeRequest = {
     user_subscribe_id: number;
+  };
+
+  type DeviceAuthticateConfig = {
+    enable: boolean;
+    show_ads: boolean;
+    enable_security: boolean;
+    only_real_device: boolean;
   };
 
   type Document = {
@@ -701,6 +721,7 @@ declare namespace API {
     date?: string;
     search?: string;
     user_id?: number;
+    user_subscribe_id?: number;
   };
 
   type FilterSubscribeLogRequest = {
@@ -709,6 +730,7 @@ declare namespace API {
     date?: string;
     search?: string;
     user_id?: number;
+    user_subscribe_id?: number;
   };
 
   type FilterSubscribeLogResponse = {
@@ -850,14 +872,14 @@ declare namespace API {
   type GetBatchSendEmailTaskListParams = {
     page: number;
     size: number;
-    scope?: string;
+    scope?: number;
     status?: number;
   };
 
   type GetBatchSendEmailTaskListRequest = {
     page: number;
     size: number;
-    scope?: string;
+    scope?: number;
     status?: number;
   };
 
@@ -991,7 +1013,7 @@ declare namespace API {
   };
 
   type GetPreSendEmailCountRequest = {
-    scope: string;
+    scope: number;
     register_start_time?: number;
     register_end_time?: number;
   };
@@ -1043,14 +1065,14 @@ declare namespace API {
   type GetSubscribeListParams = {
     page: number;
     size: number;
-    group_id?: number;
+    language?: string;
     search?: string;
   };
 
   type GetSubscribeListRequest = {
     page: number;
     size: number;
-    group_id?: number;
+    language?: string;
     search?: string;
   };
 
@@ -1289,6 +1311,11 @@ declare namespace API {
     list: Record<string, any>;
   };
 
+  type LogSetting = {
+    auto_clear: boolean;
+    clear_days: number;
+  };
+
   type MessageLog = {
     id: number;
     type: number;
@@ -1321,6 +1348,7 @@ declare namespace API {
     server_id: number;
     protocol: string;
     enabled: boolean;
+    sort?: number;
     created_at: number;
     updated_at: number;
   };
@@ -1329,6 +1357,26 @@ declare namespace API {
     node_secret: string;
     node_pull_interval: number;
     node_push_interval: number;
+    traffic_report_threshold: number;
+    ip_strategy: string;
+    dns: NodeDNS[];
+    block: string[];
+    outbound: NodeOutbound[];
+  };
+
+  type NodeDNS = {
+    proto: string;
+    address: string;
+    domains: string[];
+  };
+
+  type NodeOutbound = {
+    name: string;
+    protocol: string;
+    address: string;
+    port: number;
+    password: string;
+    rules: string[];
   };
 
   type NodeRelay = {
@@ -1455,6 +1503,11 @@ declare namespace API {
     orderNo: string;
   };
 
+  type PreViewNodeMultiplierResponse = {
+    current_time: string;
+    ratio: number;
+  };
+
   type PreviewSubscribeTemplateParams = {
     id: number;
   };
@@ -1475,6 +1528,7 @@ declare namespace API {
   type Protocol = {
     type: string;
     port: number;
+    enable: boolean;
     security?: string;
     sni?: string;
     allow_insecure?: boolean;
@@ -1498,6 +1552,48 @@ declare namespace API {
     reduce_rtt?: boolean;
     udp_relay_mode?: string;
     congestion_controller?: string;
+    /** mux, eg: off/low/medium/high */
+    multiplex?: string;
+    /** padding scheme */
+    padding_scheme?: string;
+    /** upload speed limit */
+    up_mbps?: number;
+    /** download speed limit */
+    down_mbps?: number;
+    /** obfs, 'none', 'http', 'tls' */
+    obfs?: string;
+    /** obfs host */
+    obfs_host?: string;
+    /** obfs path */
+    obfs_path?: string;
+    /** xhttp mode */
+    xhttp_mode?: string;
+    /** xhttp extra path */
+    xhttp_extra?: string;
+    /** encryption，'none', 'mlkem768x25519plus' */
+    encryption?: string;
+    /** encryption mode，'native', 'xorpub', 'random' */
+    encryption_mode?: string;
+    /** encryption rtt，'0rtt', '1rtt' */
+    encryption_rtt?: string;
+    /** encryption ticket */
+    encryption_ticket?: string;
+    /** encryption server padding */
+    encryption_server_padding?: string;
+    /** encryption private key */
+    encryption_private_key?: string;
+    /** encryption client padding */
+    encryption_client_padding?: string;
+    /** encryption password */
+    encryption_password?: string;
+    /** Traffic ratio, default is 1 */
+    ratio?: number;
+    /** Certificate mode, `none`｜`http`｜`dns`｜`self` */
+    cert_mode?: string;
+    /** DNS provider for certificate */
+    cert_dns_provider?: string;
+    /** Environment for DNS provider */
+    cert_dns_env?: string;
   };
 
   type PubilcRegisterConfig = {
@@ -1543,6 +1639,10 @@ declare namespace API {
     list: Document[];
   };
 
+  type QueryNodeTagResponse = {
+    tags: string[];
+  };
+
   type QueryOrderDetailRequest = {
     order_no: string;
   };
@@ -1555,6 +1655,45 @@ declare namespace API {
   type QueryOrderListResponse = {
     total: number;
     list: OrderDetail[];
+  };
+
+  type QueryQuotaTaskListParams = {
+    page: number;
+    size: number;
+    status?: number;
+  };
+
+  type QueryQuotaTaskListRequest = {
+    page: number;
+    size: number;
+    status?: number;
+  };
+
+  type QueryQuotaTaskListResponse = {
+    total: number;
+    list: QuotaTask[];
+  };
+
+  type QueryQuotaTaskPreCountRequest = {
+    subscribers: number[];
+    is_active: boolean;
+    start_time: number;
+    end_time: number;
+  };
+
+  type QueryQuotaTaskPreCountResponse = {
+    count: number;
+  };
+
+  type QueryQuotaTaskStatusRequest = {
+    id: number;
+  };
+
+  type QueryQuotaTaskStatusResponse = {
+    status: number;
+    current: number;
+    total: number;
+    errors: string;
   };
 
   type QuerySubscribeGroupListResponse = {
@@ -1580,6 +1719,26 @@ declare namespace API {
   type QueryUserAffiliateListResponse = {
     list: UserAffiliate[];
     total: number;
+  };
+
+  type QuotaTask = {
+    id: number;
+    subscribers: number[];
+    is_active: boolean;
+    start_time: number;
+    end_time: number;
+    reset_traffic: boolean;
+    days: number;
+    gift_type: number;
+    gift_value: number;
+    /** UserSubscribe IDs */
+    objects: number[];
+    status: number;
+    total: number;
+    current: number;
+    errors: string;
+    created_at: number;
+    updated_at: number;
   };
 
   type RechargeOrderRequest = {
@@ -1620,6 +1779,10 @@ declare namespace API {
 
   type RenewalOrderResponse = {
     order_no: string;
+  };
+
+  type ResetSortRequest = {
+    sort: SortItem[];
   };
 
   type ResetSubscribeLog = {
@@ -1678,7 +1841,6 @@ declare namespace API {
     name: string;
     country: string;
     city: string;
-    ratio: number;
     address: string;
     sort: number;
     protocols: Protocol[];
@@ -1696,8 +1858,13 @@ declare namespace API {
     updated_at: number;
   };
 
+  type ServerOnlineIP = {
+    ip: string;
+    protocol: string;
+  };
+
   type ServerOnlineUser = {
-    ip: string[];
+    ip: ServerOnlineIP[];
     user_id: number;
     subscribe: string;
     subscribe_id: number;
@@ -1719,14 +1886,16 @@ declare namespace API {
   };
 
   type ServerStatus = {
-    online: ServerOnlineUser[];
     cpu: number;
     mem: number;
     disk: number;
+    protocol: string;
+    online: ServerOnlineUser[];
+    status: string;
   };
 
   type ServerTotalDataResponse = {
-    online_user_ips: number;
+    online_users: number;
     online_servers: number;
     offline_servers: number;
     today_upload: number;
@@ -1806,6 +1975,7 @@ declare namespace API {
   type Subscribe = {
     id: number;
     name: string;
+    language: string;
     description: string;
     unit_price: number;
     unit_time: string;
@@ -1816,7 +1986,6 @@ declare namespace API {
     speed_limit: number;
     device_limit: number;
     quota: number;
-    group_id: number;
     nodes: number[];
     node_tags: string[];
     show: boolean;
@@ -1870,6 +2039,7 @@ declare namespace API {
   type SubscribeItem = {
     id?: number;
     name?: string;
+    language?: string;
     description?: string;
     unit_price?: number;
     unit_time?: string;
@@ -1880,7 +2050,6 @@ declare namespace API {
     speed_limit?: number;
     device_limit?: number;
     quota?: number;
-    group_id?: number;
     nodes?: number[];
     node_tags?: string[];
     show?: boolean;
@@ -2094,7 +2263,6 @@ declare namespace API {
     name: string;
     country?: string;
     city?: string;
-    ratio: number;
     address: string;
     sort?: number;
     protocols: Protocol[];
@@ -2122,6 +2290,7 @@ declare namespace API {
   type UpdateSubscribeRequest = {
     id: number;
     name: string;
+    language: string;
     description: string;
     unit_price: number;
     unit_time: string;
@@ -2132,7 +2301,6 @@ declare namespace API {
     speed_limit: number;
     device_limit: number;
     quota: number;
-    group_id: number;
     nodes: number[];
     node_tags: string[];
     show: boolean;
@@ -2161,6 +2329,8 @@ declare namespace API {
     avatar: string;
     balance: number;
     commission: number;
+    referral_percentage: number;
+    only_first_purchase: boolean;
     gift_amount: number;
     telegram: number;
     refer_code: string;
@@ -2191,6 +2361,8 @@ declare namespace API {
     avatar: string;
     balance: number;
     commission: number;
+    referral_percentage: number;
+    only_first_purchase: boolean;
     gift_amount: number;
     telegram: number;
     refer_code: string;

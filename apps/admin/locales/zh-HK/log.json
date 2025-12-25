@@ -15,9 +15,11 @@
     "platform": "平台",
     "remark": "備註",
     "resetAt": "重置時間",
+    "server": "伺服器",
     "serverId": "伺服器ID",
     "status": "狀態",
     "subject": "主題",
+    "subscribe": "訂閱",
     "subscribeId": "訂閱ID",
     "success": "成功",
     "time": "時間",
@@ -32,7 +34,9 @@
     "userId": "用戶ID"
   },
   "datePlaceholder": "YYYY-MM-DD",
+  "detail": "詳情",
   "failed": "失敗",
+  "pending": "待處理",
   "placeholder": {
     "serverName": "伺服器名稱",
     "toOrSubject": "收件人 / 主題",
@@ -42,6 +46,8 @@
     "userIdOrOrderNoOrSubscribeId": "用戶ID / 訂單號 / 訂閱ID",
     "userIdOrTokenOrIpOrUa": "用戶ID / 令牌 / IP / UA"
   },
+  "sending": "發送中",
+  "sent": "已發送",
   "success": "成功",
   "title": {
     "balance": "餘額日誌",
@@ -56,5 +62,24 @@
     "subscribe": "訂閱日誌",
     "subscribeTraffic": "訂閱流量日誌",
     "trafficDetails": "流量詳情"
-  }
+  },
+  "type": {
+    "231": "自動重置",
+    "232": "提前重置",
+    "233": "付費重置",
+    "321": "充值",
+    "322": "提現",
+    "323": "付款",
+    "324": "退款",
+    "325": "獎勵",
+    "326": "管理員調整",
+    "331": "購買",
+    "332": "續費",
+    "333": "退款",
+    "334": "提現",
+    "335": "管理員調整",
+    "341": "增加",
+    "342": "減少"
+  },
+  "unknown": "未知"
 }

@@ -56,6 +56,7 @@ import { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
+import { subscribeSchema } from './schema';
 import { TemplatePreview } from './template-preview';
 
 const createClientFormSchema = (t: any) =>
@@ -64,9 +65,9 @@ const createClientFormSchema = (t: any) =>
     description: z.string().optional(),
     icon: z.string().optional(),
     user_agent: z.string().min(1, `User-Agent ${t('form.validation.userAgentRequiredSuffix')}`),
-    scheme: z.string().default(''),
-    template: z.string().default(''),
-    output_format: z.string().default(''),
+    scheme: z.string().optional(),
+    template: z.string(),
+    output_format: z.string(),
     download_link: z.object({
       windows: z.string().optional(),
       mac: z.string().optional(),
@@ -83,8 +84,6 @@ export function ProtocolForm() {
   const t = useTranslations('subscribe');
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
-  const [previewOpen, setPreviewOpen] = useState(false);
-  const [previewApplicationId, setPreviewApplicationId] = useState<number | null>(null);
   const [editingClient, setEditingClient] = useState<API.SubscribeApplication | null>(null);
   const tableRef = useRef<ProTableActions>(null);
 
@@ -111,7 +110,6 @@ export function ProtocolForm() {
     },
   });
 
-  // API请求函数
   const request = async (
     pagination: { page: number; size: number },
     filter: Record<string, unknown>,
@@ -127,7 +125,6 @@ export function ProtocolForm() {
     };
   };
 
-  // 表格列定义
   const columns: ColumnDef<API.SubscribeApplication, any>[] = [
     {
       accessorKey: 'is_default',
@@ -317,7 +314,21 @@ export function ProtocolForm() {
         columns={columns}
         request={request}
         header={{
-          title: <h2 className='text-lg font-semibold'>{t('protocol.title')}</h2>,
+          title: (
+            <div className='flex items-center justify-between'>
+              <h2 className='text-lg font-semibold'>{t('protocol.title')}</h2>
+              <a
+                href='https://github.com/perfect-panel/subscription-template'
+                target='_blank'
+                rel='noreferrer'
+                className='text-primary inline-flex items-center gap-2 rounded-md px-3 py-1 text-sm font-medium hover:underline'
+              >
+                <Icon icon='mdi:github' className='h-4 w-4' />
+                <span>Template Repo</span>
+                <Icon icon='mdi:open-in-new' className='text-muted-foreground h-4 w-4' />
+              </a>
+            </div>
+          ),
           toolbar: <Button onClick={handleAdd}>{t('actions.add')}</Button>,
         }}
         actions={{
@@ -652,136 +663,7 @@ export function ProtocolForm() {
                           <FormControl>
                             <GoTemplateEditor
                               showLineNumbers
-                              schema={{
-                                SiteName: { type: 'string', description: 'Site name' },
-                                SubscribeName: { type: 'string', description: 'Subscribe name' },
-                                Proxies: {
-                                  type: 'array',
-                                  description: 'Array of proxy nodes',
-                                  items: {
-                                    type: 'object',
-                                    properties: {
-                                      Name: { type: 'string', description: 'Node name' },
-                                      Server: { type: 'string', description: 'Server host' },
-                                      Port: { type: 'number', description: 'Server port' },
-                                      Type: { type: 'string', description: 'Proxy type' },
-                                      Tags: {
-                                        type: 'array',
-                                        description: 'Node tags',
-                                        items: { type: 'string' },
-                                      },
-                                      // Security Options
-                                      Security: {
-                                        type: 'string',
-                                        description: 'Security protocol',
-                                      },
-                                      SNI: {
-                                        type: 'string',
-                                        description: 'Server Name Indication for TLS',
-                                      },
-                                      AllowInsecure: {
-                                        type: 'boolean',
-                                        description:
-                                          'Allow insecure connections (skip certificate verification)',
-                                      },
-                                      Fingerprint: {
-                                        type: 'string',
-                                        description: 'Client fingerprint for TLS connections',
-                                      },
-                                      RealityServerAddr: {
-                                        type: 'string',
-                                        description: 'Reality server address',
-                                      },
-                                      RealityServerPort: {
-                                        type: 'number',
-                                        description: 'Reality server port',
-                                      },
-                                      RealityPrivateKey: {
-                                        type: 'string',
-                                        description: 'Reality private key for authentication',
-                                      },
-                                      RealityPublicKey: {
-                                        type: 'string',
-                                        description: 'Reality public key for authentication',
-                                      },
-                                      RealityShortId: {
-                                        type: 'string',
-                                        description: 'Reality short ID for authentication',
-                                      },
-                                      // Transport Options
-                                      Transport: {
-                                        type: 'string',
-                                        description: 'Transport protocol (e.g., ws, http, grpc)',
-                                      },
-                                      Host: {
-                                        type: 'string',
-                                        description: 'For WebSocket/HTTP/HTTPS',
-                                      },
-                                      Path: { type: 'string', description: 'For HTTP/HTTPS' },
-                                      ServiceName: {
-                                        type: 'string',
-                                        description: 'For gRPC',
-                                      },
-                                      // Shadowsocks Options
-                                      Method: { type: 'string', description: 'Encryption method' },
-                                      ServerKey: {
-                                        type: 'string',
-                                        description: 'For Shadowsocks 2022',
-                                      },
-                                      // Vmess/Vless/Trojan Options
-                                      Flow: {
-                                        type: 'string',
-                                        description: 'Flow for Vmess/Vless/Trojan',
-                                      },
-                                      // Hysteria2 Options
-                                      HopPorts: {
-                                        type: 'string',
-                                        description: 'Comma-separated list of hop ports',
-                                      },
-                                      HopInterval: {
-                                        type: 'number',
-                                        description: 'Interval for hop ports in seconds',
-                                      },
-                                      ObfsPassword: {
-                                        type: 'string',
-                                        description: 'Obfuscation password for Hysteria2',
-                                      },
-                                      // Tuic Options
-                                      DisableSNI: {
-                                        type: 'boolean',
-                                        description: 'Disable SNI',
-                                      },
-                                      ReduceRtt: {
-                                        type: 'boolean',
-                                        description: 'Reduce RTT',
-                                      },
-                                      UDPRelayMode: {
-                                        type: 'string',
-                                        description: 'UDP relay mode (e.g., "full", "partial")',
-                                      },
-                                      CongestionController: {
-                                        type: 'string',
-                                        description: 'Congestion controller (e.g., "cubic", "bbr")',
-                                      },
-                                    },
-                                  },
-                                },
-                                UserInfo: {
-                                  type: 'object',
-                                  description: 'User information',
-                                  properties: {
-                                    Password: { type: 'string', description: 'User password' },
-                                    ExpiredAt: { type: 'string', description: 'Expiration date' },
-                                    Download: { type: 'number', description: 'Downloaded bytes' },
-                                    Upload: { type: 'number', description: 'Uploaded bytes' },
-                                    Traffic: { type: 'number', description: 'Total traffic bytes' },
-                                    SubscribeURL: {
-                                      type: 'string',
-                                      description: 'Subscription URL',
-                                    },
-                                  },
-                                },
-                              }}
+                              schema={subscribeSchema}
                               enableSprig
                               value={field.value || ''}
                               onChange={(value) => field.onChange(value)}

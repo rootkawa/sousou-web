@@ -1,8 +1,8 @@
 'use client';
 
-import { filterServerList } from '@/services/admin/server';
+import { useNode } from '@/store/node';
+import { useServer } from '@/store/server';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useQuery } from '@tanstack/react-query';
 import { Button } from '@workspace/ui/components/button';
 import {
   Form,
@@ -26,7 +26,7 @@ import { Combobox } from '@workspace/ui/custom-components/combobox';
 import { EnhancedInput } from '@workspace/ui/custom-components/enhanced-input';
 import TagInput from '@workspace/ui/custom-components/tag-input';
 import { useTranslations } from 'next-intl';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -36,44 +36,33 @@ export type ProtocolName =
   | 'vmess'
   | 'vless'
   | 'trojan'
-  | 'hysteria2'
+  | 'hysteria'
   | 'tuic'
-  | 'anytls';
-
-type ServerRow = API.Server;
-
-export type NodeFormValues = {
-  name: string;
-  server_id?: number;
-  protocol: ProtocolName | '';
-  address: string;
-  port: number;
-  tags: string[];
-};
-
-async function getServers(): Promise<ServerRow[]> {
-  const { data } = await filterServerList({ page: 1, size: 1000 });
-  return (data?.data?.list || []) as ServerRow[];
-}
+  | 'anytls'
+  | 'naive'
+  | 'http'
+  | 'socks'
+  | 'mieru';
 
 const buildSchema = (t: ReturnType<typeof useTranslations>) =>
   z.object({
     name: z.string().trim().min(1, t('errors.nameRequired')),
-    server_id: z.coerce
-      .number({ invalid_type_error: t('errors.serverRequired') })
+    server_id: z
+      .number({ message: t('errors.serverRequired') })
       .int()
-      .gt(0, t('errors.serverRequired')),
-    protocol: z.custom<ProtocolName>((v) => typeof v === 'string' && v.length > 0, {
-      message: t('errors.protocolRequired'),
-    }),
+      .gt(0, t('errors.serverRequired'))
+      .optional(),
+    protocol: z.string().min(1, t('errors.protocolRequired')),
     address: z.string().trim().min(1, t('errors.serverAddrRequired')),
-    port: z.coerce
-      .number({ invalid_type_error: t('errors.portRange') })
+    port: z
+      .number({ message: t('errors.portRange') })
       .int()
       .min(1, t('errors.portRange'))
       .max(65535, t('errors.portRange')),
-    tags: z.array(z.string()).default([]),
+    tags: z.array(z.string()),
   });
+
+export type NodeFormValues = z.infer<ReturnType<typeof buildSchema>>;
 
 export default function NodeForm(props: {
   trigger: string;
@@ -85,6 +74,21 @@ export default function NodeForm(props: {
   const { trigger, title, loading, initialValues, onSubmit } = props;
   const t = useTranslations('nodes');
   const Scheme = useMemo(() => buildSchema(t), [t]);
+  const [open, setOpen] = useState(false);
+
+  const [autoFilledFields, setAutoFilledFields] = useState<Set<string>>(new Set());
+
+  const addAutoFilledField = (fieldName: string) => {
+    setAutoFilledFields((prev) => new Set(prev).add(fieldName));
+  };
+
+  const removeAutoFilledField = (fieldName: string) => {
+    setAutoFilledFields((prev) => {
+      const newSet = new Set(prev);
+      newSet.delete(fieldName);
+      return newSet;
+    });
+  };
 
   const form = useForm<NodeFormValues>({
     resolver: zodResolver(Scheme),
@@ -101,19 +105,12 @@ export default function NodeForm(props: {
 
   const serverId = form.watch('server_id');
 
-  const { data } = useQuery({ queryKey: ['filterServerListAll'], queryFn: getServers });
-  const servers: ServerRow[] = data as ServerRow[];
+  const { servers, getAvailableProtocols } = useServer();
+  const { tags } = useNode();
 
-  const currentServer = useMemo(() => servers?.find((s) => s.id === serverId), [servers, serverId]);
+  const existingTags: string[] = tags || [];
 
-  const availableProtocols = useMemo(() => {
-    return (currentServer?.protocols || [])
-      .map((p) => ({
-        protocol: (p as any).type as ProtocolName,
-        port: (p as any).port as number | undefined,
-      }))
-      .filter((p) => !!p.protocol);
-  }, [currentServer]);
+  const availableProtocols = getAvailableProtocols(serverId);
 
   useEffect(() => {
     if (initialValues) {
@@ -134,47 +131,93 @@ export default function NodeForm(props: {
     const id = nextId ?? undefined;
     form.setValue('server_id', id);
 
-    const sel = servers.find((s) => s.id === id);
-    const dirty = form.formState.dirtyFields as Record<string, any>;
-    if (!dirty.name) {
-      form.setValue('name', (sel?.name as string) || '', { shouldDirty: false });
+    if (!id) {
+      setAutoFilledFields(new Set());
+      return;
     }
-    if (!dirty.address) {
-      form.setValue('address', (sel?.address as string) || '', { shouldDirty: false });
+
+    const selectedServer = servers.find((s) => s.id === id);
+    if (!selectedServer) return;
+
+    const currentValues = form.getValues();
+    const fieldsToFill: string[] = [];
+
+    if (!currentValues.name || autoFilledFields.has('name')) {
+      form.setValue('name', selectedServer.name as string, { shouldDirty: false });
+      fieldsToFill.push('name');
     }
-    const allowed = (sel?.protocols || [])
-      .map((p) => (p as any).type as ProtocolName)
-      .filter(Boolean);
-    if (!allowed.includes(form.getValues('protocol') as ProtocolName)) {
-      form.setValue('protocol', '' as any);
+
+    if (!currentValues.address || autoFilledFields.has('address')) {
+      form.setValue('address', selectedServer.address as string, { shouldDirty: false });
+      fieldsToFill.push('address');
     }
-    // Do not auto-fill port here; handled in handleProtocolChange
+
+    const protocols = getAvailableProtocols(id);
+    const firstProtocol = protocols[0];
+
+    if (firstProtocol && (!currentValues.protocol || autoFilledFields.has('protocol'))) {
+      form.setValue('protocol', firstProtocol.protocol, { shouldDirty: false });
+      fieldsToFill.push('protocol');
+
+      if (!currentValues.port || currentValues.port === 0 || autoFilledFields.has('port')) {
+        const port = firstProtocol.port || 0;
+        form.setValue('port', port, { shouldDirty: false });
+        fieldsToFill.push('port');
+      }
+    }
+
+    setAutoFilledFields(new Set(fieldsToFill));
   }
+
+  const handleManualFieldChange = (fieldName: keyof NodeFormValues, value: any) => {
+    form.setValue(fieldName, value);
+    removeAutoFilledField(fieldName);
+  };
 
   function handleProtocolChange(nextProto?: ProtocolName | null) {
-    const p = (nextProto || '') as ProtocolName | '';
-    form.setValue('protocol', p);
-    if (!p || !currentServer) return;
-    const dirty = form.formState.dirtyFields as Record<string, any>;
-    if (!dirty.port) {
-      const hit = (currentServer.protocols as any[]).find((x) => (x as any).type === p);
-      const port = (hit as any)?.port as number | undefined;
-      form.setValue('port', typeof port === 'number' && port > 0 ? port : 0, {
-        shouldDirty: false,
-      });
+    const protocol = (nextProto || '') as ProtocolName | '';
+    form.setValue('protocol', protocol);
+
+    if (!protocol || !serverId) {
+      removeAutoFilledField('protocol');
+      return;
+    }
+
+    const currentValues = form.getValues();
+    const isPortAutoFilled = autoFilledFields.has('port');
+
+    removeAutoFilledField('protocol');
+
+    if (!currentValues.port || currentValues.port === 0 || isPortAutoFilled) {
+      const protocolData = availableProtocols.find((p) => p.protocol === protocol);
+
+      if (protocolData) {
+        const port = protocolData.port || 0;
+        form.setValue('port', port, { shouldDirty: false });
+        addAutoFilledField('port');
+      }
     }
   }
 
-  async function submit(values: NodeFormValues) {
-    const ok = await onSubmit(values);
-    if (ok) form.reset();
-    return ok;
+  async function handleSubmit(values: NodeFormValues) {
+    const result = await onSubmit(values);
+    if (result) {
+      setOpen(false);
+      setAutoFilledFields(new Set());
+    }
   }
 
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button onClick={() => form.reset()}>{trigger}</Button>
+        <Button
+          onClick={() => {
+            form.reset();
+            setAutoFilledFields(new Set());
+          }}
+        >
+          {trigger}
+        </Button>
       </SheetTrigger>
 
       <SheetContent className='w-[560px] max-w-full'>
@@ -235,7 +278,7 @@ export default function NodeForm(props: {
                     <FormControl>
                       <EnhancedInput
                         {...field}
-                        onValueChange={(v) => form.setValue(field.name, v as string)}
+                        onValueChange={(v) => handleManualFieldChange('name', v as string)}
                       />
                     </FormControl>
                     <FormMessage />
@@ -252,7 +295,7 @@ export default function NodeForm(props: {
                     <FormControl>
                       <EnhancedInput
                         {...field}
-                        onValueChange={(v) => form.setValue(field.name, v as string)}
+                        onValueChange={(v) => handleManualFieldChange('address', v as string)}
                       />
                     </FormControl>
                     <FormMessage />
@@ -273,7 +316,7 @@ export default function NodeForm(props: {
                         min={1}
                         max={65535}
                         placeholder='1-65535'
-                        onValueChange={(v) => form.setValue(field.name, Number(v))}
+                        onValueChange={(v) => handleManualFieldChange('port', Number(v))}
                       />
                     </FormControl>
                     <FormMessage />
@@ -291,6 +334,7 @@ export default function NodeForm(props: {
                         placeholder={t('tags_placeholder')}
                         value={field.value || []}
                         onChange={(v) => form.setValue(field.name, v)}
+                        options={existingTags}
                       />
                     </FormControl>
                     <FormDescription>{t('tags_description')}</FormDescription>
@@ -303,19 +347,16 @@ export default function NodeForm(props: {
         </ScrollArea>
 
         <SheetFooter className='flex-row justify-end gap-2 pt-3'>
-          <Button variant='outline' disabled={loading}>
+          <Button variant='outline' disabled={loading} onClick={() => setOpen(false)}>
             {t('cancel')}
           </Button>
           <Button
             disabled={loading}
-            onClick={form.handleSubmit(
-              async (vals) => submit(vals),
-              (errors) => {
-                const key = Object.keys(errors)[0] as keyof typeof errors;
-                if (key) toast.error(String(errors[key]?.message));
-                return false;
-              },
-            )}
+            onClick={form.handleSubmit(handleSubmit, (errors) => {
+              const key = Object.keys(errors)[0] as keyof typeof errors;
+              if (key) toast.error(String(errors[key]?.message));
+              return false;
+            })}
           >
             {t('confirm')}
           </Button>

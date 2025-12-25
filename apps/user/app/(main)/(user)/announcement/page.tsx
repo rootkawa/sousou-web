@@ -29,6 +29,6 @@ export default function Page() {
       }
     />
   ) : (
-    <Empty />
+    <Empty border />
   );
 }

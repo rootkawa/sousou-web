@@ -1,3 +1,5 @@
+import { NEXT_PUBLIC_API_URL, NEXT_PUBLIC_SITE_URL } from '@/config/constants';
+import { extractDomain } from '@workspace/ui/utils';
 import { create } from 'zustand';
 
 export interface GlobalStore {
@@ -5,9 +7,10 @@ export interface GlobalStore {
   user?: API.User;
   setCommon: (common: Partial<API.GetGlobalConfigResponse>) => void;
   setUser: (user?: API.User) => void;
+  getUserSubscribeUrls: (uuid: string, type?: string) => string[];
 }
 
-export const useGlobalStore = create<GlobalStore>((set) => ({
+export const useGlobalStore = create<GlobalStore>((set, get) => ({
   common: {
     site: {
       host: '',
@@ -41,6 +44,12 @@ export const useGlobalStore = create<GlobalStore>((set) => ({
         enable_ip_register_limit: false,
         ip_register_limit: 0,
         ip_register_limit_duration: 0,
+      },
+      device: {
+        enable: false,
+        show_ads: false,
+        enable_security: false,
+        only_real_device: false,
       },
     },
     invite: {
@@ -77,6 +86,22 @@ export const useGlobalStore = create<GlobalStore>((set) => ({
       },
     })),
   setUser: (user) => set({ user }),
+  getUserSubscribeUrls: (uuid: string, type?: string) => {
+    const { pan_domain, subscribe_domain, subscribe_path } = get().common.subscribe || {};
+    const domains = subscribe_domain
+      ? subscribe_domain.split('\n')
+      : [extractDomain(NEXT_PUBLIC_API_URL || NEXT_PUBLIC_SITE_URL || '', pan_domain)];
+
+    return domains.map((domain) => {
+      if (pan_domain) {
+        if (type) return `https://${uuid}.${type}.${domain}`;
+        return `https://${uuid}.${domain}`;
+      } else {
+        if (type) return `https://${domain}${subscribe_path}?token=${uuid}&type=${type}`;
+        return `https://${domain}${subscribe_path}?token=${uuid}`;
+      }
+    });
+  },
 }));
 
 export default useGlobalStore;

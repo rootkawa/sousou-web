@@ -1,8 +1,21 @@
 'use client';
 
+import { useNode } from '@/store/node';
 import { zodResolver } from '@hookform/resolvers/zod';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@workspace/ui/components/accordion';
+import { Badge } from '@workspace/ui/components/badge';
 import { Button } from '@workspace/ui/components/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@workspace/ui/components/dropdown-menu';
 import {
   Form,
   FormControl,
@@ -28,119 +41,394 @@ import {
   SheetTrigger,
 } from '@workspace/ui/components/sheet';
 import { Switch } from '@workspace/ui/components/switch';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@workspace/ui/components/tabs';
 import { EnhancedInput } from '@workspace/ui/custom-components/enhanced-input';
 import { Icon } from '@workspace/ui/custom-components/icon';
+import { cn } from '@workspace/ui/lib/utils';
 import { useTranslations } from 'next-intl';
-import { useEffect, useMemo, useState } from 'react';
-import { useFieldArray, useForm, useWatch } from 'react-hook-form';
+import { useEffect, useState } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
 import { toast } from 'sonner';
 import {
-  FINGERPRINTS,
-  FLOWS,
+  FieldConfig,
   formSchema,
   getLabel,
   getProtocolDefaultConfig,
-  LABELS,
+  PROTOCOL_FIELDS,
   protocols as PROTOCOLS,
-  SECURITY,
-  SS_CIPHERS,
-  TRANSPORTS,
-  TUIC_CONGESTION,
-  TUIC_UDP_RELAY_MODES,
 } from './form-schema';
 
-interface ServerFormProps<T> {
-  onSubmit: (data: T) => Promise<boolean> | boolean;
-  initialValues?: T | any;
-  loading?: boolean;
-  trigger: string;
-  title: string;
-}
+function DynamicField({
+  field,
+  control,
+  form,
+  protocolIndex,
+  protocolData,
+  t,
+}: {
+  field: FieldConfig;
+  control: any;
+  form: any;
+  protocolIndex: number;
+  protocolData: any;
+  t: (key: string) => string;
+}) {
+  const fieldName = `protocols.${protocolIndex}.${field.name}` as const;
 
-function titleCase(s: string) {
-  return s.charAt(0).toUpperCase() + s.slice(1);
-}
+  if (field.condition && !field.condition(protocolData, {})) {
+    return null;
+  }
 
-function normalizeValues(raw: any) {
-  return {
-    name: raw?.name ?? '',
-    address: raw?.address ?? '',
-    country: raw?.country ?? '',
-    city: raw?.city ?? '',
-    ratio: Number(raw?.ratio ?? 1),
-    protocols: Array.isArray(raw?.protocols) ? raw.protocols : [],
+  const commonProps = {
+    control,
+    name: fieldName,
   };
+
+  switch (field.type) {
+    case 'input':
+      return (
+        <FormField
+          {...commonProps}
+          render={({ field: fieldProps }) => (
+            <FormItem>
+              <FormLabel>{t(field.label)}</FormLabel>
+              <FormControl>
+                <EnhancedInput
+                  {...fieldProps}
+                  type='text'
+                  placeholder={
+                    field.placeholder
+                      ? typeof field.placeholder === 'function'
+                        ? field.placeholder(t, protocolData)
+                        : field.placeholder
+                      : undefined
+                  }
+                  onValueChange={(v) => fieldProps.onChange(v)}
+                  suffix={
+                    field.generate ? (
+                      field.generate.functions && field.generate.functions.length > 0 ? (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button type='button' variant='ghost' size='sm'>
+                              <Icon icon='mdi:key' className='h-4 w-4' />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align='end'>
+                            {field.generate.functions.map((genFunc, idx) => (
+                              <DropdownMenuItem
+                                key={idx}
+                                onClick={async () => {
+                                  const result = await genFunc.function();
+                                  if (typeof result === 'string') {
+                                    fieldProps.onChange(result);
+                                  } else if (field.generate!.updateFields) {
+                                    Object.entries(field.generate!.updateFields).forEach(
+                                      ([fieldName, resultKey]) => {
+                                        const fullFieldName = `protocols.${protocolIndex}.${fieldName}`;
+                                        form.setValue(fullFieldName, (result as any)[resultKey]);
+                                      },
+                                    );
+                                  } else {
+                                    if (result.privateKey) {
+                                      fieldProps.onChange(result.privateKey);
+                                    }
+                                  }
+                                }}
+                              >
+                                {typeof genFunc.label === 'function'
+                                  ? genFunc.label(t, protocolData)
+                                  : genFunc.label}
+                              </DropdownMenuItem>
+                            ))}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      ) : field.generate.function ? (
+                        <Button
+                          type='button'
+                          variant='ghost'
+                          size='sm'
+                          onClick={async () => {
+                            const result = await field.generate!.function!();
+                            if (typeof result === 'string') {
+                              fieldProps.onChange(result);
+                            } else if (field.generate!.updateFields) {
+                              Object.entries(field.generate!.updateFields).forEach(
+                                ([fieldName, resultKey]) => {
+                                  const fullFieldName = `protocols.${protocolIndex}.${fieldName}`;
+                                  form.setValue(fullFieldName, (result as any)[resultKey]);
+                                },
+                              );
+                            } else {
+                              if (result.privateKey) {
+                                fieldProps.onChange(result.privateKey);
+                              }
+                            }
+                          }}
+                        >
+                          <Icon icon='mdi:key' className='h-4 w-4' />
+                        </Button>
+                      ) : null
+                    ) : (
+                      field.suffix
+                    )
+                  }
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      );
+
+    case 'number':
+      return (
+        <FormField
+          {...commonProps}
+          render={({ field: fieldProps }) => (
+            <FormItem>
+              <FormLabel>{t(field.label)}</FormLabel>
+              <FormControl>
+                <EnhancedInput
+                  {...fieldProps}
+                  type='number'
+                  min={field.min}
+                  max={field.max}
+                  step={field.step || 1}
+                  suffix={field.suffix}
+                  placeholder={
+                    field.placeholder
+                      ? typeof field.placeholder === 'function'
+                        ? field.placeholder(t, protocolData)
+                        : field.placeholder
+                      : undefined
+                  }
+                  onValueChange={(v) => fieldProps.onChange(v)}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      );
+
+    case 'select':
+      if (!field.options || field.options.length <= 1) {
+        return null;
+      }
+
+      return (
+        <FormField
+          {...commonProps}
+          render={({ field: fieldProps }) => (
+            <FormItem>
+              <FormLabel>{t(field.label)}</FormLabel>
+              <FormControl>
+                <Select
+                  value={fieldProps.value ?? field.defaultValue}
+                  onValueChange={(v) => fieldProps.onChange(v)}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder={t('please_select')} />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {field.options?.map((option) => (
+                      <SelectItem key={option} value={option}>
+                        {getLabel(option)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      );
+
+    case 'switch':
+      return (
+        <FormField
+          {...commonProps}
+          render={({ field: fieldProps }) => (
+            <FormItem>
+              <FormLabel>{t(field.label)}</FormLabel>
+              <FormControl>
+                <div className='pt-2'>
+                  <Switch
+                    checked={!!fieldProps.value}
+                    onCheckedChange={(checked) => fieldProps.onChange(checked)}
+                  />
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      );
+
+    case 'textarea':
+      return (
+        <FormField
+          {...commonProps}
+          render={({ field: fieldProps }) => (
+            <FormItem className='col-span-2'>
+              <FormLabel>{t(field.label)}</FormLabel>
+              <FormControl>
+                <textarea
+                  {...fieldProps}
+                  value={fieldProps.value ?? ''}
+                  className='border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-[80px] w-full rounded-md border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
+                  placeholder={
+                    field.placeholder
+                      ? typeof field.placeholder === 'function'
+                        ? field.placeholder(t, protocolData)
+                        : field.placeholder
+                      : undefined
+                  }
+                  onChange={(e) => fieldProps.onChange(e.target.value)}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      );
+
+    default:
+      return null;
+  }
 }
 
-export default function ServerForm<T extends { [x: string]: any }>({
-  onSubmit,
-  initialValues,
-  loading,
-  trigger,
-  title,
-}: Readonly<ServerFormProps<T>>) {
-  const t = useTranslations('servers');
-  const [open, setOpen] = useState(false);
-  const [activeType, setActiveType] = useState<(typeof PROTOCOLS)[number]>('shadowsocks');
+function renderFieldsByGroup(
+  fields: FieldConfig[],
+  group: string,
+  control: any,
+  form: any,
+  protocolIndex: number,
+  protocolData: any,
+  t: (key: string) => string,
+) {
+  const groupFields = fields.filter((field) => field.group === group);
+  if (groupFields.length === 0) return null;
 
-  const defaultValues = useMemo(
-    () =>
-      normalizeValues({
-        name: '',
-        address: '',
-        country: '',
-        city: '',
-        ratio: 1,
-        protocols: [],
-      }),
-    [],
+  return (
+    <div className='grid grid-cols-2 gap-4'>
+      {groupFields.map((field) => (
+        <DynamicField
+          key={field.name}
+          field={field}
+          control={control}
+          form={form}
+          protocolIndex={protocolIndex}
+          protocolData={protocolData}
+          t={t}
+        />
+      ))}
+    </div>
+  );
+}
+
+function renderGroupCard(
+  title: string,
+  fields: FieldConfig[],
+  group: string,
+  control: any,
+  form: any,
+  protocolIndex: number,
+  protocolData: any,
+  t: (key: string) => string,
+) {
+  const groupFields = fields.filter((field) => field.group === group);
+  if (groupFields.length === 0) return null;
+
+  const visibleFields = groupFields.filter(
+    (field) => !field.condition || field.condition(protocolData, {}),
   );
 
-  const form = useForm<any>({ resolver: zodResolver(formSchema), defaultValues });
+  if (visibleFields.length === 0) return null;
+
+  return (
+    <div className='relative'>
+      <fieldset className='border-border rounded-lg border'>
+        <legend className='text-foreground bg-background ml-3 px-1 py-1 text-sm font-medium'>
+          {t(title)}
+        </legend>
+        <div className='p-4 pt-2'>
+          {renderFieldsByGroup(fields, group, control, form, protocolIndex, protocolData, t)}
+        </div>
+      </fieldset>
+    </div>
+  );
+}
+
+export default function ServerForm(props: {
+  trigger: string;
+  title: string;
+  loading?: boolean;
+  initialValues?: Partial<API.Server>;
+  onSubmit: (values: Partial<API.Server>) => Promise<boolean> | boolean;
+}) {
+  const { trigger, title, loading, initialValues, onSubmit } = props;
+  const t = useTranslations('servers');
+  const [open, setOpen] = useState(false);
+  const [accordionValue, setAccordionValue] = useState<string>();
+
+  const { isProtocolUsedInNodes } = useNode();
+
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: '',
+      address: '',
+      country: '',
+      city: '',
+      protocols: [] as any[],
+      ...initialValues,
+    },
+  });
   const { control } = form;
-  const { fields, append, remove } = useFieldArray({ control, name: 'protocols' });
 
   const protocolsValues = useWatch({ control, name: 'protocols' });
 
   useEffect(() => {
-    const normalized = normalizeValues(initialValues || {});
-    const byType = new Map<string, any>();
-    (Array.isArray(normalized.protocols) ? normalized.protocols : []).forEach((p: any) => {
-      if (p && p.type) byType.set(String(p.type), p);
-    });
-    const full = PROTOCOLS.map((t) => byType.get(t) || getProtocolDefaultConfig(t));
-    form.reset({ ...normalized, protocols: full });
-    setActiveType('shadowsocks');
+    if (initialValues) {
+      form.reset({
+        name: '',
+        address: '',
+        country: '',
+        city: '',
+        ...initialValues,
+        protocols: PROTOCOLS.map((type) => {
+          const existingProtocol = initialValues.protocols?.find((p) => p.type === type);
+          const defaultConfig = getProtocolDefaultConfig(type);
+          return existingProtocol ? { ...defaultConfig, ...existingProtocol } : defaultConfig;
+        }),
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialValues]);
 
-  async function handleSubmit(data: { [x: string]: any }) {
-    const all = Array.isArray(data?.protocols) ? data.protocols : [];
-    const filtered = all
-      .filter((p: any) => {
-        const v = (p ?? {}).port;
-        const n = Number(v);
-        return Number.isFinite(n) && n > 0 && n <= 65535;
-      })
-      .map((p: any) => ({ ...p, port: Number(p.port) }));
-    if (filtered.length === 0) {
-      toast.error(t('validation_failed'));
-      return;
-    }
-    const body = {
-      name: data?.name,
-      country: data?.country,
-      city: data?.city,
-      ratio: Number(data?.ratio ?? 1),
-      address: data?.address,
-      protocols: filtered,
-    } as unknown as T;
-    const ok = await onSubmit(body as unknown as T);
-    if (ok) setOpen(false);
-  }
+  async function handleSubmit(values: Record<string, any>) {
+    const filteredProtocols = (values?.protocols || []).filter((protocol: any) => {
+      const port = Number(protocol?.port);
+      return protocol && Number.isFinite(port) && port > 0 && port <= 65535;
+    });
 
-  // inlined protocol editor below in TabsContent
+    const result = {
+      name: values.name,
+      country: values.country,
+      city: values.city,
+      address: values.address,
+      protocols: filteredProtocols,
+    };
+
+    const ok = await onSubmit(result);
+    if (ok) {
+      form.reset();
+      setOpen(false);
+    }
+  }
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -149,7 +437,13 @@ export default function ServerForm<T extends { [x: string]: any }>({
           onClick={() => {
             if (!initialValues) {
               const full = PROTOCOLS.map((t) => getProtocolDefaultConfig(t));
-              form.reset({ ...defaultValues, protocols: full });
+              form.reset({
+                name: '',
+                address: '',
+                country: '',
+                city: '',
+                protocols: full,
+              });
             }
             setOpen(true);
           }}
@@ -157,14 +451,14 @@ export default function ServerForm<T extends { [x: string]: any }>({
           {trigger}
         </Button>
       </SheetTrigger>
-      <SheetContent className='w-[580px] max-w-full md:max-w-screen-md'>
+      <SheetContent className='w-[700px] max-w-full md:max-w-screen-md'>
         <SheetHeader>
           <SheetTitle>{title}</SheetTitle>
         </SheetHeader>
         <ScrollArea className='-mx-6 h-[calc(100dvh-48px-36px-36px-env(safe-area-inset-top))]'>
           <Form {...form}>
             <form className='grid grid-cols-1 gap-2 px-6 pt-4'>
-              <div className='grid grid-cols-3 gap-2'>
+              <div className='grid grid-cols-2 gap-2 md:grid-cols-4'>
                 <FormField
                   control={control}
                   name='name'
@@ -173,6 +467,23 @@ export default function ServerForm<T extends { [x: string]: any }>({
                       <FormLabel>{t('name')}</FormLabel>
                       <FormControl>
                         <EnhancedInput {...field} onValueChange={(v) => field.onChange(v)} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={control}
+                  name='address'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('address')}</FormLabel>
+                      <FormControl>
+                        <EnhancedInput
+                          {...field}
+                          placeholder={t('address_placeholder')}
+                          onValueChange={(v) => field.onChange(v)}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -205,661 +516,125 @@ export default function ServerForm<T extends { [x: string]: any }>({
                   )}
                 />
               </div>
-              <div className='grid grid-cols-2 gap-2'>
-                <FormField
-                  control={control}
-                  name='address'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('address')}</FormLabel>
-                      <FormControl>
-                        <EnhancedInput
-                          {...field}
-                          placeholder={t('address_placeholder')}
-                          onValueChange={(v) => field.onChange(v)}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={control}
-                  name='ratio'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('traffic_ratio')}</FormLabel>
-                      <FormControl>
-                        <EnhancedInput
-                          {...field}
-                          type='number'
-                          step={0.1}
-                          min={0}
-                          onValueChange={(v) => field.onChange(v)}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <div className='my-3'>
+                <h3 className='text-foreground text-sm font-semibold'>
+                  {t('protocol_configurations')}
+                </h3>
+                <p className='text-muted-foreground mt-1 text-xs'>
+                  {t('protocol_configurations_desc')}
+                </p>
               </div>
-              <div className='pt-2'>
-                <Tabs value={activeType} onValueChange={(v) => setActiveType(v as any)}>
-                  <TabsList className='w-full flex-wrap'>
-                    {PROTOCOLS.map((type) => (
-                      <TabsTrigger key={type} value={type}>
-                        {titleCase(type)}
-                      </TabsTrigger>
-                    ))}
-                  </TabsList>
-                  {PROTOCOLS.map((type) => {
-                    const i = Math.max(
-                      0,
-                      PROTOCOLS.findIndex((t) => t === type),
-                    );
-                    const current = Array.isArray(protocolsValues) ? protocolsValues[i] || {} : {};
-                    const transport = (current?.transport as string | undefined) ?? 'tcp';
-                    const security = current?.security as string | undefined;
-                    const cipher = current?.cipher as string | undefined;
-                    return (
-                      <TabsContent key={type} value={type} className='pt-3'>
-                        <div className='space-y-4'>
-                          <div className='grid grid-cols-2 gap-2'>
-                            <FormField
-                              control={control}
-                              name={`protocols.${i}.port` as const}
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>{t('port')}</FormLabel>
-                                  <FormControl>
-                                    <EnhancedInput
-                                      {...field}
-                                      type='number'
-                                      step={1}
-                                      min={0}
-                                      max={65535}
-                                      placeholder='1-65535'
-                                      onValueChange={(v) => field.onChange(v)}
-                                    />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
+
+              <Accordion
+                type='single'
+                collapsible
+                className='w-full space-y-3'
+                value={accordionValue}
+                onValueChange={setAccordionValue}
+              >
+                {PROTOCOLS.map((type) => {
+                  const i = Math.max(
+                    0,
+                    PROTOCOLS.findIndex((t) => t === type),
+                  );
+                  const current = (protocolsValues[i] || {}) as Record<string, any>;
+                  const isEnabled = current?.enable;
+                  const fields = PROTOCOL_FIELDS[type] || [];
+                  return (
+                    <AccordionItem key={type} value={type} className='mb-2 rounded-lg border'>
+                      <AccordionTrigger className='px-4 py-3 hover:no-underline'>
+                        <div className='flex w-full items-center justify-between'>
+                          <div className='flex flex-col items-start gap-1'>
+                            <div className='flex items-center gap-1'>
+                              <span className='font-medium capitalize'>{type}</span>
+                              {current.transport && (
+                                <Badge variant='secondary' className='text-xs'>
+                                  {current.transport.toUpperCase()}
+                                </Badge>
                               )}
-                            />
-
-                            {type === 'shadowsocks' && (
-                              <>
-                                <FormField
-                                  control={control}
-                                  name={`protocols.${i}.cipher` as const}
-                                  render={({ field }) => (
-                                    <FormItem>
-                                      <FormLabel>{t('encryption_method')}</FormLabel>
-                                      <FormControl>
-                                        <Select
-                                          value={field.value ?? 'chacha20-ietf-poly1305'}
-                                          onValueChange={(value) => field.onChange(value)}
-                                        >
-                                          <FormControl>
-                                            <SelectTrigger>
-                                              <SelectValue
-                                                placeholder={t('select_encryption_method')}
-                                              />
-                                            </SelectTrigger>
-                                          </FormControl>
-                                          <SelectContent>
-                                            {(SS_CIPHERS as readonly string[]).map((c) => (
-                                              <SelectItem key={c} value={c}>
-                                                {getLabel(c)}
-                                              </SelectItem>
-                                            ))}
-                                          </SelectContent>
-                                        </Select>
-                                      </FormControl>
-                                      <FormMessage />
-                                    </FormItem>
-                                  )}
-                                />
-                                {[
-                                  '2022-blake3-aes-128-gcm',
-                                  '2022-blake3-aes-256-gcm',
-                                  '2022-blake3-chacha20-poly1305',
-                                ].includes((cipher || '').toString()) && (
-                                  <FormField
-                                    control={control}
-                                    name={`protocols.${i}.server_key` as const}
-                                    render={({ field }) => (
-                                      <FormItem>
-                                        <FormLabel>{t('server_key')}</FormLabel>
-                                        <FormControl>
-                                          <EnhancedInput
-                                            {...field}
-                                            onValueChange={(v) => field.onChange(v)}
-                                          />
-                                        </FormControl>
-                                        <FormMessage />
-                                      </FormItem>
-                                    )}
-                                  />
+                              {current.security && current.security !== 'none' && (
+                                <Badge variant='outline' className='text-xs'>
+                                  {current.security.toUpperCase()}
+                                </Badge>
+                              )}
+                              {current.port && <Badge className='text-xs'>{current.port}</Badge>}
+                            </div>
+                            <div className='flex items-center gap-1'>
+                              <span
+                                className={cn(
+                                  'text-xs',
+                                  isEnabled ? 'text-green-500' : 'text-muted-foreground',
                                 )}
-                              </>
-                            )}
-
-                            {type === 'vless' && (
-                              <FormField
-                                control={control}
-                                name={`protocols.${i}.flow` as const}
-                                render={({ field }) => (
-                                  <FormItem>
-                                    <FormLabel>{t('flow')}</FormLabel>
-                                    <FormControl>
-                                      <Select
-                                        value={field.value ?? 'none'}
-                                        onValueChange={(v) => field.onChange(v)}
-                                      >
-                                        <FormControl>
-                                          <SelectTrigger>
-                                            <SelectValue placeholder={t('please_select')} />
-                                          </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                          {(FLOWS.vless as readonly string[]).map((opt) => (
-                                            <SelectItem key={opt} value={opt}>
-                                              {getLabel(opt)}
-                                            </SelectItem>
-                                          ))}
-                                        </SelectContent>
-                                      </Select>
-                                    </FormControl>
-                                    <FormMessage />
-                                  </FormItem>
-                                )}
-                              />
-                            )}
-
-                            {type === 'hysteria2' && (
-                              <>
-                                <FormField
-                                  control={control}
-                                  name={`protocols.${i}.obfs_password` as const}
-                                  render={({ field }) => (
-                                    <FormItem>
-                                      <FormLabel>{t('obfs_password')}</FormLabel>
-                                      <FormControl>
-                                        <EnhancedInput
-                                          {...field}
-                                          placeholder={t('obfs_password_placeholder')}
-                                          onValueChange={(v) => field.onChange(v)}
-                                        />
-                                      </FormControl>
-                                      <FormMessage />
-                                    </FormItem>
-                                  )}
-                                />
-                                <FormField
-                                  control={control}
-                                  name={`protocols.${i}.hop_ports` as const}
-                                  render={({ field }) => (
-                                    <FormItem>
-                                      <FormLabel>{t('hop_ports')}</FormLabel>
-                                      <FormControl>
-                                        <EnhancedInput
-                                          {...field}
-                                          placeholder={t('hop_ports_placeholder')}
-                                          onValueChange={(v) => field.onChange(v)}
-                                        />
-                                      </FormControl>
-                                      <FormMessage />
-                                    </FormItem>
-                                  )}
-                                />
-                                <FormField
-                                  control={control}
-                                  name={`protocols.${i}.hop_interval` as const}
-                                  render={({ field }) => (
-                                    <FormItem>
-                                      <FormLabel>{t('hop_interval')}</FormLabel>
-                                      <FormControl>
-                                        <EnhancedInput
-                                          {...field}
-                                          type='number'
-                                          min={0}
-                                          suffix='S'
-                                          onValueChange={(v) => field.onChange(v)}
-                                        />
-                                      </FormControl>
-                                      <FormMessage />
-                                    </FormItem>
-                                  )}
-                                />
-                              </>
-                            )}
-
-                            {type === 'tuic' && (
-                              <>
-                                <FormField
-                                  control={control}
-                                  name={`protocols.${i}.udp_relay_mode` as const}
-                                  render={({ field }) => (
-                                    <FormItem>
-                                      <FormLabel>{t('udp_relay_mode')}</FormLabel>
-                                      <FormControl>
-                                        <Select
-                                          value={field.value ?? 'native'}
-                                          onValueChange={(v) => field.onChange(v)}
-                                        >
-                                          <FormControl>
-                                            <SelectTrigger>
-                                              <SelectValue placeholder={t('please_select')} />
-                                            </SelectTrigger>
-                                          </FormControl>
-                                          <SelectContent>
-                                            {(TUIC_UDP_RELAY_MODES as readonly string[]).map(
-                                              (opt) => (
-                                                <SelectItem key={opt} value={opt}>
-                                                  {getLabel(opt)}
-                                                </SelectItem>
-                                              ),
-                                            )}
-                                          </SelectContent>
-                                        </Select>
-                                      </FormControl>
-                                      <FormMessage />
-                                    </FormItem>
-                                  )}
-                                />
-                                <FormField
-                                  control={control}
-                                  name={`protocols.${i}.congestion_controller` as const}
-                                  render={({ field }) => (
-                                    <FormItem>
-                                      <FormLabel>{t('congestion_controller')}</FormLabel>
-                                      <FormControl>
-                                        <Select
-                                          value={field.value ?? 'bbr'}
-                                          onValueChange={(v) => field.onChange(v)}
-                                        >
-                                          <FormControl>
-                                            <SelectTrigger>
-                                              <SelectValue placeholder={t('please_select')} />
-                                            </SelectTrigger>
-                                          </FormControl>
-                                          <SelectContent>
-                                            {(TUIC_CONGESTION as readonly string[]).map((opt) => (
-                                              <SelectItem key={opt} value={opt}>
-                                                {getLabel(opt)}
-                                              </SelectItem>
-                                            ))}
-                                          </SelectContent>
-                                        </Select>
-                                      </FormControl>
-                                      <FormMessage />
-                                    </FormItem>
-                                  )}
-                                />
-                                <div className='grid grid-cols-2 gap-4'>
-                                  <FormField
-                                    control={control}
-                                    name={`protocols.${i}.disable_sni` as const}
-                                    render={({ field }) => (
-                                      <FormItem>
-                                        <FormLabel>{t('disable_sni')}</FormLabel>
-                                        <FormControl>
-                                          <div className='pt-2'>
-                                            <Switch
-                                              checked={!!field.value}
-                                              onCheckedChange={(checked) => field.onChange(checked)}
-                                            />
-                                          </div>
-                                        </FormControl>
-                                        <FormMessage />
-                                      </FormItem>
-                                    )}
-                                  />
-                                  <FormField
-                                    control={control}
-                                    name={`protocols.${i}.reduce_rtt` as const}
-                                    render={({ field }) => (
-                                      <FormItem>
-                                        <FormLabel>{t('reduce_rtt')}</FormLabel>
-                                        <FormControl>
-                                          <div className='pt-2'>
-                                            <Switch
-                                              checked={!!field.value}
-                                              onCheckedChange={(checked) => field.onChange(checked)}
-                                            />
-                                          </div>
-                                        </FormControl>
-                                        <FormMessage />
-                                      </FormItem>
-                                    )}
-                                  />
-                                </div>
-                              </>
-                            )}
+                              >
+                                {isEnabled ? t('enabled') : t('disabled')}
+                              </span>
+                            </div>
                           </div>
-
-                          {['vmess', 'vless', 'trojan'].includes(type) && (
-                            <Card>
-                              <CardHeader className='flex flex-row items-center justify-between p-3'>
-                                <CardTitle>{t('transport_title')}</CardTitle>
-                                <FormField
-                                  control={control}
-                                  name={`protocols.${i}.transport` as const}
-                                  render={({ field }) => (
-                                    <FormItem className='!mt-0 min-w-32'>
-                                      <FormControl>
-                                        <Select
-                                          value={field.value ?? 'tcp'}
-                                          onValueChange={(v) => field.onChange(v)}
-                                        >
-                                          <FormControl>
-                                            <SelectTrigger>
-                                              <SelectValue placeholder={t('please_select')} />
-                                            </SelectTrigger>
-                                          </FormControl>
-                                          <SelectContent>
-                                            {(
-                                              TRANSPORTS[
-                                                type as 'vmess' | 'vless' | 'trojan'
-                                              ] as readonly string[]
-                                            ).map((opt) => (
-                                              <SelectItem key={opt} value={opt}>
-                                                {getLabel(opt)}
-                                              </SelectItem>
-                                            ))}
-                                          </SelectContent>
-                                        </Select>
-                                      </FormControl>
-                                      <FormMessage />
-                                    </FormItem>
-                                  )}
-                                />
-                              </CardHeader>
-                              {transport !== 'tcp' && (
-                                <CardContent className='flex gap-4 p-3'>
-                                  {['websocket', 'http2', 'httpupgrade'].includes(
-                                    transport as string,
-                                  ) && (
-                                    <>
-                                      <FormField
-                                        control={form.control}
-                                        name={`protocols.${i}.host` as const}
-                                        render={({ field }) => (
-                                          <FormItem>
-                                            <FormLabel>HOST</FormLabel>
-                                            <FormControl>
-                                              <EnhancedInput
-                                                {...field}
-                                                onValueChange={(value) => {
-                                                  form.setValue(field.name, value);
-                                                }}
-                                              />
-                                            </FormControl>
-                                            <FormMessage />
-                                          </FormItem>
-                                        )}
-                                      />
-                                      <FormField
-                                        control={control}
-                                        name={`protocols.${i}.path` as const}
-                                        render={({ field }) => (
-                                          <FormItem>
-                                            <FormLabel>{t('path')}</FormLabel>
-                                            <FormControl>
-                                              <EnhancedInput
-                                                {...field}
-                                                onValueChange={(v) => field.onChange(v)}
-                                              />
-                                            </FormControl>
-                                            <FormMessage />
-                                          </FormItem>
-                                        )}
-                                      />
-                                    </>
-                                  )}
-                                  {transport === 'grpc' && (
-                                    <FormField
-                                      control={control}
-                                      name={`protocols.${i}.service_name` as const}
-                                      render={({ field }) => (
-                                        <FormItem>
-                                          <FormLabel>{t('service_name')}</FormLabel>
-                                          <FormControl>
-                                            <EnhancedInput
-                                              {...field}
-                                              onValueChange={(v) => field.onChange(v)}
-                                            />
-                                          </FormControl>
-                                          <FormMessage />
-                                        </FormItem>
-                                      )}
-                                    />
-                                  )}
-                                </CardContent>
-                              )}
-                            </Card>
+                          <Switch
+                            className='mr-2'
+                            checked={!!isEnabled}
+                            disabled={Boolean(
+                              initialValues?.id &&
+                                isProtocolUsedInNodes(initialValues?.id || 0, type) &&
+                                isEnabled,
+                            )}
+                            onCheckedChange={(checked) => {
+                              form.setValue(`protocols.${i}.enable`, checked);
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent className='px-4 pb-4 pt-0'>
+                        <div className='-mx-4 space-y-4 rounded-b-lg border-t px-4 pt-4'>
+                          {renderGroupCard('basic', fields, 'basic', control, form, i, current, t)}
+                          {renderGroupCard('obfs', fields, 'obfs', control, form, i, current, t)}
+                          {renderGroupCard(
+                            'transport',
+                            fields,
+                            'transport',
+                            control,
+                            form,
+                            i,
+                            current,
+                            t,
                           )}
-
-                          {['vmess', 'vless', 'trojan', 'anytls', 'tuic', 'hysteria2'].includes(
-                            type,
-                          ) && (
-                            <Card>
-                              <CardHeader className='flex flex-row items-center justify-between p-3'>
-                                <CardTitle>{t('security_title')}</CardTitle>
-                                {['vmess', 'vless', 'trojan'].includes(type) && (
-                                  <FormField
-                                    control={control}
-                                    name={`protocols.${i}.security` as const}
-                                    render={({ field }) => (
-                                      <FormItem className='!mt-0 min-w-32'>
-                                        <Select
-                                          value={
-                                            field.value ??
-                                            (type === 'vless'
-                                              ? 'none'
-                                              : type === 'trojan'
-                                                ? 'tls'
-                                                : 'none')
-                                          }
-                                          onValueChange={(v) => field.onChange(v)}
-                                        >
-                                          <FormControl>
-                                            <SelectTrigger>
-                                              <SelectValue placeholder={t('please_select')} />
-                                            </SelectTrigger>
-                                          </FormControl>
-                                          <SelectContent>
-                                            {(
-                                              SECURITY[
-                                                type as 'vless' | 'vmess' | 'trojan'
-                                              ] as readonly string[]
-                                            ).map((opt) => (
-                                              <SelectItem key={opt} value={opt}>
-                                                {LABELS[opt as keyof typeof LABELS] ?? opt}
-                                              </SelectItem>
-                                            ))}
-                                          </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                      </FormItem>
-                                    )}
-                                  />
-                                )}
-                              </CardHeader>
-
-                              {(['anytls', 'tuic', 'hysteria2'].includes(type) ||
-                                (['vmess', 'vless', 'trojan'].includes(type) &&
-                                  security !== 'none')) && (
-                                <CardContent className='grid grid-cols-2 gap-4 p-3'>
-                                  <FormField
-                                    control={control}
-                                    name={`protocols.${i}.sni` as const}
-                                    render={({ field }) => (
-                                      <FormItem>
-                                        <FormLabel>{t('security_sni')}</FormLabel>
-                                        <FormControl>
-                                          <EnhancedInput
-                                            {...field}
-                                            onValueChange={(v) => field.onChange(v)}
-                                          />
-                                        </FormControl>
-                                        <FormMessage />
-                                      </FormItem>
-                                    )}
-                                  />
-
-                                  {type === 'vless' && security === 'reality' && (
-                                    <>
-                                      <FormField
-                                        control={control}
-                                        name={`protocols.${i}.reality_server_addr` as const}
-                                        render={({ field }) => (
-                                          <FormItem>
-                                            <FormLabel>{t('security_server_address')}</FormLabel>
-                                            <FormControl>
-                                              <EnhancedInput
-                                                {...field}
-                                                placeholder={t(
-                                                  'security_server_address_placeholder',
-                                                )}
-                                                onValueChange={(v) => field.onChange(v)}
-                                              />
-                                            </FormControl>
-                                            <FormMessage />
-                                          </FormItem>
-                                        )}
-                                      />
-                                      <FormField
-                                        control={control}
-                                        name={`protocols.${i}.reality_server_port` as const}
-                                        render={({ field }) => (
-                                          <FormItem>
-                                            <FormLabel>{t('security_server_port')}</FormLabel>
-                                            <FormControl>
-                                              <EnhancedInput
-                                                {...field}
-                                                type='number'
-                                                min={1}
-                                                max={65535}
-                                                placeholder='1-65535'
-                                                onValueChange={(v) => field.onChange(v)}
-                                              />
-                                            </FormControl>
-                                            <FormMessage />
-                                          </FormItem>
-                                        )}
-                                      />
-                                      <FormField
-                                        control={control}
-                                        name={`protocols.${i}.reality_private_key` as const}
-                                        render={({ field }) => (
-                                          <FormItem>
-                                            <FormLabel>{t('security_private_key')}</FormLabel>
-                                            <FormControl>
-                                              <EnhancedInput
-                                                {...field}
-                                                placeholder={t('security_private_key_placeholder')}
-                                                onValueChange={(v) => field.onChange(v)}
-                                              />
-                                            </FormControl>
-                                            <FormMessage />
-                                          </FormItem>
-                                        )}
-                                      />
-                                      <FormField
-                                        control={control}
-                                        name={`protocols.${i}.reality_public_key` as const}
-                                        render={({ field }) => (
-                                          <FormItem>
-                                            <FormLabel>{t('security_public_key')}</FormLabel>
-                                            <FormControl>
-                                              <EnhancedInput
-                                                {...field}
-                                                placeholder={t('security_public_key_placeholder')}
-                                                onValueChange={(v) => field.onChange(v)}
-                                              />
-                                            </FormControl>
-                                            <FormMessage />
-                                          </FormItem>
-                                        )}
-                                      />
-                                      <FormField
-                                        control={control}
-                                        name={`protocols.${i}.reality_short_id` as const}
-                                        render={({ field }) => (
-                                          <FormItem>
-                                            <FormLabel>{t('security_short_id')}</FormLabel>
-                                            <FormControl>
-                                              <EnhancedInput
-                                                {...field}
-                                                onValueChange={(v) => field.onChange(v)}
-                                              />
-                                            </FormControl>
-                                            <FormMessage />
-                                          </FormItem>
-                                        )}
-                                      />
-                                    </>
-                                  )}
-
-                                  <FormField
-                                    control={control}
-                                    name={`protocols.${i}.fingerprint` as const}
-                                    render={({ field }) => (
-                                      <FormItem>
-                                        <FormLabel>{t('security_fingerprint')}</FormLabel>
-                                        <FormControl>
-                                          <Select
-                                            value={field.value ?? 'chrome'}
-                                            onValueChange={(v) => field.onChange(v)}
-                                          >
-                                            <FormControl>
-                                              <SelectTrigger>
-                                                <SelectValue placeholder={t('please_select')} />
-                                              </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                              {(FINGERPRINTS as readonly string[]).map((fp) => (
-                                                <SelectItem key={fp} value={fp}>
-                                                  {getLabel(fp)}
-                                                </SelectItem>
-                                              ))}
-                                            </SelectContent>
-                                          </Select>
-                                        </FormControl>
-                                        <FormMessage />
-                                      </FormItem>
-                                    )}
-                                  />
-                                  <FormField
-                                    control={control}
-                                    name={`protocols.${i}.allow_insecure` as const}
-                                    render={({ field }) => (
-                                      <FormItem>
-                                        <FormLabel>{t('security_allow_insecure')}</FormLabel>
-                                        <FormControl>
-                                          <div className='pt-2'>
-                                            <Switch
-                                              checked={!!field.value}
-                                              onCheckedChange={(checked) => field.onChange(checked)}
-                                            />
-                                          </div>
-                                        </FormControl>
-                                        <FormMessage />
-                                      </FormItem>
-                                    )}
-                                  />
-                                </CardContent>
-                              )}
-                            </Card>
+                          {renderGroupCard(
+                            'security',
+                            fields,
+                            'security',
+                            control,
+                            form,
+                            i,
+                            current,
+                            t,
+                          )}
+                          {renderGroupCard(
+                            'reality',
+                            fields,
+                            'reality',
+                            control,
+                            form,
+                            i,
+                            current,
+                            t,
+                          )}
+                          {renderGroupCard(
+                            'encryption',
+                            fields,
+                            'encryption',
+                            control,
+                            form,
+                            i,
+                            current,
+                            t,
                           )}
                         </div>
-                      </TabsContent>
-                    );
-                  })}
-                </Tabs>
-              </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  );
+                })}
+              </Accordion>
             </form>
           </Form>
         </ScrollArea>
@@ -869,13 +644,15 @@ export default function ServerForm<T extends { [x: string]: any }>({
           </Button>
           <Button
             disabled={loading}
-            onClick={form.handleSubmit(handleSubmit, (e) => {
-              console.log(e, form.getValues());
-              toast.error(t('validation_failed'));
+            onClick={form.handleSubmit(handleSubmit, (errors) => {
+              console.log(errors, form.getValues());
+              const key = Object.keys(errors)[0] as keyof typeof errors;
+              if (key) toast.error(String(errors[key]?.message));
               return false;
             })}
           >
-            {loading && <Icon icon='mdi:loading' className='mr-2 animate-spin' />} {t('confirm')}
+            {loading && <Icon icon='mdi:loading' className='mr-2 animate-spin' />}
+            {t('confirm')}
           </Button>
         </SheetFooter>
       </SheetContent>

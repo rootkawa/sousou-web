@@ -41,7 +41,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { QRCodeCanvas } from 'qrcode.react';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { toast } from 'sonner';
 import Subscribe from '../subscribe/page';
@@ -115,10 +115,38 @@ export default function Content() {
     },
   });
 
-  const [platform, setPlatform] = useState<keyof API.ApplicationPlatform>(getPlatform());
+  const availablePlatforms = React.useMemo(() => {
+    if (!applications || applications.length === 0) return platforms;
 
-  // Convert ApplicationPlatform key to DownloadLink key for API calls
-  const downloadPlatform: keyof API.DownloadLink = platformToDownloadKey[platform];
+    const platformsSet = new Set<keyof API.DownloadLink>();
+
+    applications.forEach((app) => {
+      if (app.download_link) {
+        platforms.forEach((platform) => {
+          if (app.download_link?.[platform]) {
+            platformsSet.add(platform);
+          }
+        });
+      }
+    });
+
+    return platforms.filter((platform) => platformsSet.has(platform));
+  }, [applications]);
+
+  const [platform, setPlatform] = useState<keyof API.DownloadLink>(() => {
+    const detectedPlatform =
+      getPlatform() === 'macos' ? 'mac' : (getPlatform() as keyof API.DownloadLink);
+    return detectedPlatform;
+  });
+
+  React.useEffect(() => {
+    if (availablePlatforms.length > 0 && !availablePlatforms.includes(platform)) {
+      const firstAvailablePlatform = availablePlatforms[0];
+      if (firstAvailablePlatform) {
+        setPlatform(firstAvailablePlatform);
+      }
+    }
+  }, [availablePlatforms, platform]);
 
   const { data } = useQuery({
     queryKey: ['getStat'],
@@ -169,27 +197,33 @@ export default function Content() {
             </div>
           </div>
           <div className='flex flex-wrap justify-between gap-4'>
-            <Tabs
-              value={downloadPlatform}
-              onValueChange={(value) => {
-                // Find the ApplicationPlatform key that maps to this DownloadLink key
-                const appPlatformKey = Object.entries(platformToDownloadKey).find(
-                  ([_, downloadKey]) => downloadKey === value,
-                )?.[0] as keyof API.ApplicationPlatform;
-                if (appPlatformKey) {
-                  setPlatform(appPlatformKey);
-                }
-              }}
-              className='w-full max-w-full md:w-auto'
-            >
-              <TabsList className='flex *:flex-auto'>
-                {platforms.map((item) => (
-                  <TabsTrigger value={item} key={item} className='min-w-[80px] px-1 lg:px-3'>
-                    <span className='text-xs font-medium'>{platformsMap[item]}</span>
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </Tabs>
+            {availablePlatforms.length > 0 && (
+              <Tabs
+                value={platform}
+                onValueChange={(value) => setPlatform(value as keyof API.DownloadLink)}
+                className='w-full max-w-full md:w-auto'
+              >
+                <TabsList className='flex *:flex-auto'>
+                  {availablePlatforms.map((item) => (
+                    <TabsTrigger value={item} key={item} className='px-1 lg:px-3'>
+                      <Icon
+                        icon={`${
+                          {
+                            windows: 'mdi:microsoft-windows',
+                            mac: 'uil:apple',
+                            linux: 'uil:linux',
+                            ios: 'simple-icons:ios',
+                            android: 'uil:android',
+                            harmony: 'simple-icons:harmonyos',
+                          }[item]
+                        }`}
+                        className='size-5'
+                      />
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+              </Tabs>
+            )}
             {data?.protocol && data?.protocol.length > 1 && (
               <Tabs
                 value={protocol}
@@ -241,7 +275,6 @@ export default function Content() {
                       {Array.from({ length: 16 }).map((_, i) => {
                         const row = Math.floor(i / 4);
                         const col = i % 4;
-                        // 计算位置百分比
                         const top = 10 + row * 25 + (col % 2 === 0 ? 5 : -5);
                         const left = 5 + col * 30 + (row % 2 === 0 ? 0 : 10);
 
@@ -302,7 +335,7 @@ export default function Content() {
                       <Renewal id={item.id} subscribe={item.subscribe} />
                       <Unsubscribe id={item.id} allowDeduction={item.subscribe.allow_deduction} />
                       <Button size='sm' variant='outline' asChild>
-                        <Link href={`/document?platform=${downloadPlatform}`}>
+                        <Link href={`/document?platform=${platform}`}>
                           <Icon icon='uil:book-alt' className='mr-1 size-4' />
                           {t('instruction')}
                         </Link>
@@ -385,14 +418,12 @@ export default function Content() {
                           <div className='grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6'>
                             {applications
                               ?.filter((application) => {
-                                if (!application.download_link && !application.scheme) return false;
-                                return (
-                                  !!application.download_link?.[downloadPlatform] ||
-                                  !!application.scheme
+                                return !!(
+                                  application.download_link?.[platform] && application.scheme
                                 );
                               })
                               .map((application) => {
-                                const downloadUrl = application.download_link?.[downloadPlatform];
+                                const downloadUrl = application.download_link?.[platform];
 
                                 const handleCopy = (text: string, result: boolean) => {
                                   if (result) {

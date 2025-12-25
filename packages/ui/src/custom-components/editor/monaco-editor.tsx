@@ -21,6 +21,7 @@ export interface MonacoEditorProps {
   language?: string;
   className?: string;
   showLineNumbers?: boolean;
+  readOnly?: boolean;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -45,6 +46,7 @@ export function MonacoEditor({
   language = 'markdown',
   className,
   showLineNumbers = false,
+  readOnly = false,
 }: MonacoEditorProps) {
   const [internalValue, setInternalValue] = useState<string | undefined>(propValue);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -112,9 +114,9 @@ export function MonacoEditor({
             </div>
           </div>
 
-          <div className={cn('relative flex flex-1 overflow-hidden')}>
+          <div className={cn('relative flex flex-1')}>
             <div
-              className={cn('flex-1 overflow-hidden p-4 invert dark:invert-0', {
+              className={cn('flex-1 overflow-auto p-4 invert dark:invert-0', {
                 'w-1/2': isPreviewVisible,
               })}
             >
@@ -142,10 +144,11 @@ export function MonacoEditor({
                   scrollBeyondLastLine: false,
                   scrollbar: {
                     useShadows: false,
-                    vertical: 'hidden',
+                    vertical: 'auto',
                   },
                   tabSize: 2,
                   wordWrap: 'off',
+                  readOnly,
                 }}
                 theme='transparentTheme'
                 beforeMount={(monaco: Monaco) => {
@@ -165,7 +168,12 @@ export function MonacoEditor({
               />
               {!internalValue?.trim() && placeholder && (
                 <pre
-                  className='text-muted-foreground pointer-events-none absolute left-7 top-4 text-sm'
+                  className={cn(
+                    'text-muted-foreground pointer-events-none absolute left-7 top-4 text-sm',
+                    {
+                      'left-16': showLineNumbers,
+                    },
+                  )}
                   style={{ userSelect: 'none' }}
                 >
                   {placeholder}

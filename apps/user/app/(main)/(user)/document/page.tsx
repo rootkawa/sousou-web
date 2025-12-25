@@ -1,5 +1,7 @@
 'use client';
 
+import { Empty } from '@/components/empty';
+import { NEXT_PUBLIC_HIDDEN_TUTORIAL_DOCUMENT } from '@/config/constants';
 import { queryDocumentList } from '@/services/user/document';
 import { getTutorialList } from '@/utils/tutorial';
 import { useQuery } from '@tanstack/react-query';
@@ -48,7 +50,15 @@ export default function Page() {
       const list = await getTutorialList();
       return list.get(locale);
     },
+    enabled: NEXT_PUBLIC_HIDDEN_TUTORIAL_DOCUMENT !== 'true',
   });
+
+  if (
+    (!DocumentList || DocumentList.length === 0) &&
+    (!TutorialList || TutorialList.length === 0)
+  ) {
+    return <Empty border />;
+  }
 
   return (
     <div className='space-y-4'>

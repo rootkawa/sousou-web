@@ -3,7 +3,7 @@
 import { querySubscribeGroupList, querySubscribeList } from '@/services/user/subscribe';
 import { useQuery } from '@tanstack/react-query';
 import { Tabs, TabsList, TabsTrigger } from '@workspace/ui/components/tabs';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -20,6 +20,7 @@ const ENABLE_GROUP_FILTERING = false;
 
 export default function SubscribePage() {
   const t = useTranslations('subscribe');
+  const locale = useLocale();
   const searchParams = useSearchParams();
   const idParam = searchParams?.get('id');
 
@@ -38,9 +39,10 @@ export default function SubscribePage() {
   });
 
   const { data } = useQuery({
-    queryKey: ['querySubscribeList'],
+    queryKey: ['querySubscribeList', locale],
     queryFn: async () => {
-      const { data } = await querySubscribeList();
+      console.log('Fetching subscription list...');
+      const { data } = await querySubscribeList({ language: locale });
       return data.data?.list || [];
     },
   });

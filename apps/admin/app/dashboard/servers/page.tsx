@@ -1,35 +1,27 @@
 'use client';
-// Online users detail moved to separate component
+
 import { ProTable, ProTableActions } from '@/components/pro-table';
 import {
   createServer,
   deleteServer,
   filterServerList,
+  resetSortWithServer,
   updateServer,
 } from '@/services/admin/server';
+import { useNode } from '@/store/node';
+import { useServer } from '@/store/server';
 import { Badge } from '@workspace/ui/components/badge';
 import { Button } from '@workspace/ui/components/button';
-import { Card, CardContent } from '@workspace/ui/components/card';
 import { ConfirmButton } from '@workspace/ui/custom-components/confirm-button';
 import { cn } from '@workspace/ui/lib/utils';
 import { useTranslations } from 'next-intl';
 import { useRef, useState } from 'react';
 import { toast } from 'sonner';
+import DynamicMultiplier from './dynamic-multiplier';
 import OnlineUsersCell from './online-users-cell';
 import ServerConfig from './server-config';
 import ServerForm from './server-form';
-
-type ProtocolName = 'shadowsocks' | 'vmess' | 'vless' | 'trojan' | 'hysteria2' | 'tuic' | 'anytls';
-
-const PROTOCOL_COLORS: Record<ProtocolName, string> = {
-  shadowsocks: 'bg-green-500',
-  vmess: 'bg-rose-500',
-  vless: 'bg-blue-500',
-  trojan: 'bg-yellow-500',
-  hysteria2: 'bg-purple-500',
-  tuic: 'bg-cyan-500',
-  anytls: 'bg-gray-500',
-};
+import ServerInstall from './server-install';
 
 function PctBar({ value }: { value: number }) {
   const v = value.toFixed(2);
@@ -58,49 +50,51 @@ function RegionIpCell({
   return (
     <div className='flex items-center gap-1'>
       <Badge variant='outline'>{region}</Badge>
-      <Badge variant='outline'>{ip || t('notAvailable')}</Badge>
+      <Badge variant='secondary'>{ip || t('notAvailable')}</Badge>
     </div>
   );
 }
 
-// OnlineUsersCell is now a standalone component
-
 export default function ServersPage() {
   const t = useTranslations('servers');
+  const { isServerReferencedByNodes } = useNode();
+  const { fetchServers } = useServer();
 
   const [loading, setLoading] = useState(false);
   const ref = useRef<ProTableActions>(null);
 
   return (
     <div className='space-y-4'>
-      <Card>
-        <CardContent className='p-4'>
-          <ServerConfig />
-        </CardContent>
-      </Card>
+      <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
+        <DynamicMultiplier />
+        <ServerConfig />
+      </div>
       <ProTable<API.Server, { search: string }>
         action={ref}
         header={{
           title: t('pageTitle'),
           toolbar: (
-            <ServerForm
-              trigger={t('create')}
-              title={t('drawerCreateTitle')}
-              loading={loading}
-              onSubmit={async (values) => {
-                setLoading(true);
-                try {
-                  await createServer(values as unknown as API.CreateServerRequest);
-                  toast.success(t('created'));
-                  ref.current?.refresh();
-                  setLoading(false);
-                  return true;
-                } catch (e) {
-                  setLoading(false);
-                  return false;
-                }
-              }}
-            />
+            <div className='flex gap-2'>
+              <ServerForm
+                trigger={t('create')}
+                title={t('drawerCreateTitle')}
+                loading={loading}
+                onSubmit={async (values) => {
+                  setLoading(true);
+                  try {
+                    await createServer(values as unknown as API.CreateServerRequest);
+                    toast.success(t('created'));
+                    ref.current?.refresh();
+                    fetchServers();
+                    setLoading(false);
+                    return true;
+                  } catch (e) {
+                    setLoading(false);
+                    return false;
+                  }
+                }}
+              />
+            </div>
           ),
         }}
         columns={[
@@ -126,24 +120,18 @@ export default function ServersPage() {
             accessorKey: 'protocols',
             header: t('protocols'),
             cell: ({ row }) => {
-              const list = (row.original.protocols || []) as API.Protocol[];
-              if (!list.length) return t('noData');
+              const list = row.original.protocols.filter((p) => p.enable) as API.Protocol[];
+              if (!list.length) return '—';
               return (
-                <div className='flex flex-wrap gap-1'>
+                <div className='flex flex-col gap-1'>
                   {list.map((p, idx) => {
-                    const proto = ((p as any)?.type || '') as ProtocolName | '';
-                    if (!proto) return null;
-                    const color = PROTOCOL_COLORS[proto as ProtocolName];
-                    const port = (p as any)?.port as number | undefined;
-                    const label = `${proto}${port ? ` (${port})` : ''}`;
+                    const ratio = Number(p.ratio ?? 1) || 1;
                     return (
-                      <Badge
-                        key={idx}
-                        variant='outline'
-                        className={cn('text-primary-foreground', color)}
-                      >
-                        {label}
-                      </Badge>
+                      <div key={idx} className='flex items-center gap-2'>
+                        <Badge variant='outline'>{ratio.toFixed(2)}x</Badge>
+                        <Badge variant='secondary'>{p.type}</Badge>
+                        <Badge variant='secondary'>{p.port}</Badge>
+                      </div>
                     );
                   })}
                 </div>
@@ -155,17 +143,16 @@ export default function ServersPage() {
             id: 'status',
             header: t('status'),
             cell: ({ row }) => {
-              const s = (row.original.status ?? {}) as API.ServerStatus;
-              const on = !!(Array.isArray(s.online) && s.online.length > 0);
+              const offline = row.original.status.status === 'offline';
               return (
                 <div className='flex items-center gap-2'>
                   <span
                     className={cn(
                       'inline-block h-2.5 w-2.5 rounded-full',
-                      on ? 'bg-emerald-500' : 'bg-zinc-400',
+                      offline ? 'bg-zinc-400' : 'bg-emerald-500',
                     )}
                   />
-                  <span className='text-sm'>{on ? t('online') : t('offline')}</span>
+                  <span className='text-sm'>{offline ? t('offline') : t('online')}</span>
                 </div>
               );
             },
@@ -195,23 +182,9 @@ export default function ServersPage() {
           {
             id: 'online_users',
             header: t('onlineUsers'),
-            cell: ({ row }) => (
-              <OnlineUsersCell
-                serverId={row.original.id}
-                status={row.original.status as API.ServerStatus}
-                t={t}
-              />
-            ),
+            cell: ({ row }) => <OnlineUsersCell status={row.original.status as API.ServerStatus} />,
           },
-          {
-            id: 'traffic_ratio',
-            header: t('traffic_ratio'),
-            cell: ({ row }) => {
-              const raw = row.original.ratio as unknown;
-              const ratio = Number(raw ?? 1) || 1;
-              return <span className='text-sm'>{ratio.toFixed(2)}x</span>;
-            },
-          },
+          // traffic ratio moved to per-protocol configs; column removed
         ]}
         params={[{ key: 'search' }]}
         request={async (pagination, filter) => {
@@ -230,7 +203,7 @@ export default function ServersPage() {
               key='edit'
               trigger={t('edit')}
               title={t('drawerEditTitle')}
-              initialValues={row as any}
+              initialValues={row}
               loading={loading}
               onSubmit={async (values) => {
                 setLoading(true);
@@ -242,6 +215,7 @@ export default function ServersPage() {
                   });
                   toast.success(t('updated'));
                   ref.current?.refresh();
+                  fetchServers();
                   setLoading(false);
                   return true;
                 } catch (e) {
@@ -250,15 +224,21 @@ export default function ServersPage() {
                 }
               }}
             />,
+            <ServerInstall key='install' server={row} />,
             <ConfirmButton
               key='delete'
-              trigger={<Button variant='destructive'>{t('delete')}</Button>}
+              trigger={
+                <Button variant='destructive' disabled={isServerReferencedByNodes(row.id)}>
+                  {t('delete')}
+                </Button>
+              }
               title={t('confirmDeleteTitle')}
               description={t('confirmDeleteDesc')}
               onConfirm={async () => {
                 await deleteServer({ id: row.id } as any);
                 toast.success(t('deleted'));
                 ref.current?.refresh();
+                fetchServers();
               }}
               cancelText={t('cancel')}
               confirmText={t('confirm')}
@@ -274,19 +254,72 @@ export default function ServersPage() {
                   name: others.name,
                   country: others.country,
                   city: others.city,
-                  ratio: others.ratio,
                   address: others.address,
                   protocols: others.protocols || [],
                 };
                 await createServer(body);
                 toast.success(t('copied'));
                 ref.current?.refresh();
+                fetchServers();
                 setLoading(false);
               }}
             >
               {t('copy')}
             </Button>,
           ],
+          batchRender(rows) {
+            const hasReferencedServers = rows.some((row) => isServerReferencedByNodes(row.id));
+            return [
+              <ConfirmButton
+                key='delete'
+                trigger={
+                  <Button variant='destructive' disabled={hasReferencedServers}>
+                    {t('delete')}
+                  </Button>
+                }
+                title={t('confirmDeleteTitle')}
+                description={t('confirmDeleteDesc')}
+                onConfirm={async () => {
+                  await Promise.all(rows.map((r) => deleteServer({ id: r.id })));
+                  toast.success(t('deleted'));
+                  ref.current?.refresh();
+                  fetchServers();
+                }}
+                cancelText={t('cancel')}
+                confirmText={t('confirm')}
+              />,
+            ];
+          },
+        }}
+        onSort={async (source, target, items) => {
+          const sourceIndex = items.findIndex((item) => String(item.id) === source);
+          const targetIndex = items.findIndex((item) => String(item.id) === target);
+
+          const originalSorts = items.map((item) => item.sort);
+
+          const [movedItem] = items.splice(sourceIndex, 1);
+          items.splice(targetIndex, 0, movedItem!);
+
+          const updatedItems = items.map((item, index) => {
+            const originalSort = originalSorts[index];
+            const newSort = originalSort !== undefined ? originalSort : item.sort;
+            return { ...item, sort: newSort };
+          });
+
+          const changedItems = updatedItems.filter((item, index) => {
+            return item.sort !== items[index]?.sort;
+          });
+
+          if (changedItems.length > 0) {
+            resetSortWithServer({
+              sort: changedItems.map((item) => ({
+                id: item.id,
+                sort: item.sort,
+              })) as API.SortItem[],
+            });
+            toast.success(t('sorted_success'));
+          }
+          return updatedItems;
         }}
       />
     </div>

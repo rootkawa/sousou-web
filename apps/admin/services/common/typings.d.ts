@@ -114,6 +114,7 @@ declare namespace API {
   type AuthConfig = {
     mobile: MobileAuthenticateConfig;
     email: EmailAuthticateConfig;
+    device: DeviceAuthticateConfig;
     register: PubilcRegisterConfig;
   };
 
@@ -128,7 +129,7 @@ declare namespace API {
     type: number;
     user_id: number;
     amount: number;
-    order_id?: number;
+    order_no?: string;
     balance: number;
     timestamp: number;
   };
@@ -209,6 +210,19 @@ declare namespace API {
     access_key: string;
     currency_unit: string;
     currency_symbol: string;
+  };
+
+  type DeviceAuthticateConfig = {
+    enable: boolean;
+    show_ads: boolean;
+    enable_security: boolean;
+    only_real_device: boolean;
+  };
+
+  type DeviceLoginRequest = {
+    identifier: string;
+    user_agent: string;
+    cf_token?: string;
   };
 
   type Document = {
@@ -363,6 +377,26 @@ declare namespace API {
     node_secret: string;
     node_pull_interval: number;
     node_push_interval: number;
+    traffic_report_threshold: number;
+    ip_strategy: string;
+    dns: NodeDNS[];
+    block: string[];
+    outbound: NodeOutbound[];
+  };
+
+  type NodeDNS = {
+    proto: string;
+    address: string;
+    domains: string[];
+  };
+
+  type NodeOutbound = {
+    name: string;
+    protocol: string;
+    address: string;
+    port: number;
+    password: string;
+    rules: string[];
   };
 
   type NodeRelay = {
@@ -501,6 +535,77 @@ declare namespace API {
     privacy_policy: string;
   };
 
+  type Protocol = {
+    type: string;
+    port: number;
+    enable: boolean;
+    security?: string;
+    sni?: string;
+    allow_insecure?: boolean;
+    fingerprint?: string;
+    reality_server_addr?: string;
+    reality_server_port?: number;
+    reality_private_key?: string;
+    reality_public_key?: string;
+    reality_short_id?: string;
+    transport?: string;
+    host?: string;
+    path?: string;
+    service_name?: string;
+    cipher?: string;
+    server_key?: string;
+    flow?: string;
+    hop_ports?: string;
+    hop_interval?: number;
+    obfs_password?: string;
+    disable_sni?: boolean;
+    reduce_rtt?: boolean;
+    udp_relay_mode?: string;
+    congestion_controller?: string;
+    /** mux, eg: off/low/medium/high */
+    multiplex?: string;
+    /** padding scheme */
+    padding_scheme?: string;
+    /** upload speed limit */
+    up_mbps?: number;
+    /** download speed limit */
+    down_mbps?: number;
+    /** obfs, 'none', 'http', 'tls' */
+    obfs?: string;
+    /** obfs host */
+    obfs_host?: string;
+    /** obfs path */
+    obfs_path?: string;
+    /** xhttp mode */
+    xhttp_mode?: string;
+    /** xhttp extra path */
+    xhttp_extra?: string;
+    /** encryption，'none', 'mlkem768x25519plus' */
+    encryption?: string;
+    /** encryption mode，'native', 'xorpub', 'random' */
+    encryption_mode?: string;
+    /** encryption rtt，'0rtt', '1rtt' */
+    encryption_rtt?: string;
+    /** encryption ticket */
+    encryption_ticket?: string;
+    /** encryption server padding */
+    encryption_server_padding?: string;
+    /** encryption private key */
+    encryption_private_key?: string;
+    /** encryption client padding */
+    encryption_client_padding?: string;
+    /** encryption password */
+    encryption_password?: string;
+    /** Traffic ratio, default is 1 */
+    ratio?: number;
+    /** Certificate mode, `none`｜`http`｜`dns`｜`self` */
+    cert_mode?: string;
+    /** DNS provider for certificate */
+    cert_dns_provider?: string;
+    /** Environment for DNS provider */
+    cert_dns_env?: string;
+  };
+
   type PubilcRegisterConfig = {
     stop_register: boolean;
     enable_ip_register_limit: boolean;
@@ -615,6 +720,7 @@ declare namespace API {
   };
 
   type ResetPasswordRequest = {
+    identifier: string;
     email: string;
     password: string;
     code?: string;
@@ -731,6 +837,7 @@ declare namespace API {
   type Subscribe = {
     id: number;
     name: string;
+    language: string;
     description: string;
     unit_price: number;
     unit_time: string;
@@ -741,7 +848,6 @@ declare namespace API {
     speed_limit: number;
     device_limit: number;
     quota: number;
-    group_id: number;
     nodes: number[];
     node_tags: string[];
     show: boolean;
@@ -807,6 +913,7 @@ declare namespace API {
   };
 
   type TelephoneLoginRequest = {
+    identifier: string;
     telephone: string;
     telephone_code: string;
     telephone_area_code: string;
@@ -815,6 +922,7 @@ declare namespace API {
   };
 
   type TelephoneRegisterRequest = {
+    identifier: string;
     telephone: string;
     telephone_area_code: string;
     password: string;
@@ -824,6 +932,7 @@ declare namespace API {
   };
 
   type TelephoneResetPasswordRequest = {
+    identifier: string;
     telephone: string;
     telephone_area_code: string;
     password: string;
@@ -890,6 +999,8 @@ declare namespace API {
     avatar: string;
     balance: number;
     commission: number;
+    referral_percentage: number;
+    only_first_purchase: boolean;
     gift_amount: number;
     telegram: number;
     refer_code: string;
@@ -942,12 +1053,14 @@ declare namespace API {
   };
 
   type UserLoginRequest = {
+    identifier: string;
     email: string;
     password: string;
     cf_token?: string;
   };
 
   type UserRegisterRequest = {
+    identifier: string;
     email: string;
     password: string;
     invite?: string;

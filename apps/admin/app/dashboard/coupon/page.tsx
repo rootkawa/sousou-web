@@ -9,13 +9,12 @@ import {
   getCouponList,
   updateCoupon,
 } from '@/services/admin/coupon';
-import { getSubscribeList } from '@/services/admin/subscribe';
-import { useQuery } from '@tanstack/react-query';
+import { useSubscribe } from '@/store/subscribe';
+import { formatDate } from '@/utils/common';
 import { Badge } from '@workspace/ui/components/badge';
 import { Button } from '@workspace/ui/components/button';
 import { Switch } from '@workspace/ui/components/switch';
 import { ConfirmButton } from '@workspace/ui/custom-components/confirm-button';
-import { formatDate } from '@workspace/ui/utils';
 import { useTranslations } from 'next-intl';
 import { useRef, useState } from 'react';
 import { toast } from 'sonner';
@@ -24,16 +23,7 @@ import CouponForm from './coupon-form';
 export default function Page() {
   const t = useTranslations('coupon');
   const [loading, setLoading] = useState(false);
-  const { data } = useQuery({
-    queryKey: ['getSubscribeList', 'all'],
-    queryFn: async () => {
-      const { data } = await getSubscribeList({
-        page: 1,
-        size: 9999,
-      });
-      return data.data?.list as API.SubscribeGroup[];
-    },
-  });
+  const { subscribes } = useSubscribe();
   const ref = useRef<ProTableActions>(null);
   return (
     <ProTable<API.Coupon, { group_id: number; query: string }>
@@ -67,8 +57,8 @@ export default function Page() {
         {
           key: 'subscribe',
           placeholder: t('subscribe'),
-          options: data?.map((item) => ({
-            label: item.name,
+          options: subscribes?.map((item) => ({
+            label: item.name!,
             value: String(item.id),
           })),
         },

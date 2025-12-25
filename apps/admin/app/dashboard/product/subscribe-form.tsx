@@ -1,9 +1,8 @@
 'use client';
 
-import { filterNodeList } from '@/services/admin/server';
-import { getSubscribeGroupList } from '@/services/admin/subscribe';
+import useGlobalStore from '@/config/use-global';
+import { useNode } from '@/store/node';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useQuery } from '@tanstack/react-query';
 import {
   Accordion,
   AccordionContent,
@@ -62,6 +61,7 @@ const defaultValues = {
   traffic: 0,
   quota: 0,
   discount: [],
+  language: '',
   node_tags: [],
   nodes: [],
   unit_time: 'Month',
@@ -79,6 +79,9 @@ export default function SubscribeForm<T extends Record<string, any>>({
   trigger,
   title,
 }: Readonly<SubscribeFormProps<T>>) {
+  const { common } = useGlobalStore();
+  const { currency } = common;
+
   const t = useTranslations('product');
   const [open, setOpen] = useState(false);
   const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -87,7 +90,7 @@ export default function SubscribeForm<T extends Record<string, any>>({
     name: z.string(),
     description: z.string().optional(),
     unit_price: z.number(),
-    unit_time: z.string().default('Month'),
+    unit_time: z.string(),
     replacement: z.number().optional(),
     discount: z
       .array(
@@ -97,22 +100,21 @@ export default function SubscribeForm<T extends Record<string, any>>({
         }),
       )
       .optional(),
-    inventory: z.number().optional().default(-1),
-    speed_limit: z.number().optional().default(0),
-    device_limit: z.number().optional().default(0),
-    traffic: z.number().optional().default(0),
-    quota: z.number().optional().default(0),
-    group_id: z.number().optional().nullish(),
-    // Use tags as group identifiers; accept string (tag) or number (legacy id)
-    node_tags: z.array(z.string()).optional().default([]),
-    nodes: z.array(z.number()).optional().default([]),
-    deduction_ratio: z.number().optional().default(0),
-    allow_deduction: z.boolean().optional().default(false),
-    reset_cycle: z.number().optional().default(0),
-    renewal_reset: z.boolean().optional().default(false),
+    inventory: z.number().optional(),
+    speed_limit: z.number().optional(),
+    device_limit: z.number().optional(),
+    traffic: z.number().optional(),
+    quota: z.number().optional(),
+    language: z.string().optional(),
+    node_tags: z.array(z.string()).optional(),
+    nodes: z.array(z.number()).optional(),
+    deduction_ratio: z.number().optional(),
+    allow_deduction: z.boolean().optional(),
+    reset_cycle: z.number().optional(),
+    renewal_reset: z.boolean().optional(),
   });
 
-  const form = useForm({
+  const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: assign(
       defaultValues,
@@ -204,7 +206,7 @@ export default function SubscribeForm<T extends Record<string, any>>({
         });
 
         if (hasChanges) {
-          form.setValue(fieldName, calculatedValues, { shouldDirty: true });
+          form.setValue(fieldName as any, calculatedValues, { shouldDirty: true });
         }
       }, 300);
     },
@@ -215,7 +217,11 @@ export default function SubscribeForm<T extends Record<string, any>>({
     form?.reset(
       assign(defaultValues, shake(initialValues, (value) => value === null) as Record<string, any>),
     );
-  }, [form, initialValues]);
+    const discount = form.getValues('discount') || [];
+    if (discount.length > 0) {
+      debouncedCalculateDiscount(discount, 'discount');
+    }
+  }, [form, initialValues, open]);
 
   useEffect(() => {
     return () => {
@@ -230,28 +236,9 @@ export default function SubscribeForm<T extends Record<string, any>>({
     if (bool) setOpen(false);
   }
 
-  const { data: group } = useQuery({
-    queryKey: ['getSubscribeGroupList'],
-    queryFn: async () => {
-      const { data } = await getSubscribeGroupList();
-      return data.data?.list as API.SubscribeGroup[];
-    },
-  });
+  const { getAllAvailableTags, getNodesByTag, getNodesWithoutTags } = useNode();
 
-  const { data: nodes } = useQuery({
-    queryKey: ['filterNodeListAll'],
-    queryFn: async () => {
-      const { data } = await filterNodeList({ page: 1, size: 9999 });
-      return (data.data?.list || []) as API.Node[];
-    },
-  });
-  const tagGroups = Array.from(
-    new Set(
-      ((nodes as API.Node[]) || [])
-        .flatMap((n) => (Array.isArray(n.tags) ? n.tags : []))
-        .filter(Boolean),
-    ),
-  ) as string[];
+  const tagGroups = getAllAvailableTags();
 
   const unit_time = form.watch('unit_time');
 
@@ -271,7 +258,7 @@ export default function SubscribeForm<T extends Record<string, any>>({
         <SheetHeader>
           <SheetTitle>{title}</SheetTitle>
         </SheetHeader>
-        <ScrollArea className='h-[calc(100dvh-48px-36px-36px-env(safe-area-inset-top))]'>
+        <ScrollArea className='-mx-6 h-[calc(100dvh-48px-36px-36px-env(safe-area-inset-top))] px-6'>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(handleSubmit)} className='pt-4'>
               <Tabs defaultValue='basic' className='w-full'>
@@ -313,21 +300,20 @@ export default function SubscribeForm<T extends Record<string, any>>({
                       />
                       <FormField
                         control={form.control}
-                        name='group_id'
+                        name='language'
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>{t('form.groupId')}</FormLabel>
+                            <FormLabel>
+                              {t('form.language')}
+                              <span className='text-muted-foreground ml-1 text-[0.8rem]'>
+                                {t('form.languageDescription')}
+                              </span>
+                            </FormLabel>
                             <FormControl>
-                              <Combobox<number, false>
-                                placeholder={t('form.selectSubscribeGroup')}
+                              <EnhancedInput
                                 {...field}
-                                onChange={(value) => {
-                                  form.setValue(field.name, value || 0);
-                                }}
-                                options={group?.map((item) => ({
-                                  label: item.name,
-                                  value: item.id,
-                                }))}
+                                placeholder={t('form.languagePlaceholder')}
+                                onValueChange={(v) => form.setValue(field.name, v as string)}
                               />
                             </FormControl>
                             <FormMessage />
@@ -652,9 +638,9 @@ export default function SubscribeForm<T extends Record<string, any>>({
                                 {
                                   name: 'discount',
                                   type: 'number',
-                                  min: 0.01,
+                                  min: 1,
                                   max: 100,
-                                  step: 0.01,
+                                  step: 1,
                                   placeholder: t('form.discountPercent'),
                                   suffix: '%',
                                 },
@@ -664,8 +650,10 @@ export default function SubscribeForm<T extends Record<string, any>>({
                                   type: 'number',
                                   min: 0,
                                   step: 0.01,
+                                  prefix: currency.currency_symbol,
                                   formatInput: (value) => unitConversion('centsToDollars', value),
-                                  formatOutput: (value) => unitConversion('dollarsToCents', value),
+                                  formatOutput: (value) =>
+                                    unitConversion('dollarsToCents', value).toString(),
                                 },
                               ]}
                               value={field.value}
@@ -799,8 +787,9 @@ export default function SubscribeForm<T extends Record<string, any>>({
                             <Accordion type='single' collapsible className='w-full'>
                               {tagGroups.map((tag) => {
                                 const value = field.value || [];
-                                // Use a synthetic ID for tag grouping selection by name
                                 const tagId = tag;
+                                const nodesWithTag = getNodesByTag(tag);
+
                                 return (
                                   <AccordionItem key={tag} value={String(tag)}>
                                     <AccordionTrigger>
@@ -816,25 +805,30 @@ export default function SubscribeForm<T extends Record<string, any>>({
                                                 );
                                           }}
                                         />
-                                        <Label>{tag}</Label>
+                                        <Label>
+                                          {tag}
+                                          <span className='text-muted-foreground ml-2 text-xs'>
+                                            ({nodesWithTag.length})
+                                          </span>
+                                        </Label>
                                       </div>
                                     </AccordionTrigger>
                                     <AccordionContent>
                                       <ul className='space-y-1'>
-                                        {(nodes as API.Node[])
-                                          ?.filter((n) => (n.tags || []).includes(tag))
-                                          ?.map((node) => (
-                                            <li
-                                              key={node.id}
-                                              className='flex items-center justify-between gap-3'
-                                            >
-                                              <span>{node.name}</span>
-                                              <span>
-                                                {node.address}:{node.port}
-                                              </span>
-                                              <span>{node.protocol}</span>
-                                            </li>
-                                          ))}
+                                        {getNodesByTag(tag).map((node) => (
+                                          <li
+                                            key={node.id}
+                                            className='flex items-center justify-between gap-3'
+                                          >
+                                            <span className='flex-1'>{node.name}</span>
+                                            <span className='flex-1'>
+                                              {node.address}:{node.port}
+                                            </span>
+                                            <span className='flex-1 text-right'>
+                                              {node.protocol}
+                                            </span>
+                                          </li>
+                                        ))}
                                       </ul>
                                     </AccordionContent>
                                   </AccordionItem>
@@ -855,34 +849,32 @@ export default function SubscribeForm<T extends Record<string, any>>({
                           <FormLabel>{t('form.node')}</FormLabel>
                           <FormControl>
                             <div className='flex flex-col gap-2'>
-                              {(nodes as API.Node[])
-                                ?.filter((item) => (item.tags || []).length === 0)
-                                ?.map((item) => {
-                                  const value = field.value || [];
+                              {getNodesWithoutTags().map((item) => {
+                                const value = field.value || [];
 
-                                  return (
-                                    <div className='flex items-center gap-2' key={item.id}>
-                                      <Checkbox
-                                        checked={value.includes(item.id!)}
-                                        onCheckedChange={(checked) => {
-                                          return checked
-                                            ? form.setValue(field.name, [...value, item.id])
-                                            : form.setValue(
-                                                field.name,
-                                                value.filter((value: number) => value !== item.id),
-                                              );
-                                        }}
-                                      />
-                                      <Label className='flex w-full items-center justify-between gap-3'>
-                                        <span>{item.name}</span>
-                                        <span>
-                                          {item.address}:{item.port}
-                                        </span>
-                                        <span>{item.protocol}</span>
-                                      </Label>
-                                    </div>
-                                  );
-                                })}
+                                return (
+                                  <div className='flex items-center gap-2' key={item.id}>
+                                    <Checkbox
+                                      checked={value.includes(item.id!)}
+                                      onCheckedChange={(checked) => {
+                                        return checked
+                                          ? form.setValue(field.name, [...value, item.id])
+                                          : form.setValue(
+                                              field.name,
+                                              value.filter((value: number) => value !== item.id),
+                                            );
+                                      }}
+                                    />
+                                    <Label className='flex w-full items-center justify-between gap-3'>
+                                      <span className='flex-1'>{item.name}</span>
+                                      <span className='flex-1'>
+                                        {item.address}:{item.port}
+                                      </span>
+                                      <span className='flex-1 text-right'>{item.protocol}</span>
+                                    </Label>
+                                  </div>
+                                );
+                              })}
                             </div>
                           </FormControl>
                           <FormMessage />
@@ -911,7 +903,8 @@ export default function SubscribeForm<T extends Record<string, any>>({
               const keys = Object.keys(errors);
               for (const key of keys) {
                 const formattedKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
-                toast.error(`${t(`form.${formattedKey}`)} is ${errors[key]?.message}`);
+                const error = (errors as any)[key];
+                toast.error(`${t(`form.${formattedKey}`)} is ${error?.message}`);
                 return false;
               }
             })}

@@ -15,9 +15,11 @@
     "platform": "Platformă",
     "remark": "Observație",
     "resetAt": "Resetat La",
+    "server": "Server",
     "serverId": "ID Server",
     "status": "Stare",
     "subject": "Subiect",
+    "subscribe": "Abonează-te",
     "subscribeId": "ID Abonament",
     "success": "Succes",
     "time": "Timp",
@@ -32,7 +34,9 @@
     "userId": "ID Utilizator"
   },
   "datePlaceholder": "AAAA-LL-ZZ",
+  "detail": "Detaliu",
   "failed": "Eșuat",
+  "pending": "În așteptare",
   "placeholder": {
     "serverName": "Numele Serverului",
     "toOrSubject": "Către / Subiect",
@@ -42,6 +46,8 @@
     "userIdOrOrderNoOrSubscribeId": "ID Utilizator / Nr. Comandă / ID Abonament",
     "userIdOrTokenOrIpOrUa": "ID Utilizator / Token / IP / UA"
   },
+  "sending": "Trimitere",
+  "sent": "Trimis",
   "success": "Succes",
   "title": {
     "balance": "Jurnal Sold",
@@ -56,5 +62,24 @@
     "subscribe": "Jurnal Abonare",
     "subscribeTraffic": "Jurnal Trafic Abonament",
     "trafficDetails": "Detalii Trafic"
-  }
+  },
+  "type": {
+    "231": "Resetare automată",
+    "232": "Resetare timpurie",
+    "233": "Resetare plătită",
+    "321": "Reîncărcare",
+    "322": "Retragere",
+    "323": "Plată",
+    "324": "Rambursare",
+    "325": "Recompensă",
+    "326": "Ajustare Administrator",
+    "331": "Achiziție",
+    "332": "Reînnoire",
+    "333": "Rambursare",
+    "334": "Retragere",
+    "335": "Ajustare Administrator",
+    "341": "Creștere",
+    "342": "Scădere"
+  },
+  "unknown": "Necunoscut"
 }

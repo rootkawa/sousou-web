@@ -1,6 +1,5 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useRef } from 'react';
@@ -8,14 +7,14 @@ import { useRef } from 'react';
 import { Display } from '@/components/display';
 import { ProTable, ProTableActions } from '@/components/pro-table';
 import { getOrderList, updateOrderStatus } from '@/services/admin/order';
-import { getSubscribeList } from '@/services/admin/subscribe';
+import { useSubscribe } from '@/store/subscribe';
+import { formatDate } from '@/utils/common';
 import { Badge } from '@workspace/ui/components/badge';
 import { Button } from '@workspace/ui/components/button';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@workspace/ui/components/hover-card';
 import { Separator } from '@workspace/ui/components/separator';
 import { Combobox } from '@workspace/ui/custom-components/combobox';
 import { cn } from '@workspace/ui/lib/utils';
-import { formatDate } from '@workspace/ui/utils';
 import { UserDetail } from '../user/user-detail';
 
 export default function Page() {
@@ -32,16 +31,7 @@ export default function Page() {
 
   const ref = useRef<ProTableActions>(null);
 
-  const { data: subscribeList } = useQuery({
-    queryKey: ['getSubscribeList', 'all'],
-    queryFn: async () => {
-      const { data } = await getSubscribeList({
-        page: 1,
-        size: 9999,
-      });
-      return data.data?.list as API.SubscribeGroup[];
-    },
-  });
+  const { subscribes, getSubscribeName } = useSubscribe();
 
   const initialFilters = {
     search: sp?.get('search') || undefined,
@@ -69,9 +59,10 @@ export default function Page() {
           accessorKey: 'subscribe_id',
           header: t('subscribe'),
           cell: ({ row }) => {
-            const name = subscribeList?.find(
-              (item) => item.id === row.getValue('subscribe_id'),
-            )?.name;
+            if (row.original.type === 4) {
+              return t(`type.${row.getValue('type')}`);
+            }
+            const name = getSubscribeName(row.getValue('subscribe_id'));
             const quantity = row.original.quantity;
             return name ? `${name} × ${quantity}` : '';
           },
@@ -187,8 +178,8 @@ export default function Page() {
         {
           key: 'subscribe_id',
           placeholder: `${t('subscribe')}`,
-          options: subscribeList?.map((item) => ({
-            label: item.name,
+          options: subscribes?.map((item) => ({
+            label: item.name!,
             value: String(item.id),
           })),
         },
