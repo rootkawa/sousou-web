@@ -13,8 +13,8 @@ export default function MobileLogPage() {
   const today = new Date().toISOString().split('T')[0];
 
   const initialFilters = {
-    search: sp.get('search') || undefined,
-    date: sp.get('date') || today,
+    search: sp?.get('search') || undefined,
+    date: sp?.get('date') || today,
   };
   return (
     <ProTable<API.MessageLog, { search?: string }>

@@ -24,8 +24,8 @@ export default function ResetSubscribeLogPage() {
   };
 
   const initialFilters = {
-    date: sp.get('date') || today,
-    user_subscribe_id: sp.get('user_subscribe_id')
+    date: sp?.get('date') || today,
+    user_subscribe_id: sp?.get('user_subscribe_id')
       ? Number(sp.get('user_subscribe_id'))
       : undefined,
   };

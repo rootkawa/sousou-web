@@ -17,10 +17,10 @@ export default function TrafficDetailsPage() {
   const today = new Date().toISOString().split('T')[0];
 
   const initialFilters = {
-    date: sp.get('date') || today,
-    server_id: sp.get('server_id') ? Number(sp.get('server_id')) : undefined,
-    user_id: sp.get('user_id') ? Number(sp.get('user_id')) : undefined,
-    subscribe_id: sp.get('subscribe_id') ? Number(sp.get('subscribe_id')) : undefined,
+    date: sp?.get('date') || today,
+    server_id: sp?.get('server_id') ? Number(sp.get('server_id')) : undefined,
+    user_id: sp?.get('user_id') ? Number(sp.get('user_id')) : undefined,
+    subscribe_id: sp?.get('subscribe_id') ? Number(sp.get('subscribe_id')) : undefined,
   };
   return (
     <ProTable<API.TrafficLogDetails, { search?: string }>

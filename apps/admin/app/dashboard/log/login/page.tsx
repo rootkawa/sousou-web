@@ -22,8 +22,8 @@ export default function LoginLogPage() {
   const today = new Date().toISOString().split('T')[0];
 
   const initialFilters = {
-    date: sp.get('date') || today,
-    user_id: sp.get('user_id') ? Number(sp.get('user_id')) : undefined,
+    date: sp?.get('date') || today,
+    user_id: sp?.get('user_id') ? Number(sp.get('user_id')) : undefined,
   };
   return (
     <ProTable<API.LoginLog, { date?: string; user_id?: number }>

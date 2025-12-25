@@ -18,8 +18,8 @@ export default function ServerTrafficLogPage() {
   const today = new Date().toISOString().split('T')[0];
 
   const initialFilters = {
-    date: sp.get('date') || today,
-    server_id: sp.get('server_id') ? Number(sp.get('server_id')) : undefined,
+    date: sp?.get('date') || today,
+    server_id: sp?.get('server_id') ? Number(sp.get('server_id')) : undefined,
   };
   return (
     <ProTable<API.ServerTrafficLog, { date?: string; server_id?: number }>

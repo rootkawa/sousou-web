@@ -25,8 +25,8 @@ export default function CommissionLogPage() {
   };
 
   const initialFilters = {
-    date: sp.get('date') || today,
-    user_id: sp.get('user_id') ? Number(sp.get('user_id')) : undefined,
+    date: sp?.get('date') || today,
+    user_id: sp?.get('user_id') ? Number(sp.get('user_id')) : undefined,
   };
   return (
     <ProTable<API.CommissionLog, { search?: string }>
